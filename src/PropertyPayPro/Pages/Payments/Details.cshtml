@@ -1,0 +1,20 @@
+@page "{id:int}"
+@model PropertyPayPro.Pages.Payments.DetailsModel
+@{
+    ViewData["Title"] = "Payment";
+}
+
+<h1>Payment</h1>
+
+<dl class="row">
+    <dt class="col-sm-3">Date</dt><dd class="col-sm-9">@Model.Payment!.PaidOn.ToString("yyyy-MM-dd")</dd>
+    <dt class="col-sm-3">Tenant</dt><dd class="col-sm-9">@Model.Payment.Lease!.Tenant!.DisplayName</dd>
+    <dt class="col-sm-3">Property</dt><dd class="col-sm-9">@Model.Payment.Lease.Property!.Name</dd>
+    <dt class="col-sm-3">Amount</dt><dd class="col-sm-9">@Model.Payment.Amount.ToString("C")</dd>
+    <dt class="col-sm-3">Method</dt><dd class="col-sm-9">@Model.Payment.Method</dd>
+    <dt class="col-sm-3">Reference</dt><dd class="col-sm-9">@Model.Payment.Reference</dd>
+    <dt class="col-sm-3">Notes</dt><dd class="col-sm-9">@Model.Payment.Notes</dd>
+</dl>
+
+<a asp-page="Edit" asp-route-id="@Model.Payment.Id" class="btn btn-primary">Edit</a>
+<a asp-page="Index" class="btn btn-outline-secondary">Back</a>

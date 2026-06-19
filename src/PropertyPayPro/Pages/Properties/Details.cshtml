@@ -1,0 +1,22 @@
+@page "{id:int}"
+@model PropertyPayPro.Pages.Properties.DetailsModel
+@{
+    ViewData["Title"] = "Property";
+}
+
+<h1>@Model.Property!.Name</h1>
+
+<dl class="row">
+    <dt class="col-sm-3">Address</dt>
+    <dd class="col-sm-9">
+        @Model.Property.AddressLine1
+        @if (!string.IsNullOrWhiteSpace(Model.Property.AddressLine2)) { <span>, @Model.Property.AddressLine2</span> }
+        <br />
+        @Model.Property.City, @Model.Property.State @Model.Property.PostalCode
+    </dd>
+    <dt class="col-sm-3">Notes</dt>
+    <dd class="col-sm-9">@Model.Property.Notes</dd>
+</dl>
+
+<a asp-page="Edit" asp-route-id="@Model.Property.Id" class="btn btn-primary">Edit</a>
+<a asp-page="Index" class="btn btn-outline-secondary">Back</a>

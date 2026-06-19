@@ -1,0 +1,14 @@
+@page "{id:int}"
+@model PropertyPayPro.Pages.Payments.DeleteModel
+@{
+    ViewData["Title"] = "Delete Payment";
+}
+
+<h1 class="text-danger">Delete Payment</h1>
+<p>Delete the @Model.Payment!.Amount.ToString("C") payment from @Model.Payment.PaidOn.ToString("yyyy-MM-dd")?</p>
+
+<form method="post">
+    <input type="hidden" asp-for="Payment.Id" />
+    <button type="submit" class="btn btn-danger">Delete</button>
+    <a asp-page="Index" class="btn btn-outline-secondary">Cancel</a>
+</form>

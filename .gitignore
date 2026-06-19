@@ -1,0 +1,54 @@
+## .NET / Visual Studio
+bin/
+obj/
+out/
+*.user
+*.suo
+*.userprefs
+*.userosscache
+*.sln.docstates
+[Dd]ebug/
+[Rr]elease/
+x64/
+x86/
+.vs/
+.vscode/
+.idea/
+
+## Build results
+[Bb]uild/
+[Ll]ogs/
+[Tt]est[Rr]esult*/
+[Bb]uild[Ll]og.*
+*.tlog
+*.binlog
+project.lock.json
+project.fragment.lock.json
+artifacts/
+
+## ASP.NET Core / EF
+*.pidb
+*.svclog
+*.scc
+appsettings.Local.json
+appsettings.*.Local.json
+
+## Logs / Env
+*.log
+.env
+.env.local
+.env.*.local
+
+## OS
+.DS_Store
+Thumbs.db
+
+## Docker
+docker-compose.override.yml
+
+## NuGet
+*.nupkg
+**/packages/*
+!**/packages/build/
+*.nuget.props
+*.nuget.targets

@@ -1,0 +1,14 @@
+@page "{id:int}"
+@model PropertyPayPro.Pages.Tenants.DeleteModel
+@{
+    ViewData["Title"] = "Delete Tenant";
+}
+
+<h1 class="text-danger">Delete Tenant</h1>
+<p>Are you sure you want to delete <strong>@Model.Tenant!.DisplayName</strong>?</p>
+
+<form method="post">
+    <input type="hidden" asp-for="Tenant.Id" />
+    <button type="submit" class="btn btn-danger">Delete</button>
+    <a asp-page="Index" class="btn btn-outline-secondary">Cancel</a>
+</form>

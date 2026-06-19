@@ -1,0 +1,37 @@
+@page "{id:int}"
+@model PropertyPayPro.Pages.Leases.DetailsModel
+@{
+    ViewData["Title"] = "Lease";
+}
+
+<h1>Lease</h1>
+
+<dl class="row">
+    <dt class="col-sm-3">Property</dt><dd class="col-sm-9">@Model.Lease!.Property!.Name</dd>
+    <dt class="col-sm-3">Tenant</dt><dd class="col-sm-9">@Model.Lease.Tenant!.DisplayName</dd>
+    <dt class="col-sm-3">Term</dt><dd class="col-sm-9">@Model.Lease.StartDate.ToString("yyyy-MM-dd") &mdash; @Model.Lease.EndDate.ToString("yyyy-MM-dd")</dd>
+    <dt class="col-sm-3">Monthly rent</dt><dd class="col-sm-9">@Model.Lease.MonthlyRent.ToString("C")</dd>
+    <dt class="col-sm-3">Security deposit</dt><dd class="col-sm-9">@Model.Lease.SecurityDeposit.ToString("C")</dd>
+    <dt class="col-sm-3">Rent due day</dt><dd class="col-sm-9">@Model.Lease.RentDueDay</dd>
+    <dt class="col-sm-3">Notes</dt><dd class="col-sm-9">@Model.Lease.Notes</dd>
+</dl>
+
+<h3>Payments</h3>
+<table class="table table-sm">
+    <thead><tr><th>Date</th><th>Method</th><th class="text-end">Amount</th><th>Reference</th></tr></thead>
+    <tbody>
+    @foreach (var p in Model.Lease.Payments.OrderByDescending(x => x.PaidOn))
+    {
+        <tr>
+            <td>@p.PaidOn.ToString("yyyy-MM-dd")</td>
+            <td>@p.Method</td>
+            <td class="text-end">@p.Amount.ToString("C")</td>
+            <td>@p.Reference</td>
+        </tr>
+    }
+    </tbody>
+</table>
+
+<a asp-page="Edit" asp-route-id="@Model.Lease.Id" class="btn btn-primary">Edit</a>
+<a asp-page="/Payments/Create" asp-route-leaseId="@Model.Lease.Id" class="btn btn-success">Record Payment</a>
+<a asp-page="Index" class="btn btn-outline-secondary">Back</a>

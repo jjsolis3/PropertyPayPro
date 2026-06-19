@@ -1,0 +1,40 @@
+@page
+@model IndexModel
+@{
+    ViewData["Title"] = "Dashboard";
+}
+
+<div class="text-center">
+    <h1 class="display-5">PropertyPayPro</h1>
+    <p class="lead">Manage your properties, leases, and rent payments in one place.</p>
+</div>
+
+<div class="row mt-4 g-3">
+    <div class="col-md-4">
+        <div class="card text-bg-light h-100">
+            <div class="card-body">
+                <h5 class="card-title">Properties</h5>
+                <p class="display-6">@Model.PropertyCount</p>
+                <a class="btn btn-primary" asp-page="/Properties/Index">Manage</a>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card text-bg-light h-100">
+            <div class="card-body">
+                <h5 class="card-title">Active Leases</h5>
+                <p class="display-6">@Model.ActiveLeaseCount</p>
+                <a class="btn btn-primary" asp-page="/Leases/Index">Manage</a>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card text-bg-light h-100">
+            <div class="card-body">
+                <h5 class="card-title">Collected This Month</h5>
+                <p class="display-6">@Model.CollectedThisMonth.ToString("C")</p>
+                <a class="btn btn-primary" asp-page="/Payments/Index">View</a>
+            </div>
+        </div>
+    </div>
+</div>

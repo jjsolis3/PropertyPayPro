@@ -1,0 +1,45 @@
+@page "{id:int}"
+@model PropertyPayPro.Pages.Tenants.EditModel
+@{
+    ViewData["Title"] = "Edit Tenant";
+}
+
+<h1>Edit Tenant</h1>
+
+<div class="row">
+    <div class="col-md-6">
+        <form method="post">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <input type="hidden" asp-for="Tenant.Id" />
+            <div class="row">
+                <div class="col mb-3">
+                    <label asp-for="Tenant.FirstName" class="form-label"></label>
+                    <input asp-for="Tenant.FirstName" class="form-control" />
+                    <span asp-validation-for="Tenant.FirstName" class="text-danger"></span>
+                </div>
+                <div class="col mb-3">
+                    <label asp-for="Tenant.LastName" class="form-label"></label>
+                    <input asp-for="Tenant.LastName" class="form-control" />
+                    <span asp-validation-for="Tenant.LastName" class="text-danger"></span>
+                </div>
+            </div>
+            <div class="mb-3">
+                <label asp-for="Tenant.Email" class="form-label"></label>
+                <input asp-for="Tenant.Email" class="form-control" />
+                <span asp-validation-for="Tenant.Email" class="text-danger"></span>
+            </div>
+            <div class="mb-3">
+                <label asp-for="Tenant.Phone" class="form-label"></label>
+                <input asp-for="Tenant.Phone" class="form-control" />
+            </div>
+            <div class="mb-3">
+                <label asp-for="Tenant.Notes" class="form-label"></label>
+                <textarea asp-for="Tenant.Notes" class="form-control" rows="3"></textarea>
+            </div>
+            <button type="submit" class="btn btn-primary">Save</button>
+            <a asp-page="Index" class="btn btn-outline-secondary">Cancel</a>
+        </form>
+    </div>
+</div>
+
+@section Scripts { <partial name="_ValidationScriptsPartial" /> }

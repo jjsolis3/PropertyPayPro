@@ -1,0 +1,16 @@
+@page "{id:int}"
+@model PropertyPayPro.Pages.Tenants.DetailsModel
+@{
+    ViewData["Title"] = "Tenant";
+}
+
+<h1>@Model.Tenant!.DisplayName</h1>
+
+<dl class="row">
+    <dt class="col-sm-3">Email</dt><dd class="col-sm-9">@Model.Tenant.Email</dd>
+    <dt class="col-sm-3">Phone</dt><dd class="col-sm-9">@Model.Tenant.Phone</dd>
+    <dt class="col-sm-3">Notes</dt><dd class="col-sm-9">@Model.Tenant.Notes</dd>
+</dl>
+
+<a asp-page="Edit" asp-route-id="@Model.Tenant.Id" class="btn btn-primary">Edit</a>
+<a asp-page="Index" class="btn btn-outline-secondary">Back</a>

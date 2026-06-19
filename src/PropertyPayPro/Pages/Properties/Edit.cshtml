@@ -1,0 +1,57 @@
+@page "{id:int}"
+@model PropertyPayPro.Pages.Properties.EditModel
+@{
+    ViewData["Title"] = "Edit Property";
+}
+
+<h1>Edit Property</h1>
+
+<div class="row">
+    <div class="col-md-6">
+        <form method="post">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <input type="hidden" asp-for="Property.Id" />
+            <div class="mb-3">
+                <label asp-for="Property.Name" class="form-label"></label>
+                <input asp-for="Property.Name" class="form-control" />
+                <span asp-validation-for="Property.Name" class="text-danger"></span>
+            </div>
+            <div class="mb-3">
+                <label asp-for="Property.AddressLine1" class="form-label"></label>
+                <input asp-for="Property.AddressLine1" class="form-control" />
+                <span asp-validation-for="Property.AddressLine1" class="text-danger"></span>
+            </div>
+            <div class="mb-3">
+                <label asp-for="Property.AddressLine2" class="form-label"></label>
+                <input asp-for="Property.AddressLine2" class="form-control" />
+            </div>
+            <div class="row">
+                <div class="col mb-3">
+                    <label asp-for="Property.City" class="form-label"></label>
+                    <input asp-for="Property.City" class="form-control" />
+                    <span asp-validation-for="Property.City" class="text-danger"></span>
+                </div>
+                <div class="col mb-3">
+                    <label asp-for="Property.State" class="form-label"></label>
+                    <input asp-for="Property.State" class="form-control" />
+                    <span asp-validation-for="Property.State" class="text-danger"></span>
+                </div>
+                <div class="col mb-3">
+                    <label asp-for="Property.PostalCode" class="form-label"></label>
+                    <input asp-for="Property.PostalCode" class="form-control" />
+                    <span asp-validation-for="Property.PostalCode" class="text-danger"></span>
+                </div>
+            </div>
+            <div class="mb-3">
+                <label asp-for="Property.Notes" class="form-label"></label>
+                <textarea asp-for="Property.Notes" class="form-control" rows="3"></textarea>
+            </div>
+            <button type="submit" class="btn btn-primary">Save</button>
+            <a asp-page="Index" class="btn btn-outline-secondary">Cancel</a>
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}
