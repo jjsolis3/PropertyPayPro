@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.EntityFrameworkCore;
 using PropertyPayPro.Data;
+using PropertyPayPro.Models;
 
 namespace PropertyPayPro.Pages;
 
@@ -15,6 +16,8 @@ public class IndexModel : PageModel
     public decimal CollectedThisMonth { get; private set; }
     public decimal OutstandingBalance { get; private set; }
     public int OverdueCount { get; private set; }
+    public List<RentPayment> RecentPayments { get; private set; } = new();
+    public List<RentalCharge> UpcomingBills { get; private set; } = new();
 
     public async Task OnGetAsync()
     {
@@ -28,10 +31,25 @@ public class IndexModel : PageModel
             .SumAsync(p => (decimal?)p.Amount) ?? 0m;
 
         var charges = await _db.RentalCharges
+            .Include(c => c.Lease).ThenInclude(l => l!.Tenant)
             .Include(c => c.Allocations)
             .ToListAsync();
 
         OutstandingBalance = charges.Sum(c => c.Balance);
-        OverdueCount = charges.Count(c => c.Status == Models.ChargeStatus.Overdue);
+        OverdueCount = charges.Count(c => c.Status == ChargeStatus.Overdue);
+
+        UpcomingBills = charges
+            .Where(c => c.Balance > 0)
+            .OrderBy(c => c.DueDate)
+            .Take(5)
+            .ToList();
+
+        RecentPayments = await _db.RentPayments
+            .Include(p => p.Lease).ThenInclude(l => l!.Property)
+            .Include(p => p.Lease).ThenInclude(l => l!.Tenant)
+            .OrderByDescending(p => p.PaidOn)
+            .ThenByDescending(p => p.Id)
+            .Take(8)
+            .ToListAsync();
     }
 }
