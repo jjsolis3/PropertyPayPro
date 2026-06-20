@@ -1,0 +1,21 @@
+@page "{id:int}"
+@model PropertyPayPro.Pages.Expenses.DetailsModel
+@{
+    ViewData["Title"] = "Expense";
+}
+
+<h1>@Model.Expense!.Description</h1>
+
+<dl class="row">
+    <dt class="col-sm-3">Property</dt><dd class="col-sm-9">@Model.Expense.Property!.Name</dd>
+    <dt class="col-sm-3">Category</dt><dd class="col-sm-9">@Model.Expense.Category</dd>
+    <dt class="col-sm-3">Vendor</dt><dd class="col-sm-9">@Model.Expense.Vendor</dd>
+    <dt class="col-sm-3">Amount</dt><dd class="col-sm-9">@Model.Expense.AmountDue.ToString("C")</dd>
+    <dt class="col-sm-3">Due</dt><dd class="col-sm-9">@(Model.Expense.DueDate?.ToString("yyyy-MM-dd") ?? "—")</dd>
+    <dt class="col-sm-3">Paid</dt><dd class="col-sm-9">@(Model.Expense.PaidOn?.ToString("yyyy-MM-dd") ?? "Unpaid")</dd>
+    <dt class="col-sm-3">Pass through</dt><dd class="col-sm-9">@(Model.Expense.PassThroughToTenant ? "Yes" : "No")</dd>
+    <dt class="col-sm-3">Notes</dt><dd class="col-sm-9">@Model.Expense.Notes</dd>
+</dl>
+
+<a asp-page="Edit" asp-route-id="@Model.Expense.Id" class="btn btn-primary">Edit</a>
+<a asp-page="Index" class="btn btn-outline-secondary">Back</a>

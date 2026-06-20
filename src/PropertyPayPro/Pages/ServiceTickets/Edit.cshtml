@@ -1,0 +1,72 @@
+@page "{id:int}"
+@model PropertyPayPro.Pages.ServiceTickets.EditModel
+@{
+    ViewData["Title"] = "Edit Ticket";
+}
+
+<h1>Edit Service Ticket</h1>
+
+<div class="row">
+    <div class="col-md-7">
+        <form method="post">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <input type="hidden" asp-for="Ticket.Id" />
+            <div class="row">
+                <div class="col mb-3">
+                    <label asp-for="Ticket.PropertyId" class="form-label">Property</label>
+                    <select asp-for="Ticket.PropertyId" class="form-select" asp-items="Model.Properties"></select>
+                </div>
+                <div class="col mb-3">
+                    <label asp-for="Ticket.Category" class="form-label"></label>
+                    <select asp-for="Ticket.Category" class="form-select"
+                            asp-items="Html.GetEnumSelectList<PropertyPayPro.Models.ServiceCategory>()"></select>
+                </div>
+                <div class="col mb-3">
+                    <label asp-for="Ticket.Status" class="form-label"></label>
+                    <select asp-for="Ticket.Status" class="form-select"
+                            asp-items="Html.GetEnumSelectList<PropertyPayPro.Models.ServiceTicketStatus>()"></select>
+                </div>
+            </div>
+            <div class="mb-3">
+                <label asp-for="Ticket.Title" class="form-label"></label>
+                <input asp-for="Ticket.Title" class="form-control" />
+            </div>
+            <div class="mb-3">
+                <label asp-for="Ticket.Description" class="form-label"></label>
+                <textarea asp-for="Ticket.Description" class="form-control" rows="3"></textarea>
+            </div>
+            <div class="row">
+                <div class="col mb-3">
+                    <label asp-for="Ticket.Vendor" class="form-label"></label>
+                    <input asp-for="Ticket.Vendor" class="form-control" />
+                </div>
+                <div class="col mb-3">
+                    <label asp-for="Ticket.Cost" class="form-label"></label>
+                    <input asp-for="Ticket.Cost" class="form-control" />
+                </div>
+            </div>
+            <div class="row">
+                <div class="col mb-3">
+                    <label asp-for="Ticket.ReportedOn" class="form-label"></label>
+                    <input asp-for="Ticket.ReportedOn" class="form-control" />
+                </div>
+                <div class="col mb-3">
+                    <label asp-for="Ticket.ResolvedOn" class="form-label"></label>
+                    <input asp-for="Ticket.ResolvedOn" class="form-control" />
+                </div>
+            </div>
+            <div class="mb-3 form-check">
+                <input asp-for="Ticket.PassThroughToTenant" class="form-check-input" />
+                <label asp-for="Ticket.PassThroughToTenant" class="form-check-label">Pass cost through to tenant</label>
+            </div>
+            <div class="mb-3">
+                <label asp-for="Ticket.Notes" class="form-label"></label>
+                <textarea asp-for="Ticket.Notes" class="form-control" rows="3"></textarea>
+            </div>
+            <button type="submit" class="btn btn-primary">Save</button>
+            <a asp-page="Index" class="btn btn-outline-secondary">Cancel</a>
+        </form>
+    </div>
+</div>
+
+@section Scripts { <partial name="_ValidationScriptsPartial" /> }
