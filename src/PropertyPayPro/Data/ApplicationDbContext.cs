@@ -16,6 +16,7 @@ public class ApplicationDbContext : IdentityDbContext<IdentityUser>
     public DbSet<RentPayment> RentPayments => Set<RentPayment>();
     public DbSet<RentalCharge> RentalCharges => Set<RentalCharge>();
     public DbSet<PaymentAllocation> PaymentAllocations => Set<PaymentAllocation>();
+    public DbSet<LeaseDocument> LeaseDocuments => Set<LeaseDocument>();
 
     protected override void OnModelCreating(ModelBuilder builder)
     {
@@ -46,8 +47,14 @@ public class ApplicationDbContext : IdentityDbContext<IdentityUser>
             .OnDelete(DeleteBehavior.Cascade);
 
         builder.Entity<RentalCharge>()
-            .HasIndex(c => new { c.LeaseId, c.BillingPeriodStart })
+            .HasIndex(c => new { c.LeaseId, c.BillingPeriodStart, c.Kind })
             .IsUnique();
+
+        builder.Entity<LeaseDocument>()
+            .HasOne(d => d.Lease)
+            .WithMany(l => l.Documents)
+            .HasForeignKey(d => d.LeaseId)
+            .OnDelete(DeleteBehavior.Cascade);
 
         builder.Entity<PaymentAllocation>()
             .HasOne(a => a.Payment)

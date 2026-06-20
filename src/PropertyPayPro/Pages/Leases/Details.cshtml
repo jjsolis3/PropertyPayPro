@@ -9,12 +9,64 @@
 <dl class="row">
     <dt class="col-sm-3">Property</dt><dd class="col-sm-9">@Model.Lease!.Property!.Name</dd>
     <dt class="col-sm-3">Tenant</dt><dd class="col-sm-9">@Model.Lease.Tenant!.DisplayName</dd>
-    <dt class="col-sm-3">Term</dt><dd class="col-sm-9">@Model.Lease.StartDate.ToString("yyyy-MM-dd") &mdash; @Model.Lease.EndDate.ToString("yyyy-MM-dd")</dd>
+    <dt class="col-sm-3">Term</dt>
+    <dd class="col-sm-9">
+        @Model.Lease.StartDate.ToString("yyyy-MM-dd") &mdash; @Model.Lease.EndDate.ToString("yyyy-MM-dd")
+        @if (Model.Lease.IsMonthToMonth) { <span class="badge bg-info ms-2">Month-to-month</span> }
+    </dd>
     <dt class="col-sm-3">Monthly rent</dt><dd class="col-sm-9">@Model.Lease.MonthlyRent.ToString("C")</dd>
     <dt class="col-sm-3">Security deposit</dt><dd class="col-sm-9">@Model.Lease.SecurityDeposit.ToString("C")</dd>
     <dt class="col-sm-3">Rent due day</dt><dd class="col-sm-9">@Model.Lease.RentDueDay</dd>
+    <dt class="col-sm-3">Late fee</dt>
+    <dd class="col-sm-9">
+        @Model.Lease.LateFeeAmount.ToString("C") after @Model.Lease.LateFeeGraceDays day(s) past due
+    </dd>
     <dt class="col-sm-3">Notes</dt><dd class="col-sm-9">@Model.Lease.Notes</dd>
 </dl>
+
+<h3>Documents</h3>
+<form method="post" enctype="multipart/form-data" asp-page-handler="Upload" class="row g-2 mb-3">
+    <input type="hidden" name="leaseId" value="@Model.Lease.Id" />
+    <div class="col-auto">
+        <input type="file" name="file" class="form-control" required />
+    </div>
+    <div class="col-auto">
+        <input type="text" name="description" class="form-control" placeholder="Description (optional)" maxlength="255" />
+    </div>
+    <div class="col-auto">
+        <button type="submit" class="btn btn-primary">Upload</button>
+    </div>
+</form>
+
+@if (Model.Lease.Documents.Any())
+{
+    <table class="table table-sm">
+        <thead><tr><th>File</th><th>Description</th><th>Size</th><th>Uploaded</th><th></th></tr></thead>
+        <tbody>
+        @foreach (var d in Model.Lease.Documents.OrderByDescending(x => x.UploadedOn))
+        {
+            <tr>
+                <td>@d.FileName</td>
+                <td>@d.Description</td>
+                <td>@($"{d.SizeBytes / 1024.0:N1} KB")</td>
+                <td>@d.UploadedOn.ToString("yyyy-MM-dd HH:mm")</td>
+                <td class="text-end">
+                    <a asp-page-handler="Download" asp-route-documentId="@d.Id" class="btn btn-sm btn-outline-secondary">Download</a>
+                    <form method="post" asp-page-handler="DeleteDocument" class="d-inline">
+                        <input type="hidden" name="documentId" value="@d.Id" />
+                        <button type="submit" class="btn btn-sm btn-outline-danger"
+                                onclick="return confirm('Delete this document?')">Delete</button>
+                    </form>
+                </td>
+            </tr>
+        }
+        </tbody>
+    </table>
+}
+else
+{
+    <p class="text-muted">No documents uploaded yet.</p>
+}
 
 <h3>Payments</h3>
 <table class="table table-sm">
