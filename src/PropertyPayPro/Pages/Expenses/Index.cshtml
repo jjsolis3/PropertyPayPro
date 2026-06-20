@@ -1,0 +1,50 @@
+@page
+@model PropertyPayPro.Pages.Expenses.IndexModel
+@{
+    ViewData["Title"] = "Property Expenses";
+}
+
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <h1>Property Expenses</h1>
+    <a asp-page="Create" class="btn btn-success">New Expense</a>
+</div>
+
+<table class="table table-striped">
+    <thead>
+        <tr>
+            <th>Property</th>
+            <th>Category</th>
+            <th>Vendor</th>
+            <th>Description</th>
+            <th>Due</th>
+            <th>Paid</th>
+            <th class="text-end">Amount</th>
+            <th>Status</th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+    @foreach (var e in Model.Expenses)
+    {
+        <tr>
+            <td>@e.Property!.Name</td>
+            <td>@e.Category</td>
+            <td>@e.Vendor</td>
+            <td>@e.Description</td>
+            <td>@(e.DueDate?.ToString("yyyy-MM-dd") ?? "—")</td>
+            <td>@(e.PaidOn?.ToString("yyyy-MM-dd") ?? "—")</td>
+            <td class="text-end">@e.AmountDue.ToString("C")</td>
+            <td>
+                @if (e.IsPaid) { <span class="badge bg-success">Paid</span> }
+                else { <span class="badge bg-secondary">Open</span> }
+                @if (e.PassThroughToTenant) { <span class="badge bg-info ms-1">Pass-through</span> }
+            </td>
+            <td class="text-end">
+                <a asp-page="Details" asp-route-id="@e.Id" class="btn btn-sm btn-outline-secondary">Details</a>
+                <a asp-page="Edit" asp-route-id="@e.Id" class="btn btn-sm btn-outline-primary">Edit</a>
+                <a asp-page="Delete" asp-route-id="@e.Id" class="btn btn-sm btn-outline-danger">Delete</a>
+            </td>
+        </tr>
+    }
+    </tbody>
+</table>

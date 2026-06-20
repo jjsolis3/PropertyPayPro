@@ -1,0 +1,23 @@
+@page "{id:int}"
+@model PropertyPayPro.Pages.ServiceTickets.DetailsModel
+@{
+    ViewData["Title"] = "Ticket";
+}
+
+<h1>@Model.Ticket!.Title</h1>
+
+<dl class="row">
+    <dt class="col-sm-3">Property</dt><dd class="col-sm-9">@Model.Ticket.Property!.Name</dd>
+    <dt class="col-sm-3">Category</dt><dd class="col-sm-9">@Model.Ticket.Category</dd>
+    <dt class="col-sm-3">Status</dt><dd class="col-sm-9">@Model.Ticket.Status</dd>
+    <dt class="col-sm-3">Vendor</dt><dd class="col-sm-9">@Model.Ticket.Vendor</dd>
+    <dt class="col-sm-3">Reported</dt><dd class="col-sm-9">@Model.Ticket.ReportedOn.ToString("yyyy-MM-dd")</dd>
+    <dt class="col-sm-3">Resolved</dt><dd class="col-sm-9">@(Model.Ticket.ResolvedOn?.ToString("yyyy-MM-dd") ?? "—")</dd>
+    <dt class="col-sm-3">Cost</dt><dd class="col-sm-9">@(Model.Ticket.Cost?.ToString("C") ?? "—")</dd>
+    <dt class="col-sm-3">Pass through</dt><dd class="col-sm-9">@(Model.Ticket.PassThroughToTenant ? "Yes" : "No")</dd>
+    <dt class="col-sm-3">Description</dt><dd class="col-sm-9">@Model.Ticket.Description</dd>
+    <dt class="col-sm-3">Notes</dt><dd class="col-sm-9">@Model.Ticket.Notes</dd>
+</dl>
+
+<a asp-page="Edit" asp-route-id="@Model.Ticket.Id" class="btn btn-primary">Edit</a>
+<a asp-page="Index" class="btn btn-outline-secondary">Back</a>
