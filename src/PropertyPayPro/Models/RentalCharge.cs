@@ -11,12 +11,20 @@ public enum ChargeStatus
     Overdue
 }
 
+public enum ChargeKind
+{
+    Rent,
+    LateFee
+}
+
 public class RentalCharge
 {
     public int Id { get; set; }
 
     public int LeaseId { get; set; }
     public Lease? Lease { get; set; }
+
+    public ChargeKind Kind { get; set; } = ChargeKind.Rent;
 
     [DataType(DataType.Date)]
     public DateOnly BillingPeriodStart { get; set; }
@@ -52,5 +60,7 @@ public class RentalCharge
     }
 
     [NotMapped]
-    public string PeriodLabel => BillingPeriodStart.ToString("MMMM yyyy");
+    public string PeriodLabel => Kind == ChargeKind.LateFee
+        ? $"Late fee — {BillingPeriodStart:MMMM yyyy}"
+        : BillingPeriodStart.ToString("MMMM yyyy");
 }
