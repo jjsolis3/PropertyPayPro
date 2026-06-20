@@ -86,12 +86,12 @@ public class CreateModel : PageModel
     {
         var leases = await _db.Leases
             .Include(l => l.Property)
-            .Include(l => l.Tenant)
+            .Include(l => l.Tenants)
             .OrderByDescending(l => l.StartDate)
             .ToListAsync();
 
         Leases = new SelectList(
-            leases.Select(l => new { l.Id, Label = $"{l.Tenant!.DisplayName} — {l.Property!.Name}" }),
+            leases.Select(l => new { l.Id, Label = $"{l.TenantNames} — {l.Property!.Name}" }),
             "Id", "Label");
     }
 

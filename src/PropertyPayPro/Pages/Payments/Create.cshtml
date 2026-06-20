@@ -4,81 +4,170 @@
     ViewData["Title"] = "Record Payment";
 }
 
-<h1>Record Payment</h1>
+<h1 class="h3 mb-3">Record Payment</h1>
 
 <div class="row">
-    <div class="col-md-8">
+    <div class="col-md-10">
         <form method="post">
-            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <div class="card mb-3">
+                <div class="card-body">
+                    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
 
-            <div class="row">
-                <div class="col mb-3">
-                    <label asp-for="Payment.LeaseId" class="form-label">Lease</label>
-                    <select asp-for="Payment.LeaseId" class="form-select" asp-items="Model.Leases"></select>
-                </div>
-                <div class="col mb-3">
-                    <label asp-for="Payment.PaidOn" class="form-label"></label>
-                    <input asp-for="Payment.PaidOn" class="form-control" />
-                </div>
-                <div class="col mb-3">
-                    <label asp-for="Payment.Amount" class="form-label"></label>
-                    <input asp-for="Payment.Amount" class="form-control" />
-                </div>
-                <div class="col mb-3">
-                    <label asp-for="Payment.Method" class="form-label"></label>
-                    <select asp-for="Payment.Method" class="form-select"
-                            asp-items="Html.GetEnumSelectList<PropertyPayPro.Models.PaymentMethod>()"></select>
+                    <div class="row">
+                        <div class="col mb-3">
+                            <label asp-for="Payment.LeaseId" class="form-label">Lease</label>
+                            <select asp-for="Payment.LeaseId" class="form-select" asp-items="Model.Leases" id="leaseSelect"></select>
+                        </div>
+                        <div class="col mb-3">
+                            <label asp-for="Payment.PaidOn" class="form-label"></label>
+                            <input asp-for="Payment.PaidOn" class="form-control" />
+                        </div>
+                        <div class="col mb-3">
+                            <label asp-for="Payment.Amount" class="form-label"></label>
+                            <input asp-for="Payment.Amount" class="form-control" id="amountInput" step="0.01" min="0" />
+                        </div>
+                        <div class="col mb-3">
+                            <label asp-for="Payment.Method" class="form-label"></label>
+                            <select asp-for="Payment.Method" class="form-select"
+                                    asp-items="Html.GetEnumSelectList<PropertyPayPro.Models.PaymentMethod>()"></select>
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label asp-for="Payment.Reference" class="form-label"></label>
+                        <input asp-for="Payment.Reference" class="form-control" />
+                    </div>
+                    <div class="mb-3">
+                        <label asp-for="Payment.Notes" class="form-label"></label>
+                        <textarea asp-for="Payment.Notes" class="form-control" rows="2"></textarea>
+                    </div>
                 </div>
             </div>
 
-            <div class="mb-3">
-                <label asp-for="Payment.Reference" class="form-label"></label>
-                <input asp-for="Payment.Reference" class="form-control" />
-            </div>
-            <div class="mb-3">
-                <label asp-for="Payment.Notes" class="form-label"></label>
-                <textarea asp-for="Payment.Notes" class="form-control" rows="2"></textarea>
+            <div class="card mb-3">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h4 class="card-title mb-0">Allocate to bills</h4>
+                    <button type="button" class="btn btn-sm btn-outline-primary" id="autoAllocateBtn">Auto-allocate oldest-first</button>
+                </div>
+                <div class="card-body">
+                    <p class="text-muted small">
+                        Bills load when you pick a lease. Click Auto-allocate to fill oldest-first up to the payment amount,
+                        or set per-bill amounts manually. Any unallocated remainder is held as a credit.
+                    </p>
+                    <div id="allocationStatus" class="alert alert-info py-2 mb-2 d-none"></div>
+                    <table class="table table-sm">
+                        <thead>
+                            <tr><th>Period</th><th>Due</th><th class="text-end">Balance</th><th style="width: 10rem;">Apply</th></tr>
+                        </thead>
+                        <tbody id="allocationTbody">
+                            <tr id="allocationEmpty"><td colspan="4" class="text-center text-muted py-3">Pick a lease to see outstanding bills.</td></tr>
+                        </tbody>
+                        <tfoot>
+                            <tr>
+                                <th colspan="3" class="text-end">Total allocated</th>
+                                <th class="text-end" id="allocationTotal">$0.00</th>
+                            </tr>
+                        </tfoot>
+                    </table>
+                </div>
             </div>
 
-            <h4 class="mt-4">Allocate to bills</h4>
-            @if (!Model.OutstandingCharges.Any())
-            {
-                <p class="text-muted">
-                    No outstanding bills for the selected lease. Save the payment to hold the full amount as a credit,
-                    or generate bills first.
-                </p>
-            }
-            else
-            {
-                <p class="text-muted small">
-                    Amounts pre-filled oldest-first. Adjust as needed; total can be less than or equal to the payment amount.
-                </p>
-                <table class="table">
-                    <thead><tr><th>Period</th><th>Due</th><th class="text-end">Balance</th><th>Apply</th></tr></thead>
-                    <tbody>
-                    @for (int i = 0; i < Model.OutstandingCharges.Count; i++)
-                    {
-                        var c = Model.OutstandingCharges[i];
-                        <tr>
-                            <td>@c.PeriodLabel</td>
-                            <td>@c.DueDate.ToString("yyyy-MM-dd")</td>
-                            <td class="text-end">@c.Balance.ToString("C")</td>
-                            <td>
-                                <input type="hidden" name="AllocationChargeIds[@i]" value="@c.Id" />
-                                <input type="number" step="0.01" min="0" max="@c.Balance"
-                                       name="AllocationAmounts[@i]" value="@Model.SuggestedAmounts[i]"
-                                       class="form-control form-control-sm" style="max-width: 8rem;" />
-                            </td>
-                        </tr>
-                    }
-                    </tbody>
-                </table>
-            }
-
-            <button type="submit" class="btn btn-primary">Save</button>
+            <button type="submit" class="btn btn-primary">Save Payment</button>
             <a asp-page="Index" class="btn btn-outline-secondary">Cancel</a>
         </form>
     </div>
 </div>
 
-@section Scripts { <partial name="_ValidationScriptsPartial" /> }
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+    <script>
+        (function () {
+            const leaseSelect = document.getElementById('leaseSelect');
+            const amountInput = document.getElementById('amountInput');
+            const tbody = document.getElementById('allocationTbody');
+            const totalEl = document.getElementById('allocationTotal');
+            const statusEl = document.getElementById('allocationStatus');
+            const autoBtn = document.getElementById('autoAllocateBtn');
+
+            let charges = [];
+
+            function fmt(n) {
+                return '$' + (Number(n) || 0).toFixed(2);
+            }
+
+            function renderTable() {
+                if (!charges.length) {
+                    tbody.innerHTML = '<tr><td colspan="4" class="text-center text-muted py-3">No outstanding bills for this lease. The full payment will be held as a credit.</td></tr>';
+                    recalcTotal();
+                    return;
+                }
+                tbody.innerHTML = charges.map((c, i) => `
+                    <tr>
+                        <td>${c.label}</td>
+                        <td>${c.dueDate}</td>
+                        <td class="text-end">${fmt(c.balance)}</td>
+                        <td>
+                            <input type="hidden" name="AllocationChargeIds[${i}]" value="${c.id}" />
+                            <input type="number" step="0.01" min="0" max="${c.balance}" value="0"
+                                   name="AllocationAmounts[${i}]"
+                                   class="form-control form-control-sm allocation-input text-end" />
+                        </td>
+                    </tr>
+                `).join('');
+                tbody.querySelectorAll('.allocation-input').forEach(el =>
+                    el.addEventListener('input', recalcTotal));
+                recalcTotal();
+            }
+
+            function recalcTotal() {
+                let total = 0;
+                tbody.querySelectorAll('.allocation-input').forEach(el => total += Number(el.value) || 0);
+                totalEl.textContent = fmt(total);
+                const payAmount = Number(amountInput.value) || 0;
+                if (total > payAmount + 0.001) {
+                    statusEl.classList.remove('d-none', 'alert-info');
+                    statusEl.classList.add('alert-danger');
+                    statusEl.textContent = `Allocated ${fmt(total)} exceeds payment amount ${fmt(payAmount)}.`;
+                } else if (payAmount > 0 && total < payAmount) {
+                    statusEl.classList.remove('d-none', 'alert-danger');
+                    statusEl.classList.add('alert-info');
+                    statusEl.textContent = `Unallocated remainder ${fmt(payAmount - total)} will be held as a credit.`;
+                } else {
+                    statusEl.classList.add('d-none');
+                }
+            }
+
+            function autoAllocate() {
+                let remaining = Number(amountInput.value) || 0;
+                tbody.querySelectorAll('tr').forEach((tr, i) => {
+                    const input = tr.querySelector('.allocation-input');
+                    if (!input || !charges[i]) return;
+                    const apply = Math.min(charges[i].balance, remaining);
+                    input.value = apply > 0 ? apply.toFixed(2) : '0';
+                    remaining -= Math.max(apply, 0);
+                });
+                recalcTotal();
+            }
+
+            async function loadOutstanding(leaseId) {
+                if (!leaseId) { charges = []; renderTable(); return; }
+                try {
+                    const res = await fetch(`/api/leases/${leaseId}/outstanding-charges`, { credentials: 'same-origin' });
+                    if (!res.ok) { charges = []; renderTable(); return; }
+                    charges = await res.json();
+                    renderTable();
+                    autoAllocate();
+                } catch {
+                    charges = []; renderTable();
+                }
+            }
+
+            leaseSelect.addEventListener('change', () => loadOutstanding(leaseSelect.value));
+            amountInput.addEventListener('input', autoAllocate);
+            autoBtn.addEventListener('click', autoAllocate);
+
+            // Initial load
+            if (leaseSelect.value) loadOutstanding(leaseSelect.value);
+        })();
+    </script>
+}

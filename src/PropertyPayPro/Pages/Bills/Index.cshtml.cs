@@ -56,7 +56,7 @@ public class IndexModel : PageModel
     {
         var query = _db.RentalCharges
             .Include(c => c.Lease).ThenInclude(l => l!.Property)
-            .Include(c => c.Lease).ThenInclude(l => l!.Tenant)
+            .Include(c => c.Lease).ThenInclude(l => l!.Tenants)
             .Include(c => c.Allocations)
             .OrderByDescending(c => c.BillingPeriodStart)
             .AsQueryable();

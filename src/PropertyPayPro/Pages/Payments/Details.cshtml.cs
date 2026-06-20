@@ -19,7 +19,7 @@ public class DetailsModel : PageModel
     {
         Payment = await _db.RentPayments
             .Include(p => p.Lease).ThenInclude(l => l!.Property)
-            .Include(p => p.Lease).ThenInclude(l => l!.Tenant)
+            .Include(p => p.Lease).ThenInclude(l => l!.Tenants)
             .Include(p => p.Allocations).ThenInclude(a => a.RentalCharge)
             .FirstOrDefaultAsync(p => p.Id == id);
         return Payment is null ? NotFound() : Page();

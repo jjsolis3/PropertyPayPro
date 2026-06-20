@@ -5,7 +5,10 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>@ViewData["Title"] - PropertyPayPro</title>
-    <link rel="icon" type="image/svg+xml" href="/img/brand/favicon.svg">
+    <link rel="icon" type="image/png" sizes="32x32" href="/img/brand/favicon/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="/img/brand/favicon/favicon-16x16.png">
+    <link rel="apple-touch-icon" sizes="180x180" href="/img/brand/favicon/apple-touch-icon.png">
+    <link rel="manifest" href="/img/brand/favicon/site.webmanifest">
     <link class="main-css" href="/mophy/admin/css/style.css" rel="stylesheet">
 </head>
 <body class="vh-100">
@@ -18,13 +21,9 @@
                             <div class="col-xl-12">
                                 <div class="auth-form">
                                     <div class="text-center mb-4">
-                                        <a asp-area="" asp-page="/Index" class="text-decoration-none d-inline-flex align-items-center">
-                                            <svg width="48" height="48" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                                <rect width="32" height="32" rx="8" fill="#2A6FFF"/>
-                                                <path d="M9 22V10h5.5a4 4 0 1 1 0 8H12v4H9zm3-7h2.5a1.5 1.5 0 1 0 0-3H12v3z" fill="#fff"/>
-                                                <path d="M19 22V10h5.5a4 4 0 1 1 0 8H22v4h-3zm3-7h2.5a1.5 1.5 0 1 0 0-3H22v3z" fill="#fff" opacity=".7"/>
-                                            </svg>
-                                            <span class="ms-2 fs-3 fw-bold text-black">PropertyPayPro</span>
+                                        <a asp-area="" asp-page="/Index" class="text-decoration-none">
+                                            <img src="/img/brand/PPS_Logo-Shield.png" alt="PropertyPayPro"
+                                                 style="max-height: 120px; width: auto;" />
                                         </a>
                                     </div>
                                     @RenderBody()

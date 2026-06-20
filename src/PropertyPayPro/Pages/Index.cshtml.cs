@@ -32,7 +32,7 @@ public class IndexModel : PageModel
             .SumAsync(p => (decimal?)p.Amount) ?? 0m;
 
         var charges = await _db.RentalCharges
-            .Include(c => c.Lease).ThenInclude(l => l!.Tenant)
+            .Include(c => c.Lease).ThenInclude(l => l!.Tenants)
             .Include(c => c.Allocations)
             .ToListAsync();
 
@@ -47,7 +47,7 @@ public class IndexModel : PageModel
 
         RecentPayments = await _db.RentPayments
             .Include(p => p.Lease).ThenInclude(l => l!.Property)
-            .Include(p => p.Lease).ThenInclude(l => l!.Tenant)
+            .Include(p => p.Lease).ThenInclude(l => l!.Tenants)
             .OrderByDescending(p => p.PaidOn)
             .ThenByDescending(p => p.Id)
             .Take(8)

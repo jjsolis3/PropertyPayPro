@@ -103,7 +103,7 @@
                                         {
                                             <tr>
                                                 <td>@p.PaidOn.ToString("yyyy-MM-dd")</td>
-                                                <td>@p.Lease!.Tenant!.DisplayName</td>
+                                                <td>@p.Lease!.TenantNames</td>
                                                 <td>@p.Lease.Property!.Name</td>
                                                 <td><span class="badge badge-rounded badge-outline-primary">@p.Method</span></td>
                                                 <td class="text-end fw-bold">@p.Amount.ToString("C")</td>
@@ -147,7 +147,7 @@
                                         {
                                             <tr>
                                                 <td>@c.PeriodLabel</td>
-                                                <td>@c.Lease!.Tenant!.DisplayName</td>
+                                                <td>@c.Lease!.TenantNames</td>
                                                 <td>@c.DueDate.ToString("MM-dd")</td>
                                                 <td class="text-end fw-bold">@c.Balance.ToString("C")</td>
                                             </tr>

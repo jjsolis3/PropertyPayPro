@@ -66,7 +66,7 @@
                             @c.PeriodLabel
                             @if (c.Kind == PropertyPayPro.Models.ChargeKind.LateFee) { <span class="badge bg-warning text-dark ms-1">Late fee</span> }
                         </td>
-                        <td>@c.Lease!.Tenant!.DisplayName</td>
+                        <td>@c.Lease!.TenantNames</td>
                         <td>@c.Lease.Property!.Name</td>
                         <td>@c.DueDate.ToString("yyyy-MM-dd")</td>
                         <td class="text-end">@c.AmountDue.ToString("C")</td>

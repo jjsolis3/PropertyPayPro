@@ -91,7 +91,7 @@ public class DetailsModel : PageModel
     {
         Lease = await _db.Leases
             .Include(l => l.Property)
-            .Include(l => l.Tenant)
+            .Include(l => l.Tenants)
             .Include(l => l.Payments)
             .Include(l => l.Documents)
             .FirstOrDefaultAsync(l => l.Id == id);

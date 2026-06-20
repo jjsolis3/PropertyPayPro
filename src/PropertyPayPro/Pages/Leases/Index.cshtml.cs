@@ -18,7 +18,7 @@ public class IndexModel : PageModel
     {
         Leases = await _db.Leases
             .Include(l => l.Property)
-            .Include(l => l.Tenant)
+            .Include(l => l.Tenants)
             .OrderByDescending(l => l.StartDate)
             .ToListAsync();
     }

@@ -4,7 +4,7 @@
     ViewData["Title"] = "Bill Details";
 }
 
-<h1>@Model.Charge!.PeriodLabel — @Model.Charge.Lease!.Tenant!.DisplayName</h1>
+<h1>@Model.Charge!.PeriodLabel — @Model.Charge.Lease!.TenantNames</h1>
 
 <dl class="row">
     <dt class="col-sm-3">Property</dt><dd class="col-sm-9">@Model.Charge.Lease.Property!.Name</dd>
