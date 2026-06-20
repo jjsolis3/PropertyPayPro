@@ -22,7 +22,8 @@ public class IndexModel : PageModel
         var firstOfMonth = new DateOnly(today.Year, today.Month, 1);
 
         PropertyCount = await _db.Properties.CountAsync();
-        ActiveLeaseCount = await _db.Leases.CountAsync(l => l.StartDate <= today && l.EndDate >= today);
+        ActiveLeaseCount = await _db.Leases
+            .CountAsync(l => l.StartDate <= today && (l.IsMonthToMonth || l.EndDate >= today));
         CollectedThisMonth = await _db.RentPayments
             .Where(p => p.PaidOn >= firstOfMonth)
             .SumAsync(p => (decimal?)p.Amount) ?? 0m;

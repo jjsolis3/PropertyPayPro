@@ -18,8 +18,11 @@ public class BillingService
         var periodEnd = new DateOnly(year, month, DateTime.DaysInMonth(year, month));
         var dueDate = new DateOnly(year, month, Math.Min(DueDayOfMonth, DateTime.DaysInMonth(year, month)));
 
+        // A lease is billable for the period if it has started by the end of the period
+        // AND either it's month-to-month (rolls forever) or its term overlaps the period.
         var activeLeases = await _db.Leases
-            .Where(l => l.StartDate <= periodEnd && l.EndDate >= periodStart)
+            .Where(l => l.StartDate <= periodEnd
+                && (l.IsMonthToMonth || l.EndDate >= periodStart))
             .ToListAsync();
 
         var existing = await _db.RentalCharges
