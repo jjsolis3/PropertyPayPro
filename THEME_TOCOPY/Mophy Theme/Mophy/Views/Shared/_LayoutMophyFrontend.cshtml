@@ -1,0 +1,64 @@
+﻿@{
+    @using Microsoft.Extensions.Configuration
+    @inject IConfiguration Configuration
+}
+<!DOCTYPE html>
+<html>
+<head>
+    <partial name="Mophy/Frontend/_Meta" />
+    <title>@Configuration.GetSection("DefaultValue")["TitleFrontend"]</title>
+    <!-- Favicon icon -->
+    <link rel="icon" type="image/png" href="~/mophy/frontend/images/favicon.png">
+
+    <!-- Stylesheet -->
+    <link href="~/mophy/frontend/vendor/animate/animate.css" rel="stylesheet">
+    <link href="~/mophy/frontend/vendor/magnific-popup/magnific-popup.css" rel="stylesheet">
+    <link href="~/mophy/frontend/vendor/swiper/swiper-bundle.min.css" rel="stylesheet">
+    <link href="~/mophy/frontend/vendor/switcher/switcher.css" rel="stylesheet">
+    <link href="~/mophy/frontend/vendor/rangeslider/rangeslider.css" rel="stylesheet">
+    <link href="~/mophy/frontend/plugin/twentytwenty-master/css/twentytwenty.css" rel="stylesheet" type="text/css">
+
+    <!-- Custom Stylesheet -->
+    <link href="~/mophy/frontend/css/style.css" rel="stylesheet">
+    <link href="~/mophy/frontend/css/skin/skin-1.css" class="skin" rel="stylesheet">
+
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap" rel="stylesheet">
+</head>
+<body id="bg" data-anm=".anm">
+    <partial name="Mophy/Frontend/_PreLoader" />
+    <!--**********************************
+        Main wrapper start
+    ***********************************-->
+    <div class="page-wraper">
+        <partial name="Mophy/Frontend/_Header" />
+        <partial name="Mophy/Frontend/_Sidebar" />
+        <div class="menu-close"></div>
+        <div class="page-content">
+            <!--**********************************
+                Content body start
+            ***********************************-->
+            @RenderBody()
+            <!--**********************************
+                Content body end
+            ***********************************-->
+        </div>
+        <partial name="Mophy/Frontend/_Footer" />
+        <partial name="Mophy/Frontend/_AuthModal" />
+    </div>
+    <!--**********************************
+        Main wrapper end
+    ***********************************-->
+    <!-- JAVASCRIPT FILES ========================================= -->
+    <script src="~/mophy/frontend/js/jquery.min.js"></script><!-- JQUERY.MIN JS -->
+    <script src="~/mophy/frontend/vendor/wow/wow.js"></script><!-- WOW.JS -->
+    <script src="~/mophy/frontend/vendor/swiper/swiper-bundle.min.js"></script><!-- OWL silder -->
+    <script src="~/mophy/frontend/vendor/bootstrap/js/bootstrap.bundle.min.js"></script><!-- WOW.JS -->
+    <script src="~/mophy/frontend/vendor/magnific-popup/magnific-popup.js"></script><!-- OWL SLIDER -->
+    <script src="~/mophy/frontend/js/dz.ajax.js"></script><!-- AJAX -->
+    <script src="~/mophy/frontend/js/custom.js"></script><!-- CUSTOM JS -->
+    @RenderSection("Mophy_script", false)
+</body>
+</html>

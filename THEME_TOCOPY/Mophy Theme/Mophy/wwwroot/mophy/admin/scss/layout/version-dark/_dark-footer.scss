@@ -1,0 +1,11 @@
+[data-theme-version="dark"] {
+    .footer {
+        .copyright {
+            background-color: transparent;
+
+            p {
+                color: $white;
+            }
+        }
+    }
+}

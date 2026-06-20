@@ -1,0 +1,117 @@
+[data-sidebar-style="overlay"] {
+	&[data-layout="vertical"]{
+
+		--dz-side-sub_nav-padding : .5rem .5rem .5rem 3.5rem;
+		--dz-side-nav-padding : .75rem 1.5rem;
+
+	}
+    .deznav {
+        #{$dz-pos-left}: -100%;
+        @include transitionMedium;
+		box-shadow: 0 0 0.625rem rgba(0, 0, 0, 0.2);
+		.metismenu{
+			& > li {
+				padding: 0 0.5rem;
+				& > a {
+					color: #7f7184;
+					border-radius: $radius;
+					-webkit-transition: all 0.5s;
+					-ms-transition: all 0.5s;
+					transition: all 0.5s;
+					i{
+						height: auto;
+						width: auto;
+						margin-#{$dz-pos-right}: 0.6rem;
+						line-height: normal;
+					}
+					
+				}
+				&>a.has-arrow::after {
+					border-top-color: var(--text-dark);
+					border-#{$dz-pos-left}-color: var(--text-dark);
+				}
+				&:hover > a{
+					color:var(--primary);
+					
+				}
+				&.mm-active{
+					&>a {
+						color:$white;
+						background-color: var(--primary);
+						i{
+							height: auto;
+							width: auto;
+							line-height: normal;
+							margin-#{$dz-pos-right}: 0.6rem;
+						}
+						
+						&:after {
+							border-top-color: $white;
+							border-#{$dz-pos-left}-color: $white;
+						}
+					}
+
+				}
+				
+			}
+			
+		}
+		
+    }
+    .content-body {
+        margin-#{$dz-pos-left}: 0;
+    }
+    .nav-header {
+        position: absolute;
+        .hamburger.is-active {
+            #{$dz-pos-left}: 0;
+            .line {
+                background-color: var(--primary);
+            }
+        }
+    }
+    .menu-toggle {
+        .nav-header {
+            position: absolute;
+            #{$dz-pos-left}: auto;
+        }
+        .deznav {
+            #{$dz-pos-left}: 0;
+        }
+    }
+    .footer {
+        padding-#{$dz-pos-left}: 0;
+    }
+}
+
+[data-sidebar-style="overlay"][data-header-position="fixed"] {
+    .nav-header {
+        position: fixed;
+    }
+}
+
+
+[data-container="wide-boxed"][data-sidebar-position="fixed"][data-sidebar-style="overlay"][data-layout="vertical"],
+[data-container="boxed"][data-sidebar-position="fixed"][data-sidebar-style="overlay"][data-layout="vertical"]{ 
+	.deznav {
+        position: fixed;
+		#{$dz-pos-left}: auto;
+		width:0;
+		overflow: hidden;
+		transition: all 0.3s cubic-bezier(0.77, 0, 0.175, 1) 0s;
+		& > div{
+			width: var(--dz-sidebar-width);
+			min-width: var(--dz-sidebar-width);
+			#{$dz-pos-right}: var(--dz-sidebar-width);
+			transition: all 0.3s cubic-bezier(0.77, 0, 0.175, 1) 0s;
+		}
+    }
+	.menu-toggle{
+		.deznav {
+			width:var(--dz-sidebar-width);
+			& > div{
+				#{$dz-pos-right}: 0;
+			}
+		}
+	}	
+}

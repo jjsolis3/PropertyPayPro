@@ -1,0 +1,129 @@
+﻿@{
+	Layout = "~/Views/Shared/_LayoutMophyFrontend.cshtml";
+	ViewData["Title"] = "<<Put your different title string value here for each page>>";
+}
+<!-- Banner  -->
+<div class="dz-bnr-inr dz-bnr-inr-sm text-center position-relative overlay-primary-linear">
+	<div class="move-3">
+		<img src="~/mophy/frontend/images/home-banner/move-1.png" alt="">
+	</div>
+	<div class="container">
+		<div class="dz-bnr-inr-entry">
+			<h1>Contact Us</h1>
+			<!-- Breadcrumb Row -->
+			<nav aria-label="breadcrumb" class="breadcrumb-row m-t15">
+				<ul class="">
+					<li class="breadcrumb-item"><a href="@Url.Action("Index","Frontend")">Home</a></li>
+					<li class="breadcrumb-item  text-black active" aria-current="page">Contact Us</li>
+				</ul>
+			</nav>
+			<!-- Breadcrumb Row End -->
+		</div>
+	</div>
+</div>
+<!-- Banner End -->
+<div class="section-full content-inner-3">
+	<div class="container-fluid">
+		<div class="section-head style-1 text-center">
+			<h6 class="sub-title text-center">Contact us</h6>
+			<h2 class="title  text-center ">Always Help You</h2>
+			<p>Meh synth Schlitz, tempor duis single-origin coffee ea next level ethnic fingerstache fanny pack nostrud. Photo booth anim 8</p>
+		</div>
+		<div class="map-iframe style-1">
+			<iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d227748.3825624477!2d75.65046970649679!3d26.88544791796718!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x396c4adf4c57e281%3A0xce1c63a0cf22e09!2sJaipur%2C+Rajasthan!5e0!3m2!1sen!2sin!4v1500819483219" style="border:0; width:100%; min-height:100%; margin-bottom: -8px;" allowfullscreen></iframe>
+		</div>
+	</div>
+</div>
+
+<section class="section-full content-inner-2 contact-box">
+	<div class="container">
+		<div class="row justify-content-center m-b30">
+			<div class="col-lg-4 col-md-6 m-b30">
+				<div class="icon-bx-wraper box-hover style-5">
+					<div class="icon-lg">
+						<a href="javascript:void(0);" class="icon-cell m-r15">
+							<i class="fa fa-phone"></i>
+						</a>
+					</div>
+					<div class="icon-content">
+						<h5 class="dz-tilte m-b5 text-capitalize">Trusted Partner</h5>
+						<span>394-091-3312 </span>
+					</div>
+				</div>
+			</div>
+			<div class="col-lg-4 col-md-6 m-b30">
+				<div class="icon-bx-wraper box-hover style-5 ">
+					<div class="icon-lg">
+						<a href="javascript:void(0);" class="icon-cell m-r15">
+							<i class="fa fa-envelope"></i>
+						</a>
+					</div>
+					<div class="icon-content">
+						<h5 class="dz-tilte m-b5 text-capitalize">Mail</h5>
+						<span>support@akcel.com </span>
+					</div>
+				</div>
+			</div>
+			<div class="col-lg-4 col-md-6 m-b30">
+				<div class="icon-bx-wraper box-hover style-5">
+					<div class="icon-md">
+						<a href="javascript:void(0);" class="icon-cell m-r15">
+							<i class="fas fa-map-marker-alt  "></i>
+						</a>
+					</div>
+					<div class="icon-content">
+						<h5 class="dz-tilte m-b5 text-capitalize">Our Address</h5>
+						<span>832  Thompson Drive, San Fransisco, United States</span>
+					</div>
+				</div>
+			</div>
+		</div>
+
+		<div class="section-head text-center">
+			<h2 class="m-b5">Get in touch with us</h2>
+			<p>Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever.</p>
+		</div>
+
+		<div class="dzFormMsg"></div>
+		<form method="post" class="dzForm" action="script/contact.php">
+			<input type="hidden" value="Contact" name="dzToDo">
+			<div class="row">
+				<div class="col-lg-4 col-md-4 col-sm-12">
+					<div class="input-group">
+						<input name="dzName" type="text" required class="form-control" placeholder="Enter your name">
+					</div>
+				</div>
+				<div class="col-lg-4 col-md-4 col-sm-12">
+					<div class="input-group">
+						<input name="dzEmail" type="email" class="form-control" required placeholder="Your Email Address">
+					</div>
+				</div>
+				<div class="col-lg-4 col-md-4 col-sm-12">
+					<div class="input-group">
+						<input name="dzOther[Phone]" type="text" required class="form-control" placeholder="Phone">
+					</div>
+				</div>
+				<div class="col-lg-12 col-md-12 col-sm-12">
+					<div class="input-group">
+						<textarea name="dzMessage" rows="4" class="form-control" required placeholder="Your message here"></textarea>
+					</div>
+				</div>
+				<div class="col-md-12 col-sm-12">
+					<div class="input-group">
+						<div class="g-recaptcha" data-sitekey="6Lf1KykpAAAAAE1zshitq_jP0QE8nODP93n8xYf3" data-callback="verifyRecaptchaCallback" data-expired-callback="expiredRecaptchaCallback"></div>
+						<input class="form-control d-none" style="display:none;" data-recaptcha="true" required data-error="Please complete the Captcha">
+					</div>
+				</div>
+				<div class="col-md-12 col-sm-12 text-center">
+					<button name="submit" type="submit" value="Submit" class="btn btn-rounded btn-lg btn-transparant">Send Message<span></span></button>
+				</div>
+			</div>
+		</form>
+	</div>
+</section>
+
+@section Mophy_script
+	{
+	<script src="~/mophy/frontend/vendor/rangeslider/rangeslider.js"></script><!-- RANGESLIDER -->
+	<script src='https://www.google.com/recaptcha/api.js'></script> <!-- Google API For Recaptcha  -->
+}

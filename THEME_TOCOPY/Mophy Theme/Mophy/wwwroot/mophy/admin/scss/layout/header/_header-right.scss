@@ -1,0 +1,394 @@
+.header-right {
+    height: 100%;
+    .nav-item {
+        height: 100%;
+        display: flex;
+        align-items: center;
+        .nav-link {
+            color: $l-ctd;
+            font-size: 18px;
+        }
+    }
+	.right-sidebar{
+		margin-#{$dz-pos-right}:-30px;
+		a{
+			height: 80px;
+			width: 80px;
+			text-align: center;
+			justify-content: center;
+			display: flex;
+			align-items: center;
+			border-#{$dz-pos-left}: 1px solid $light;
+		}
+	}
+    
+    .notification_dropdown {
+        @include respond('phone-land') {
+            position: static;
+        }
+        .nav-link {
+            position: relative;
+            color: var(--primary);
+			background: $white;
+			border-radius: 100%;
+			padding: 12px;
+			line-height: 1;
+			margin-#{$dz-pos-right}:18px;
+			@include respond ('phone'){
+				margin-#{$dz-pos-right}:13px;
+			}
+            svg{
+                width: 24px;
+                height: 24px;
+                line-height: 24px;
+				path{
+					fill:var(--text-dark);
+				}
+            }
+			@include respond('laptop') {
+				padding: 10px;
+			}
+			
+			&.secondary{
+				background:$secondary-light;
+				color: $secondary;
+				[fill] {
+					fill: $secondary;
+				}
+				
+			}
+			&.primary{
+				background:var(--rgba-primary-1);
+				color: var(--primary);
+				[fill] {
+					fill: var(--primary);
+				}
+			}
+			&.warning{
+				background:$warning-light;
+				color: $warning;
+				[fill] {
+					fill: $warning;
+				}
+			}
+			&.success{
+				background:$success-light;
+				color: $success;
+				[fill] {
+					fill: $success;
+				}
+			}
+            i {
+                font-size: 24px;
+				@include respond('laptop') {
+					font-size: 18px;
+				}
+				
+            }
+			svg{
+				@include respond('laptop') {
+					width:18px;
+					height:18px;
+				}
+			}
+            .badge {
+                position: absolute;
+                font-size: 10px;
+                border-radius: 0;
+                #{$dz-pos-right}: -5px;
+				box-shadow:0px 0px 10px 3px var(--rgba-primary-2);
+                top: -5px;
+                font-weight: normal;
+                height: 20px;
+                width: 20px;
+                font-weight: 500;
+                line-height: 20px;
+                text-align: center;
+                padding: 0px;
+				@include respond('laptop') {
+					#{$dz-pos-right}: -2px;
+					top: -2px;
+					font-size: 12px;
+					height: 18px;
+					width: 18px;
+					line-height: 18px;
+				}
+            }
+        }
+        .dropdown-item {
+            &:focus,
+            &:active {
+                a {
+                    color: $white;
+                }
+            }
+            a {
+                color: $dark;
+                &:hover {
+                    text-decoration: none;
+                }
+            }
+        }
+    }
+    .dropdown-menu {
+        border-width:0;
+        box-shadow: 0 0 37px rgba(8,21,66,0.05);
+        @at-root [data-theme-version="dark"] & {
+            box-shadow: none;
+        }
+    }
+    .header-profile {
+        &>a.nav-link {
+			padding: 0 0 0 0;
+			display: flex;
+			align-items: center;
+			border-radius: $radius 28px 28px $radius;
+			@include respond('phone') {
+				background: transparent;
+				padding: 0 ;
+			}	
+            i {
+                font-weight: 700;
+            }
+			.header-info{
+				text-align: #{$dz-pos-right};
+				padding-#{$dz-pos-right}:15px;
+				@include respond('tab-land') {
+					padding-#{$dz-pos-left}:15px;
+				}
+				@include respond ('phone-land'){
+					padding-#{$dz-pos-left}:0px;
+					padding-#{$dz-pos-right}:12px;
+				}
+				@include respond('phone') {
+					display:none;
+				}
+				span{
+					font-size:16px;
+					display: block;
+					font-weight: 400;
+					@include respond ('phone-land'){
+						font-size: .9375rem;
+					}
+				}
+				strong{
+					font-weight: 600;
+				}
+				small{
+					display:block;
+					font-size: 13px;
+					color:$muted;
+					font-weight:400;
+					line-height: 1.2;
+				}
+			}
+        }
+        .dropdown-menu {
+            padding: 15px 0;
+            min-width: 12.5rem;
+            a {
+                &:hover,
+                &:focus,
+                &.active {
+                    color: var(--primary);
+                }
+            }
+        }
+        img {
+            width: 57px;
+            height: 57px;
+            border-radius: 100%;
+				
+			@include respond('laptop') {
+				 width: 39px;
+				height: 39px;
+			}
+        }
+        .dropdown-toggle {
+            i {
+                font-size: 1.25rem;
+            }
+            span {
+                @include respond('phone') {
+                    display: none;
+                }
+            }
+        }
+        .profile_title {
+            background: var(--primary);
+            color: $white;
+            padding: 10px 20px;
+            h5 {
+                color: $white;
+                margin-bottom: 3px;
+            }
+        }
+        
+        .dropdown-item {
+            padding: 8px 24px;
+        }
+    }
+	.weather-detail{
+		background:#F0F4F5;
+		color:#424242;
+		height:45px;
+		font-size:14px;
+		font-weight:500;
+		line-height:45px;
+		padding-#{$dz-pos-right}:15px;
+		border-radius:4rem;
+		margin-#{$dz-pos-right}:18px;
+		span{
+			height:45px;
+			background:var(--primary);
+			line-height:45px;
+			font-size:20px;
+			padding: 0px 15px;
+			margin-#{$dz-pos-right}: 10px;
+			border-radius:4rem;
+			color:$white;
+			i{
+				padding-#{$dz-pos-right}: 12px;
+				font-size: 25px;
+			}
+		}
+		@include respond ('laptop'){
+			height:40px;
+			line-height:40px;
+			span{
+				height:40px;
+				line-height:40px;
+				font-size:20px;
+			}
+		}
+		@include custommq($max:1250px){
+			display:none!important;
+		}
+	}
+	.header-profile{
+		.nav-link{
+			margin-#{$dz-pos-left}:1rem;
+			@include respond ('phone'){
+				margin-#{$dz-pos-left}:0.2rem;
+			}
+		}
+
+	}
+}
+.dz-fullscreen{
+	#icon-minimize{
+		display:none;
+	}
+	&.active{
+		#icon-full{
+			display:none;
+		}
+		#icon-minimize{
+			display:inline-block;
+		}
+	}
+}
+.dz-theme-mode{
+	#icon-light{
+		display:none;
+	}
+	&.active{
+		#icon-light{
+			display:inline-block;
+		}
+		#icon-dark{
+			display:none;
+		}
+	}
+}
+.notification_dropdown {
+    .dropdown-menu-end {
+        min-width: 310px;
+        padding: 0rem 0 1rem;
+        top: 100%;
+		
+        .notification_title {
+            background: var(--primary);
+            color: $white;
+            padding: 10px 20px;
+            h5 {
+                color: $white;
+                margin-bottom: 3px;
+            }
+        }
+        .media {
+			width: 45px !important;
+			height: 45px !important;
+			font-size: 18px !important;
+			
+           
+            @at-root [data-theme-version="dark"] & {
+                border-color: $d-border;
+            }
+            &>span {
+                width: 35px;
+                height: 35px;
+                border-radius: 50px;
+                display: inline-block;
+                padding: 7px 9px;
+                margin-#{$dz-pos-right}: 10px;
+				@at-root [direction="rtl"]#{&} {
+					 margin-#{$dz-pos-right}: 0;
+					 margin-#{$dz-pos-left}: 10px
+				}
+                &.success {
+                    background: $success-light;
+                    color: $success;
+					[fill] {
+						fill: $success;
+					}
+                }
+                &.primary {
+                    background: var(--rgba-primary-1);
+                    color: var(--primary);
+					svg [fill] {
+						fill: var(--primary);
+					}
+                }
+                &.danger {
+                    background: $danger-light;
+                    color: $danger;
+					[fill] {
+						fill: $danger;
+					}
+                }
+				[fill] {
+					fill: var(--primary);
+				}
+            }
+            .notify-time {
+                width: 100%!important;
+                margin-#{$dz-pos-right}: 0!important;
+                color: $l-ctl;
+            }
+            p {
+                text-overflow: ellipsis;
+                overflow: hidden;
+                white-space: nowrap;
+                max-width: 200px;
+                margin-bottom: 0;
+                margin-top: 5px;
+				@include respond('phone') {
+				    max-width: 100px;
+				}
+            }
+        }
+        .all-notification {
+            display: block;
+            padding: 15px 30px 0;
+            text-align: center;
+			border-top: 1px solid var(--border);
+			color:var(--primary);
+				
+            i {
+                margin-#{$dz-pos-left}: 10px;
+				font-weight:900;
+            }
+        }
+    }
+}

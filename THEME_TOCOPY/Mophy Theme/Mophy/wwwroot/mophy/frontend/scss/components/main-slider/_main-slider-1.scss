@@ -1,0 +1,208 @@
+// Banner One
+.main-bnr-one{
+	position:relative;
+  	align-items: center;
+	z-index:1;
+	overflow: hidden;		
+	
+	.banner-inner{
+		padding: 100px 0;
+		display: flex;
+		align-items: center
+	}
+	.banner-content{
+		position: relative;
+		z-index: 10;
+		.sub-title{
+			font-weight: 500;
+			font-size: 16px;
+			color: var(--primary);
+		}
+		.title{
+			font-weight: 600;
+			font-size: 4.375rem;
+			line-height: 5rem;;
+			color: #130F26;	
+		}
+		p{
+			font-size: 1.125rem;
+			color: #6E6E6E;
+			padding-right: 60px;	
+		}
+	
+	}
+	
+	.banner-media{
+		z-index: 3;
+		position: relative;
+		display: flex;
+	    padding-top: 40px;
+	    padding-bottom: 30px;
+		margin-left: 150px;		
+		.move{
+			position: absolute;	
+			z-index: -1;
+
+			&.move-1{
+				top: 10%;
+				left: -35%;
+				@include respond('laptop'){
+					left: -24%;
+				}
+			}
+			
+			&.move-2{
+				top: 50%;
+				right: 13%;
+				@include respond('laptop'){
+					right: 24%;
+				}
+				@include respond('tab-land'){
+					right:0;
+				}
+			}
+		}
+		
+		.banner-media-shape {
+			left: 25%;
+			width: 100%;
+			top: 50%;
+			position: absolute;
+			transform: translate(-50%, -50%);
+		}
+	
+		@include respond('laptop'){
+			margin-left: 50px;
+		}
+		
+	
+	}
+	.dz-social-icon{
+		position: absolute;
+		top: 50%;
+		right: 20px;
+		transform: translateY(-50%);
+		ul{
+			li{
+				margin-bottom: 20px;
+				a{
+					@include transitionMedium;
+					&:hover{
+						background: var(--primary);
+						color: #fff;
+					}
+				}
+			}	
+			
+		}
+	}
+
+
+	@include respond('laptop'){
+		.move-3{
+			display: none;
+		}
+	}
+	@include respond('tab-land'){
+		.banner-media{
+			margin-left: 10px;
+			padding: 0;
+		}
+		.banner-content{
+			.title{
+				font-size: 3.375rem;
+    			line-height: 4rem;
+			}
+		}
+	}
+
+	@include respond('tab-port'){
+		.banner-inner{
+		
+			.banner-content {
+				.title {
+					font-size: 2.375rem;
+					line-height: 3rem;
+					}	
+				p{
+					font-size: 14px;
+					margin-bottom: 26px;
+				}	
+			}
+			.banner-media{
+				max-width: 250px!important;
+				padding-bottom: 0;
+				margin: auto;
+				.move-2{
+					right: -15%;
+				}
+			}
+		}
+		
+	
+	}	
+
+	@include respond('phone-land'){
+		.banner-inner{
+			min-height: 500px;
+			.banner-content{
+				.title{
+					font-size: 32px;
+					line-height: 1.2;
+				}
+				.sub-title{
+					font-size: 14px;
+					
+				}
+			}
+		}
+		.dz-social-icon ul li a{
+			width: 40px;
+			height: 40px;
+		}	
+	}
+
+	
+	@include respond('phone'){
+			.banner-inner{
+				.banner-media{
+					width: 60%;
+					margin: auto;
+					margin-top: 20px;
+				}
+			}	
+	}
+}
+.move-3{
+	width: 180px;
+	height: 250px;
+	position: absolute;
+	left: 4%;
+	bottom: 30%;
+	display: flex;
+	transform: rotate(-9.42deg);
+	align-items: flex-end;
+	justify-content: center;
+	 @media only screen and (max-width: 1600px) {
+		width: 125px;
+		height: 185px;
+		left:1%;
+	 }
+	
+	img{
+		border-radius: 0 0px 74px 74px;
+	}
+	&::before{
+		content: '';
+		position: absolute;
+		bottom: 0;
+		left: 0;
+		width: 100%;
+		height: 70%;
+		background: linear-gradient(180deg, #EFC1FF 0%, var(--primary) 100%);
+		box-shadow: 0px 20px 30px rgba(0,0, 0, 0.4);	
+		transform: rotate(-9.42deg);
+		border-radius: 50%;
+		z-index: -1;
+	}
+}

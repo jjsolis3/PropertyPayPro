@@ -1,0 +1,17 @@
+// html[dir="rtl"] {
+
+//content body
+[direction="rtl"] {
+	
+	.bootstrap-select .dropdown-toggle .filter-option{
+		text-align: right
+	}
+	.noUi-horizontal .noUi-handle {
+		right: -11px;
+	}
+	.noUi-vertical .noUi-pips-vertical {
+		left: -20px;
+	}
+	
+}
+

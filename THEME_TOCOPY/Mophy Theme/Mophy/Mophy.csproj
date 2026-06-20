@@ -1,0 +1,40 @@
+<Project Sdk="Microsoft.NET.Sdk.Web">
+
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Compile Remove="wwwroot\mophy\frontend\node_modules\**" />
+    <Compile Remove="wwwroot\mophy\frontend\scss\node_modules\**" />
+    <Content Remove="wwwroot\mophy\frontend\node_modules\**" />
+    <Content Remove="wwwroot\mophy\frontend\scss\node_modules\**" />
+    <EmbeddedResource Remove="wwwroot\mophy\frontend\node_modules\**" />
+    <EmbeddedResource Remove="wwwroot\mophy\frontend\scss\node_modules\**" />
+    <None Remove="wwwroot\mophy\frontend\node_modules\**" />
+    <None Remove="wwwroot\mophy\frontend\scss\node_modules\**" />
+    <TypeScriptCompile Remove="wwwroot\mophy\frontend\node_modules\**" />
+    <TypeScriptCompile Remove="wwwroot\mophy\frontend\scss\node_modules\**" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="wwwroot\mophy\admin\vendor\jquery-smartwizard\.github\FUNDING.yml" />
+    <None Include="wwwroot\mophy\admin\vendor\jquery-smartwizard\.github\ISSUE_TEMPLATE\bug_report.md" />
+    <None Include="wwwroot\mophy\admin\vendor\jquery-smartwizard\.github\ISSUE_TEMPLATE\feature_request.md" />
+    <None Include="wwwroot\mophy\admin\vendor\jquery-smartwizard\.github\pull_request_template.md" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.TypeScript.MSBuild" Version="5.3.3">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="wwwroot\mophy\admin\vendor\lightgallery\src\images\" />
+  </ItemGroup>
+
+</Project>

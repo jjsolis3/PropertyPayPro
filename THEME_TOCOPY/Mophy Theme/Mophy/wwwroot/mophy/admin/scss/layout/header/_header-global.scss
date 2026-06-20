@@ -1,0 +1,56 @@
+/////////////////
+// Header
+/////////////////
+.header {
+    height: var(--dz-header-height);
+    z-index: 1;
+    position: var(--dz-header-pos);
+    padding: 0rem;
+    background:var(--headerbg);
+    z-index: 3;
+    top: 0;
+    width: 100%;
+    padding-#{$dz-pos-left}: var(--dz-sidebar-width);
+    transition: all .2s ease;
+	
+    .header-content {
+        position: relative;
+        height: 100%;
+        padding-#{$dz-pos-left}: 5rem;
+        padding-#{$dz-pos-right}: 1.875rem;
+        align-items: center;
+        display: flex;
+		
+        @include custommq($max: 47.9375rem) {
+            padding-#{$dz-pos-left}: 3.75rem;
+			padding-#{$dz-pos-right}: 0.938rem;
+        }
+		@include respond ('phone'){
+			padding-#{$dz-pos-right}:0.938rem;
+		}
+        .nav-control{
+            #{$dz-pos-right}: auto;
+            #{$dz-pos-right}: 1rem;
+        }
+		
+    }
+    .navbar {
+        padding: 0;
+        height: 100%;
+        width: 100%;
+        .navbar-collapse {
+            height: 100%;
+            width: 100%;
+        }
+    }
+    @include respond('phone-land'){
+        padding-#{$dz-pos-left}: 5rem;
+    }
+}
+
+[data-header-position="fixed"] {
+    --dz-header-pos : fixed;
+    .content-body {
+        padding-top: var(--dz-header-height);
+    }
+}

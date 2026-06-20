@@ -44,5 +44,4 @@ public class Lease
 
     public List<RentPayment> Payments { get; set; } = new();
     public List<RentalCharge> Charges { get; set; } = new();
-    public List<LeaseDocument> Documents { get; set; } = new();
 }

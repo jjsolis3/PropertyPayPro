@@ -1,0 +1,107 @@
+.breadcrumb{
+	font-size:1rem;
+	.breadcrumb-item{
+		&.active{
+			a{
+				color:var(--primary);
+			}
+		}
+	}
+	.breadcrumb-item + .breadcrumb-item::before{
+		color:var(--primary);
+        float: #{$dz-pos-left};
+        padding-#{$dz-pos-right}:0.5rem;
+	}
+}
+
+.page-titles {
+	padding: 15px 25px;
+    background: var(--card);
+    margin-bottom: 1.875rem;
+	border-radius: $radius;
+    margin-top: 0;
+    margin-#{$dz-pos-left}: 0;
+    margin-#{$dz-pos-right}: 0;
+    box-shadow: 0 2px 10px -3px rgba(0, 0, 0, 0.09);
+   
+
+    @include respond('tab-land') {
+		margin-top: 0.125rem;
+	}
+    @include respond('phone-land') {
+		margin-bottom: 0.9375rem;
+		padding: 0.9375rem 1.25rem;
+		
+    }
+
+    .justify-content-sm-end{
+        align-items: center;
+    }
+
+    h4 {
+        margin-bottom: 0;
+        margin-top: 0;
+        color: var(--primary);
+        font-size: 1.25rem;
+        span {
+            font-size: 0.875rem;
+            font-weight: 400;
+        }
+    }
+    .breadcrumb {
+        margin-bottom: 0;
+        padding: 0;
+        background: transparent;
+        li {
+            margin-top: 0;
+            margin-bottom: 0;
+
+            a{
+               color: $l-ctl; 
+			   @include respond ('phone'){
+					font-size:0.875rem;
+			   }
+
+            }
+
+            &.active{
+                color:var(--primary);
+				font-weight: 600;
+				a{
+					color:var(--primary);
+				}
+            }
+        }
+        
+        .breadcrumb-item + .breadcrumb-item {
+            &:before {
+				color:$primary;
+            }
+        }
+
+        &-datepicker{
+            font-size: 0.75rem;
+            color: $muted;
+
+            &__icon{
+                font-size: 0.875rem;
+            }
+        }
+    }
+
+    .breadcrumb-widget{
+        .border-dark{
+            border-color: $gray-300!important;
+        }
+        h4{
+            color: $strong;
+            font-weight: 600;
+        }
+        @include respond('phone') {
+            text-align: #{$dz-pos-left}!important;
+            margin-bottom: 0.9375rem;
+        }
+    }
+    
+}
+

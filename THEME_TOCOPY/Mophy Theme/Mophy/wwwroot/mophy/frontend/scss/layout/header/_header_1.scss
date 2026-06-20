@@ -1,0 +1,107 @@
+.site-header{
+    &.style-1{
+           .container-fluid{
+            padding-left: 30px;
+            padding-right: 30px;  
+			@include respond('phone'){
+				padding-left:15px;
+				padding-right:15px;
+			}		
+            & > .logo-header.logo-dark{
+                display: flex;
+                align-items: center;
+            } 
+
+            .header-nav{
+                @include respond('tab-port-min') {
+                    .logo-dark{
+                        display: none;
+                    }
+                }
+            }
+        } 
+        @include respond('laptop-min'){
+            .header-nav .nav{
+                padding-left: 180px;
+                
+            }
+        }
+    }
+}
+
+.contact-sidebar{
+    padding:30px;
+    position:fixed;
+    height:100%;
+    width:350px;
+    z-index:9999999;
+    background:#fff;
+    top:0;
+    left:-350px;
+    overflow-y:auto;
+    @include transitionMedium;
+    &.active{
+        left:0;
+    }
+    .logo-contact{
+        margin-bottom:40px;
+        display:block;
+        img{
+            width:180px;	
+        }
+    }
+    .dz-title{
+        margin-bottom: 10px;
+        h4{
+            font-size: 24px;
+            font-family: var(--font-family-title);
+            margin-bottom: 0;
+            line-height: 1;
+        }
+    }
+    .icon-bx-wraper{
+        margin-bottom: 20px;
+        
+        &.left{
+            .icon-md{
+                margin-right: 15px;
+            }
+        }
+        .icon-md{
+            padding: 0;
+            background: var(--primary);
+            box-shadow: 0px 5px 10px 0 var(--rgba-primary-1);
+            color: #fff;
+            width: 50px;
+            height: 50px;
+            line-height: 50px !important;
+            margin-top: 5px;
+            border-radius: var(--border-radius-base);
+            
+            i{
+                font-size: 28px;
+            }
+        }	
+        .tilte{
+            font-family: var(--font-family-title);
+            margin-bottom: 5px;
+        }
+        p{
+            font-size: 16px;
+        }
+    }
+}
+.menu-close{
+    width: 0;
+    position: fixed;
+    height: 100%;
+    background: #333;
+    top: 0;
+    opacity: 0.90;
+    left: 0;
+    @include transitionMedium;
+    z-index:99998;
+}
+.contact-sidebar.active + .menu-close{
+    width: 100%;
+}

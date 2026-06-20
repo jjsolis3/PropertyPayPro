@@ -1,0 +1,38 @@
+[data-theme-version="dark"] {
+	.alert-dark,
+	.light.badge-dark,
+	.light.btn-dark{
+		background-color: rgba(177, 177, 177, 0.35);
+		border-color:rgba(177, 177, 177, 0.35);
+	}
+	.light.btn-dark{
+		&:hover{
+			background-color:$dark;
+			border-color:$dark;
+		}
+	}
+	.btn-outline-dark{
+		color:$white;
+	}
+	.brand-title,
+	.invoice-logo .logo-compact,
+	.signature-media img{
+		filter: brightness(21.5);
+	}
+	.authincation {
+		background-image: url(../images/student-bg-Recovered.jpg) !important;
+	}
+	.morris_chart_height text tspan {
+		fill: $white;
+	}
+	
+	.apexcharts-gridlines-horizontal line {
+		stroke:$d-border;
+	}
+	.stacked-2:after{
+		background-color: $dark-card;
+	}
+	.ct-grid {
+		stroke: rgba(255, 255, 255, 0.1);
+	  }
+}	

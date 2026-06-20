@@ -1,0 +1,193 @@
+﻿<!--**********************************
+			Sidebar start
+		***********************************-->
+<div class="deznav">
+	<div class="deznav-scroll">
+		<ul class="metismenu" id="menu">
+			<li>
+				<a class="has-arrow ai-icon" href="javascript:void()" aria-expanded="false">
+					<i class="flaticon-381-networking"></i>
+					<span class="nav-text">Dashboard</span>
+				</a>
+				<ul aria-expanded="false">
+					<li><a href="@Url.Action("Index","Admin")">Dashboard Light</a></li>
+					<li><a href="@Url.Action("Index2","Admin")">Dashboard Dark</a></li>
+					<li><a href="@Url.Action("MyWallet","Admin")">My Wallet</a></li>
+					<li><a href="@Url.Action("Invoices","Admin")">Invoices</a></li>
+					<li><a href="@Url.Action("CardsCenter","Admin")">Cards Center</a></li>
+					<li><a href="@Url.Action("Transactions","Admin")">Transactions</a></li>
+					<li><a href="@Url.Action("TransactionsDetails","Admin")">Transactions Details</a></li>
+				</ul>
+			</li>
+			<li>
+				<a class="has-arrow ai-icon" href="javascript:void()" aria-expanded="false">
+					<i class="fa-regular fa-gear fw-bold"></i>
+					<span class="nav-text">CMS</span>
+					<span class="badge badge-xs style-1 badge-danger">New</span>
+				</a>
+				<ul aria-expanded="false">
+					<li><a href="@Url.Action("Content","Admin")">Content</a></li>
+					<li><a href="@Url.Action("ContentAdd","Admin")">Add Content</a></li>
+					<li><a href="@Url.Action("Menu","Admin")">Menus</a></li>
+					<li><a href="@Url.Action("EmailTemplate","Admin")">Email Template</a></li>
+					<li><a href="@Url.Action("AddEmail","Admin")">Add Email</a></li>
+					<li><a href="@Url.Action("Blog","Admin")">Blog</a></li>
+					<li><a href="@Url.Action("AddBlog","Admin")">Add Blog</a></li>
+					<li><a href="@Url.Action("BlogCategory","Admin")">Blog Category</a></li>
+				</ul>
+			</li>
+			<li>
+				<a class="has-arrow ai-icon" href="javascript:void()" aria-expanded="false">
+					<i class="flaticon-381-television"></i>
+					<span class="nav-text">Apps</span>
+				</a>
+				<ul aria-expanded="false">
+					<li><a href="@Url.Action("AppProfile","Admin")">Profile</a></li>
+					<li><a href="@Url.Action("EditProfile","Admin")">Edit Profile <span class="badge badge-xs badge-danger ms-3">New</span></a></li>
+					<li><a href="@Url.Action("PostDetails","Admin")">Post Details</a></li>
+					<li>
+						<a class="has-arrow" href="javascript:void()" aria-expanded="false">Email</a>
+						<ul aria-expanded="false">
+							<li><a href="@Url.Action("EmailCompose","Admin")">Compose</a></li>
+							<li><a href="@Url.Action("EmailInbox","Admin")">Inbox</a></li>
+							<li><a href="@Url.Action("EmailRead","Admin")">Read</a></li>
+						</ul>
+					</li>
+					<li><a href="@Url.Action("AppCalender","Admin")">Calendar</a></li>
+					<li>
+						<a class="has-arrow" href="javascript:void()" aria-expanded="false">Shop</a>
+						<ul aria-expanded="false">
+							<li><a href="@Url.Action("EcomProductGrid","Admin")">Product Grid</a></li>
+							<li><a href="@Url.Action("EcomProductList","Admin")">Product List</a></li>
+							<li><a href="@Url.Action("EcomProductDetail","Admin")">Product Details</a></li>
+							<li><a href="@Url.Action("EcomProductOrder","Admin")">Order</a></li>
+							<li><a href="@Url.Action("EcomCheckout","Admin")">Checkout</a></li>
+							<li><a href="@Url.Action("EcomInvoice","Admin")">Invoice</a></li>
+							<li><a href="@Url.Action("EcomCustomers","Admin")">Customers</a></li>
+						</ul>
+					</li>
+				</ul>
+			</li>
+			<li>
+				<a class="has-arrow ai-icon" href="javascript:void()" aria-expanded="false">
+					<i class="flaticon-381-controls-3"></i>
+					<span class="nav-text">Charts</span>
+				</a>
+				<ul aria-expanded="false">
+					<li><a href="@Url.Action("ChartFlot","Admin")">Flot</a></li>
+					<li><a href="@Url.Action("ChartMorris","Admin")">Morris</a></li>
+					<li><a href="@Url.Action("ChartChartjs","Admin")">Chartjs</a></li>
+					<li><a href="@Url.Action("ChartChartist","Admin")">Chartist</a></li>
+					<li><a href="@Url.Action("ChartSparkline","Admin")">Sparkline</a></li>
+					<li><a href="@Url.Action("ChartPeity","Admin")">Peity</a></li>
+				</ul>
+			</li>
+			<li>
+				<a class="has-arrow ai-icon" href="javascript:void()" aria-expanded="false">
+					<i class="flaticon-381-internet"></i>
+					<span class="nav-text">Bootstrap</span>
+				</a>
+				<ul aria-expanded="false">
+					<li><a href="@Url.Action("UiAccordion","Admin")">Accordion</a></li>
+					<li><a href="@Url.Action("UiAlert","Admin")">Alert</a></li>
+					<li><a href="@Url.Action("UiBadge","Admin")">Badge</a></li>
+					<li><a href="@Url.Action("UiButton","Admin")">Button</a></li>
+					<li><a href="@Url.Action("UiModal","Admin")">Modal</a></li>
+					<li><a href="@Url.Action("UiButtonGroup","Admin")">Button Group</a></li>
+					<li><a href="@Url.Action("UiListGroup","Admin")">List Group</a></li>
+					<li><a href="@Url.Action("UiMediaObject","Admin")">Media Object</a></li>
+					<li><a href="@Url.Action("UiCard","Admin")">Cards</a></li>
+					<li><a href="@Url.Action("UiCarousel","Admin")">Carousel</a></li>
+					<li><a href="@Url.Action("UiDropdown","Admin")">Dropdown</a></li>
+					<li><a href="@Url.Action("UiPopover","Admin")">Popover</a></li>
+					<li><a href="@Url.Action("UiProgressbar","Admin")">Progressbar</a></li>
+					<li><a href="@Url.Action("UiTab","Admin")">Tab</a></li>
+					<li><a href="@Url.Action("UiTypography","Admin")">Typography</a></li>
+					<li><a href="@Url.Action("UiPagination","Admin")">Pagination</a></li>
+					<li><a href="@Url.Action("UiGrid","Admin")">Grid</a></li>
+
+				</ul>
+			</li>
+			<li>
+				<a class="has-arrow ai-icon" href="javascript:void()" aria-expanded="false">
+					<i class="flaticon-381-heart"></i>
+					<span class="nav-text">Plugins</span>
+				</a>
+				<ul aria-expanded="false">
+					<li><a href="@Url.Action("UcSelect2","Admin")">Select 2</a></li>
+					<li><a href="@Url.Action("UcNestable","Admin")">Nestedable</a></li>
+					<li><a href="@Url.Action("UcNouiSlider","Admin")">Noui Slider</a></li>
+					<li><a href="@Url.Action("UcSweetalert","Admin")">Sweet Alert</a></li>
+					<li><a href="@Url.Action("UcToastr","Admin")">Toastr</a></li>
+					<li><a href="@Url.Action("MapJqvmap","Admin")">Jqv Map</a></li>
+					<li><a href="@Url.Action("UcLightgallery","Admin")">Light Gallery</a></li>
+				</ul>
+			</li>
+			<li>
+				<a href="javascript:void()" class="ai-icon has-arrow" aria-expanded="false">
+					<i class="flaticon-381-settings-2"></i>
+					<span class="nav-text">Widget</span>
+				</a>
+				<ul aria-expanded="false">
+					<li><a href="@Url.Action("WidgetCard","Admin")">Card</a></li>
+					<li><a href="@Url.Action("WidgetChart","Admin")">Chart</a></li>
+					<li><a href="@Url.Action("WidgetList","Admin")">List</a></li>
+
+				</ul>
+			</li>
+			<li>
+				<a class="has-arrow ai-icon" href="javascript:void()" aria-expanded="false">
+					<i class="flaticon-381-notepad"></i>
+					<span class="nav-text">Forms</span>
+				</a>
+				<ul aria-expanded="false">
+					<li><a href="@Url.Action("FormElement","Admin")">Form Elements</a></li>
+					<li><a href="@Url.Action("FormWizard","Admin")">Wizard</a></li>
+					<li><a href="@Url.Action("FormCkeditor","Admin")">CkEditor</a></li>
+					<li><a href="@Url.Action("FormPickers","Admin")">Pickers</a></li>
+					<li><a href="@Url.Action("FormValidationJquery","Admin")">Form Validate</a></li>
+				</ul>
+			</li>
+			<li>
+				<a class="has-arrow ai-icon" href="javascript:void()" aria-expanded="false">
+					<i class="flaticon-381-network"></i>
+					<span class="nav-text">Table</span>
+				</a>
+				<ul aria-expanded="false">
+					<li><a href="@Url.Action("TableBootstrapBasic","Admin")">Bootstrap</a></li>
+					<li><a href="@Url.Action("TableDatatableBasic","Admin")">Datatable</a></li>
+				</ul>
+			</li>
+			<li>
+				<a class="has-arrow ai-icon" href="javascript:void()" aria-expanded="false">
+					<i class="flaticon-381-layer-1"></i>
+					<span class="nav-text">Pages</span>
+				</a>
+				<ul aria-expanded="false">
+					<li><a href="@Url.Action("PageRegister","Admin")">Register</a></li>
+					<li><a href="@Url.Action("PageLogin","Admin")">Login</a></li>
+					<li>
+						<a class="has-arrow" href="javascript:void()" aria-expanded="false">Error</a>
+						<ul aria-expanded="false">
+							<li><a href="@Url.Action("PageError400","Admin")">Error 400</a></li>
+							<li><a href="@Url.Action("PageError403","Admin")">Error 403</a></li>
+							<li><a href="@Url.Action("PageError404","Admin")">Error 404</a></li>
+							<li><a href="@Url.Action("PageError500","Admin")">Error 500</a></li>
+							<li><a href="@Url.Action("PageError503","Admin")">Error 503</a></li>
+						</ul>
+					</li>
+					<li><a href="@Url.Action("PageLockScreen","Admin")">Lock Screen</a></li>
+					<li><a href="@Url.Action("EmptyPage","Admin")">Empty Page</a></li>
+				</ul>
+			</li>
+		</ul>
+
+		<div class="copyright">
+			<p><strong>Mophy Payment Admin Dashboard</strong> © 2024 All Rights Reserved</p>
+			<p>Made with <span class="heart"></span> by DexignZone</p>
+		</div>
+	</div>
+</div>
+<!--**********************************
+	Sidebar end
+***********************************-->

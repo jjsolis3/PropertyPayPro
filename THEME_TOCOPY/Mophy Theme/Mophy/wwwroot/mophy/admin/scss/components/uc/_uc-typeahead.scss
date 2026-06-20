@@ -1,0 +1,23 @@
+
+.twitter-typeahead {
+    width: 100%;
+    .tt-dataset.tt-dataset-states {
+        border: 1px solid $border;
+    }
+
+    .tt-menu {
+        width: 100%;
+        background-color: $white;
+
+        .tt-suggestion {
+            padding: 0.625rem;
+            cursor: pointer;
+
+            &:hover {
+                background-color: $primary;
+                color: $white;
+            }
+        }
+    }
+}
+

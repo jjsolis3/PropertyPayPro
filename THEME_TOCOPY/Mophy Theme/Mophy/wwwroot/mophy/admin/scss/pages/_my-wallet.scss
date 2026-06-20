@@ -1,0 +1,197 @@
+.donut-chart-sale2 {
+    position: relative;
+    z-index: 1;
+	small {
+		font-size: .875rem;
+		position: absolute;
+		width: 75%;
+		height: 75%;
+		background:$white;
+		box-shadow: 0rem 0rem .625rem rgba(0, 0, 0, 0.1);
+		left: 50%;
+		border-radius: 4.75rem;
+		
+		display: flex;
+		
+		align-items: center;
+		top: 50%;
+		transform: translate(-50%, -50%);
+		justify-content: center;
+		font-weight: 500;
+	}
+}
+.payment-bx{
+	.profile-image{
+		display:inline-block;
+		position:relative;
+		span{
+			position:absolute;
+			bottom:0;
+			#{$dz-pos-right}:-0.3125rem;
+			height:1.875rem;
+			text-align:center;
+			line-height:1.4375rem;
+			width:1.875rem;
+			border-radius:100%;
+			border:.125rem solid $white;
+		}
+	}
+	
+	.accordion__header{
+		border: 0;
+		font-size: 1rem;
+		background:var(--primary);
+		span{
+			color:$white!important;
+		}
+		h6 a{
+			color:$white!important;
+		}
+		.btn-outline-success,.btn-outline-warning,.btn-outline-danger{
+			background:rgba($white,0.3);
+			color:$white;
+			border-color:transparent;
+		}
+		&.collapsed{
+			background:var(--card);
+			.btn-outline-success{
+				border:.0625rem solid $success;
+				color:$success;
+				background-color: transparent;
+				&:hover,&:focus{
+					color:$white;
+					background:$success;
+				}
+			}
+			.btn-outline-warning{
+				border:.0625rem solid $warning;
+				color:$warning;
+				background-color: transparent;
+				&:hover,&:focus{
+					color:$white;
+					background:$warning;
+				}
+			}
+			.btn-outline-danger{
+				border:.0625rem solid $danger;
+				color:$danger;
+				background-color: transparent;
+				&:hover,&:focus{
+					color:$white;
+					background:$danger;
+				}
+			}
+			span{
+				color:var(--text-dark)!important;
+			}
+			h6 a{
+				color:var(--text-dark)!important;
+			}
+		}
+		
+	}
+	.accordion__item{
+		.accordion__body,.accordion__header{
+			justify-content:space-between;
+			padding: 1.25rem 1.875rem;
+			@include respond ('tab-port'){
+				padding:.625rem .625rem;
+			}
+		}
+		.accordion__header{
+			padding: 1.25rem 1.875rem 1.25rem 1.875rem;
+			&.collapsed .accordion__header--indicator::before {
+				    content: "\f054";
+					font-family: 'font Awesome 5 Free';
+					font-weight: 600;
+			}
+			&:not(.collapsed) .accordion__header--indicator::before {
+				content: "\f078";
+				font-family: 'font Awesome 5 Free';
+				font-weight: 600;
+			}
+			@include respond ('tab-port'){
+				padding: .9375rem 3.75rem 0rem .625rem;
+			}
+		}	
+		.accordion__body{
+			box-shadow: 0rem .625rem .9375rem var(--rgba-primary-1);
+			background: var(--card);
+			position:relative;
+			z-index:3;
+			border-radius:0 0 $radius $radius;
+		}
+		.accordion__body--text{
+			justify-content:space-between;
+		}
+	}
+}
+
+//stacked
+ .stacked-2{
+	position:relative;
+	margin-bottom:5.625rem;
+	height: auto;
+	&:after,&:before{
+		content:"";
+		z-index:-1;
+		border-radius:$radius;
+		height:50%;
+		position:absolute;
+		left:50%;
+		transform:translatex(-50%);
+	}
+	&:after{
+		width:94%;
+		bottom:-1.875rem;
+		background:#F1F1F1;
+		@include respond ('phone'){
+			bottom:-0.9375rem;
+		}
+	}
+	&:before{
+		width:87%;
+		background:var(--border);
+		bottom:-3.75rem;
+		@include respond ('phone'){
+			bottom:-1.875rem;
+		}
+	}
+	@include respond ('phone'){
+		margin-bottom:3.75rem;
+	}
+ }
+ 
+
+ .stacked-2{
+	@include respond ('tab-land'){
+		.payment-svg{
+			width:3.4375rem;
+			height: 3.4375rem;
+		}
+	}
+	.payment-main-bx{
+		.text-num{
+			font-size:32px;
+			@include respond ('laptop'){
+				font-size:1.8125rem;
+			}
+			@include respond ('tab-land'){
+				font-size: 1.5625rem;
+			}
+			
+			@include respond ('phone'){
+				font-size:1.5rem;
+			}
+		 }
+		 h5{
+			font-size: 1.25rem;
+			@include respond ('phone'){
+				font-size:1.125rem;
+
+			}
+
+		 }
+	}
+	
+ }

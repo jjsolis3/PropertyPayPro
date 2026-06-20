@@ -1,0 +1,188 @@
+//customize bootstrap
+@import './bs-custom';
+
+$strong: #646c9a;
+$border: #e3e3e3;
+$shadow: 0px 0Epx 40px 0px rgba(82, 63, 105, 0.1);
+$body-bg: #f5f5f5;
+
+
+///////////////
+// Solid Color
+///////////////
+$white: #fff;
+$black: #000;
+$charade: #23252F;
+
+/////////////////////////
+// Light Version Color
+/////////////////////////
+
+$l-ctd: #464a53;
+$l-ctl: #828690;
+$l-border: #eaeaea;
+$l-bg: #f2f4fa;
+$heading: #333;
+$card: #fff;
+$text-dark: #312a2a;
+$text-gray: #737B8B;
+$text: #7e7e7e;
+$border: #e6e6e6;
+//$dark_bg_lighter: #1E2A4A;
+
+
+/////////////////////////
+// Dark Version Color
+/////////////////////////
+$d-ctd: #ddd;
+$d-ctl: #828690;
+$d-border: #333a54;
+$d-bg: #181f39;
+$dark-card: #1e2746;
+$dark_bg_lighter: #1E2A4A;
+$d-text-dark : #fff;
+$d-text-gray : #b3b3b3;
+$d-text : #828690;
+
+
+
+
+
+/////////////////////////
+// Primary Light
+/////////////////////////
+$primary-light: lighten($primary, 40%);
+$secondary-light: lighten($secondary, 44%);
+$success-light: lighten($success, 47%);
+$warning-light: lighten($warning, 38%);
+$danger-light: lighten($danger, 30%);
+$info-light: lighten($info, 46%);
+$dark-light: lighten($dark, 25%);
+
+/////////////////////////
+// Opacity 
+/////////////////////////
+$primary-opacity: rgba($primary, 0.2);
+$secondary-opacity: rgba($secondary, 0.5);
+$success-opacity: rgba($success, 0.1);
+$warning-opacity: rgba($warning, 0.1);
+$danger-opacity: rgba($danger, 0.15);
+$info-opacity: rgba($info, 0.1);
+$dark-opacity: rgba($dark, 0.35);
+
+
+///////////////////
+// Material Colors
+///////////////////
+$dusty-gray: #999999;
+$gallery: #EEEEEE;
+$gray: #898989;
+$input-border-color: $border;
+
+
+///////////////////
+// Social Colors
+///////////////////
+$facebook: #3b5998;
+$twitter: #1da1f2;
+$youtube: #FF0000;
+$google-plus: #db4439;
+$linkedin: #007bb6;
+$instagram: #c32aa3;
+$pinterest: #bd081c;
+$google: #4285f4;
+$snapchat: #fffc00;
+$whatsapp: #25d366;
+$tumblr: #35465d;
+$reddit: #ff4500;
+$spotify: #1ed760;
+$yahoo: #430297;
+$dribbble: #ea4c89;
+$skype: #00aff0;
+$quora: #aa2200;
+$riverBed: #4C585C;
+$vimeo: #1ab7ea;
+
+
+///////////////////
+// Misc Colors
+///////////////////
+$iron: #DDDFE1;
+$grey: #D2D6DE;
+$pale-sky: #6a707e;
+$athensGray: #F0F0F2;
+$sky: #2290FF;
+
+
+//color for coller pallate
+$color_pallate_1: $white;
+$color_pallate_2: #143b64;
+$color_pallate_3: $primary;
+$color_pallate_4: #4527a0;
+$color_pallate_5: #c62828;
+$color_pallate_6: #283593;
+$color_pallate_7: #7356f1;
+$color_pallate_8: #3695eb;
+$color_pallate_9: #00838f;
+$color_pallate_10: #ff8f16;
+$color_pallate_11: #6673fd;
+$color_pallate_12: #558b2f;
+$color_pallate_13: #2a2a2a;
+$color_pallate_14: #1367c8;
+$color_pallate_15: #ed0b4c;
+
+$text-color-1: $white;
+$text-color-2: #6610f2;
+$text-color-3: $primary;
+$text-color-4: #dc3545;
+$text-color-5: #dc3545;
+$text-color-6: #fd7e14;
+$text-color-7: #ffc107;
+$text-color-8: #ff5ed2;
+$text-color-9: #20c997;
+$text-color-10: #17a2b8;
+$text-color-11: #94618E;
+$text-color-12: #343a40;
+$text-color-13: #83418b;
+$text-color-14: #4885ed;
+$text-color-15: #4cb32b;
+
+
+
+//utility variables
+$radius-lg: 0.625rem;
+$radius: 0.5rem;
+
+$dz-pos-right: right;
+$dz-pos-left: left;
+$radius-sm: 0.313rem;
+
+
+
+:root {
+	--primary: #{$primary};
+	--secondary: #{$secondary};
+	--primary-hover: #{darken($primary, 10)};
+	--primary-dark: #{darken($primary, 30)};
+	--rgba-primary-1: #{rgba($primary, 0.1)};
+	--rgba-primary-2: #{rgba($primary, 0.2)};
+	--rgba-primary-3: #{rgba($primary, 0.3)};
+	--rgba-primary-4: #{rgba($primary, 0.4)};
+	--rgba-primary-5: #{rgba($primary, 0.5)};
+	--rgba-primary-6: #{rgba($primary, 0.6)};
+	--rgba-primary-7: #{rgba($primary, 0.7)};
+	--rgba-primary-8: #{rgba($primary, 0.8)};
+	--rgba-primary-9: #{rgba($primary, 0.9)};
+
+
+
+	--card : #{$card};
+	--text-dark : #{$text-dark};
+	--text-gray : #{$text-gray};
+	--text : #{$text};
+	--body-bg : #{$body-bg};
+	--light : #{$body-bg};
+	--border : #{$border};
+	--bs-border-color:#{$border};
+
+}

@@ -24,7 +24,6 @@ builder.Services
 
 builder.Services.AddRazorPages();
 builder.Services.AddScoped<PropertyPayPro.Services.BillingService>();
-builder.Services.AddSingleton<PropertyPayPro.Services.IDocumentStorage, PropertyPayPro.Services.LocalFileSystemDocumentStorage>();
 
 var app = builder.Build();
 

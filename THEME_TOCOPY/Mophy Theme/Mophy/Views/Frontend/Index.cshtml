@@ -1,0 +1,836 @@
+﻿@{
+	Layout = "~/Views/Shared/_LayoutMophyFrontend.cshtml";
+	ViewData["Title"] = "<<Put your different title string value here for each page>>";
+}
+<!--Swiper Banner Start -->
+<div class="main-slider style-1 position-relative">
+	<div class="pagination">
+		<div class="main-swiper1-pagination"></div>
+	</div>
+	<div class="main-swiper swiper">
+		<div class="swiper-wrapper">
+			<div class="swiper-slide" data-rel="1">
+				<div class="main-bnr-one overlay-primary-linear">
+					<div class="move-3 anm" data-speed-x="-1" data-speed-scale="-1">
+						<img src="~/mophy/frontend/images/home-banner/move-1.png" alt="">
+					</div>
+					<div class="container">
+						<div class="row align-items-center banner-inner">
+							<div class="col-xl-7 col-lg-7 col-md-12">
+								<div class="banner-content">
+									<h6 class="sub-title wow fadeInUp" data-wow-delay="0.6s">Welcome To Online Payment</h6>
+									<h1 class="title wow fadeInUp" data-wow-delay="0.8s">FASTER & SECURE ONLINE MONEY TRANSITION</h1>
+									<p class="m-b50 wow fadeInUp" data-wow-delay="1.0s">It is a long established fact that a reader will be distracted by the readable content of a page when looking at its layout.</p>
+									<a href="@Url.Action("Index","Frontend")" class="btn btn-rounded btn-lg btn-transparant wow fadeInUp" data-wow-delay="1.2s">READ MORE</a>
+								</div>
+							</div>
+							<div class="col-xl-5 col-lg-5 col-md-12">
+								<div class="banner-media">
+									<svg class="banner-media-shape" viewBox="0 0 587 562" fill="none" xmlns="http://www.w3.org/2000/svg">
+										<path opacity="0.4" d="M49.8018 415.063C49.8018 398.622 60.0001 383.93 75.3918 378.199C165.509 344.617 468.042 229.26 568.949 157.333C579.255 149.987 585.283 138.066 585.283 125.392V119.957" stroke="var(--primary)" stroke-width="0.9948" stroke-miterlimit="10" stroke-linecap="round" stroke-linejoin="round" stroke-dasharray="6.53 6.53" />
+										<g opacity="0.3">
+											<path d="M49.8015 424.939V440.788C58.6006 441.488 67.2113 443.533 74.4228 446.95C77.2751 448.322 78.3784 451.847 77.1944 454.78L74.6112 461.158C73.3196 464.36 69.6062 466.082 66.4579 464.656C63.5518 463.337 60.6456 462.315 57.7394 461.508C53.757 460.404 49.8015 463.445 49.8015 467.589V479.752C49.8015 482.631 51.7658 485.106 54.5643 485.806C69.2294 489.6 83.6524 495.789 83.6524 514.275C83.6524 528.187 74.3151 540.35 55.0486 544.359C52.0617 544.978 49.8015 547.454 49.8015 550.521V561.5H35.2708V551.329C35.2708 548.099 32.8221 545.543 29.62 545.14C19.9329 543.902 10.8109 541.076 4.00298 537.282C1.12376 535.668 -0.0601634 532.17 1.28527 529.183L4.16442 522.805C5.6444 519.523 9.5462 518.177 12.7214 519.872C17.1613 522.267 22.274 524.178 27.6019 525.389C31.5036 526.277 35.2708 523.263 35.2708 519.254V507.252C35.2708 504.4 33.3333 501.924 30.5617 501.198C15.8427 497.269 1.12382 491.08 1.12382 472.298C1.12382 458.117 10.5956 445.793 29.9967 441.891C33.0105 441.272 35.2708 438.797 35.2708 435.729V424.939H42.2132M35.2708 481.016V460.377C27.5749 462.127 24.5342 466.324 24.5342 471.141C24.5073 476.227 28.8665 478.998 35.2708 481.016ZM60.2689 516.051C60.2689 510.966 56.0443 508.221 49.8015 506.014V526.061C57.0668 524.474 60.2689 520.68 60.2689 516.051Z" stroke="var(--primary)" stroke-width="0.9948" stroke-miterlimit="10" stroke-linecap="round" stroke-linejoin="round" />
+											<path d="M585.713 103.139V51.3399C585.713 48.8105 583.937 46.6579 581.515 46.1466V28.8444C581.515 13.6948 569.191 1.3707 554.042 1.3707H528.398C513.275 1.3707 500.951 13.6948 500.951 28.8444V46.1466C498.556 46.6579 496.753 48.8105 496.753 51.3399V103.139C496.753 106.072 499.121 108.467 502.081 108.467H575.138M528.424 13.937H554.068C562.276 13.937 568.976 20.6103 568.976 28.8444V46.012H513.517V28.8444C513.517 20.6372 520.217 13.937 528.424 13.937ZM551.781 79.6209C550.651 81.1009 550.005 82.9037 550.005 84.7604V92.6446C550.005 94.5821 548.445 96.1428 546.507 96.1428H536.013C534.075 96.1428 532.515 94.5821 532.515 92.6446V84.7604C532.515 82.9575 531.95 81.1816 530.846 79.7554C529.07 77.4951 527.994 74.6428 527.994 71.5483C527.994 70.4989 528.129 69.4763 528.344 68.5076C529.743 62.5339 535.232 58.1209 541.664 58.3093C547.664 58.4976 552.75 62.8837 554.122 68.5076C554.391 69.5571 554.526 70.6603 554.499 71.7905C554.445 74.7504 553.423 77.4413 551.781 79.6209Z" stroke="var(--primary)" stroke-width="0.9948" stroke-miterlimit="10" stroke-linecap="round" stroke-linejoin="round" />
+										</g>
+									</svg>
+									<img src="~/mophy/frontend/images/home-banner/phone.png" alt="" class="anm" data-speed-x="-1" data-speed-scale="-1">
+									<img src="~/mophy/frontend/images/home-banner/card1.png" alt="" class="move-1 move anm" data-speed-x="-1" data-speed-scale="-1">
+									<img src="~/mophy/frontend/images/home-banner/card2.png" alt="" class="move-2 move anm" data-speed-x="-1" data-speed-scale="-1">
+								</div>
+							</div>
+						</div>
+					</div>
+					<ul class="dz-social-icon style-1 mt-20">
+						<li><a href="#0" target="_blank" rel="nofollow" class=" wow bounceInRight" data-wow-delay="1.2s"><i class="fab fa-facebook-f"></i><span>FB</span></a></li>
+						<li><a href="#0" target="_blank" rel="nofollow" class=" wow bounceInRight" data-wow-delay="1.4s"><i class="fab fa-twitter"></i><span>TW</span></a></li>
+						<li><a href="#0" target="_blank" rel="nofollow" class=" wow bounceInRight" data-wow-delay="1.6s"><i class="fab fa-linkedin-in"></i><span>LN</span></a></li>
+						<li><a href="#0" target="_blank" rel="nofollow" class=" wow bounceInRight" data-wow-delay="1.8s"><i class="fab fa-instagram"></i><span>IN</span></a></li>
+					</ul>
+				</div>
+			</div>
+			<div class="swiper-slide" data-rel="2">
+				<div class="main-bnr-one overlay-primary-linear">
+					<div class="move-3 anm" data-speed-x="-1" data-speed-scale="-1">
+						<img src="~/mophy/frontend/images/home-banner/move-1.png" alt="">
+					</div>
+					<div class="container">
+						<div class="row align-items-center banner-inner">
+							<div class="col-xl-7 col-lg-7 col-md-12">
+								<div class="banner-content">
+									<h6 class="sub-title wow fadeInUp" data-wow-delay="0.6s">Welcome To Online Payment</h6>
+									<h1 class="title wow fadeInUp" data-wow-delay="0.8s">WE PROVIDE THE BEST FOR YOU</h1>
+									<p class="m-b50 wow fadeInUp" data-wow-delay="1.0s">It is a long established fact that a reader will be distracted by the readable content of a page when looking at its layout.</p>
+									<a href="@Url.Action("Index","Frontend")" class="btn btn-rounded btn-lg btn-transparant wow fadeInUp" data-wow-delay="1.2s">READ MORE</a>
+								</div>
+							</div>
+							<div class="col-xl-5 col-lg-5 col-md-12">
+								<div class="banner-media wow fadeInRight" data-wow-delay="1s">
+									<svg class="banner-media-shape" viewBox="0 0 587 562" fill="none" xmlns="http://www.w3.org/2000/svg">
+										<path opacity="0.4" d="M49.8018 415.063C49.8018 398.622 60.0001 383.93 75.3918 378.199C165.509 344.617 468.042 229.26 568.949 157.333C579.255 149.987 585.283 138.066 585.283 125.392V119.957" stroke="var(--primary)" stroke-width="0.9948" stroke-miterlimit="10" stroke-linecap="round" stroke-linejoin="round" stroke-dasharray="6.53 6.53" />
+										<g opacity="0.3">
+											<path d="M49.8015 424.939V440.788C58.6006 441.488 67.2113 443.533 74.4228 446.95C77.2751 448.322 78.3784 451.847 77.1944 454.78L74.6112 461.158C73.3196 464.36 69.6062 466.082 66.4579 464.656C63.5518 463.337 60.6456 462.315 57.7394 461.508C53.757 460.404 49.8015 463.445 49.8015 467.589V479.752C49.8015 482.631 51.7658 485.106 54.5643 485.806C69.2294 489.6 83.6524 495.789 83.6524 514.275C83.6524 528.187 74.3151 540.35 55.0486 544.359C52.0617 544.978 49.8015 547.454 49.8015 550.521V561.5H35.2708V551.329C35.2708 548.099 32.8221 545.543 29.62 545.14C19.9329 543.902 10.8109 541.076 4.00298 537.282C1.12376 535.668 -0.0601634 532.17 1.28527 529.183L4.16442 522.805C5.6444 519.523 9.5462 518.177 12.7214 519.872C17.1613 522.267 22.274 524.178 27.6019 525.389C31.5036 526.277 35.2708 523.263 35.2708 519.254V507.252C35.2708 504.4 33.3333 501.924 30.5617 501.198C15.8427 497.269 1.12382 491.08 1.12382 472.298C1.12382 458.117 10.5956 445.793 29.9967 441.891C33.0105 441.272 35.2708 438.797 35.2708 435.729V424.939H42.2132M35.2708 481.016V460.377C27.5749 462.127 24.5342 466.324 24.5342 471.141C24.5073 476.227 28.8665 478.998 35.2708 481.016ZM60.2689 516.051C60.2689 510.966 56.0443 508.221 49.8015 506.014V526.061C57.0668 524.474 60.2689 520.68 60.2689 516.051Z" stroke="var(--primary)" stroke-width="0.9948" stroke-miterlimit="10" stroke-linecap="round" stroke-linejoin="round" />
+											<path d="M585.713 103.139V51.3399C585.713 48.8105 583.937 46.6579 581.515 46.1466V28.8444C581.515 13.6948 569.191 1.3707 554.042 1.3707H528.398C513.275 1.3707 500.951 13.6948 500.951 28.8444V46.1466C498.556 46.6579 496.753 48.8105 496.753 51.3399V103.139C496.753 106.072 499.121 108.467 502.081 108.467H575.138M528.424 13.937H554.068C562.276 13.937 568.976 20.6103 568.976 28.8444V46.012H513.517V28.8444C513.517 20.6372 520.217 13.937 528.424 13.937ZM551.781 79.6209C550.651 81.1009 550.005 82.9037 550.005 84.7604V92.6446C550.005 94.5821 548.445 96.1428 546.507 96.1428H536.013C534.075 96.1428 532.515 94.5821 532.515 92.6446V84.7604C532.515 82.9575 531.95 81.1816 530.846 79.7554C529.07 77.4951 527.994 74.6428 527.994 71.5483C527.994 70.4989 528.129 69.4763 528.344 68.5076C529.743 62.5339 535.232 58.1209 541.664 58.3093C547.664 58.4976 552.75 62.8837 554.122 68.5076C554.391 69.5571 554.526 70.6603 554.499 71.7905C554.445 74.7504 553.423 77.4413 551.781 79.6209Z" stroke="var(--primary)" stroke-width="0.9948" stroke-miterlimit="10" stroke-linecap="round" stroke-linejoin="round" />
+										</g>
+									</svg>
+									<img src="~/mophy/frontend/images/home-banner/phone.png" alt="" class="anm" data-speed-x="-1" data-speed-scale="-1">
+									<img src="~/mophy/frontend/images/home-banner/card1.png" alt="" class="move-1 move anm" data-speed-x="-1" data-speed-scale="-1">
+									<img src="~/mophy/frontend/images/home-banner/card2.png" alt="" class="move-2 move anm" data-speed-x="-1" data-speed-scale="-1">
+								</div>
+							</div>
+						</div>
+					</div>
+					<ul class="dz-social-icon style-1 mt-20">
+						<li><a href="#0" target="_blank" rel="nofollow" class=" wow bounceInRight" data-wow-delay="1.2s"><i class="fab fa-facebook-f"></i><span>FB</span></a></li>
+						<li><a href="#0" target="_blank" rel="nofollow" class=" wow bounceInRight" data-wow-delay="1.4s"><i class="fab fa-twitter"></i><span>TW</span></a></li>
+						<li><a href="#0" target="_blank" rel="nofollow" class=" wow bounceInRight" data-wow-delay="1.6s"><i class="fab fa-linkedin-in"></i><span>LN</span></a></li>
+						<li><a href="#0" target="_blank" rel="nofollow" class=" wow bounceInRight" data-wow-delay="1.8s"><i class="fab fa-instagram"></i><span>IN</span></a></li>
+					</ul>
+				</div>
+			</div>
+		</div>
+	</div>
+	<div class="bottom-wrapper">
+		<div class="btn-wrapper">
+			<div class="main-btn main-btn-prev wow bounceInLeft" data-wow-delay="2.0s"><i class="fa-solid fa-arrow-up"></i></div>
+			<div class="main-btn main-btn-next wow bounceInLeft" data-wow-delay="2.2s"><i class="fa-solid fa-arrow-down"></i></div>
+		</div>
+	</div>
+</div>
+<!--Swiper Banner End-->
+<!-- partners -->
+<section class="content-inner-2 bg-primary">
+	<div class="container">
+		<div class="swiper clients-swiper">
+			<div class="swiper-wrapper">
+				<div class="swiper-slide">
+					<div class="clients-logo text-center wow fadeInUp" data-wow-delay="0.6s">
+						<img src="~/mophy/frontend/images/brands/coinbase.png" alt="">
+					</div>
+				</div>
+				<div class="swiper-slide">
+					<div class="clients-logo text-center wow fadeInUp" data-wow-delay="0.8s">
+						<img src="~/mophy/frontend/images/brands/dropbox.png" alt="">
+					</div>
+				</div>
+				<div class="swiper-slide">
+					<div class="clients-logo text-center wow fadeInUp" data-wow-delay="1.0s">
+						<img src="~/mophy/frontend/images/brands/zoom.png" alt="">
+					</div>
+				</div>
+				<div class="swiper-slide">
+					<div class="clients-logo text-center wow fadeInUp" data-wow-delay="1.2s">
+						<img src="~/mophy/frontend/images/brands/slack.png" alt="">
+					</div>
+				</div>
+				<div class="swiper-slide">
+					<div class="clients-logo text-center wow fadeInUp" data-wow-delay="1.4s">
+						<img src="~/mophy/frontend/images/brands/dropbox.png" alt="">
+					</div>
+				</div>
+
+			</div>
+		</div>
+	</div>
+</section>
+
+
+<!-- Feature -->
+<section class="content-inner-3 position-relative about-bx">
+	<h2 class="side-text">MOPHY</h2>
+	<div class="container">
+		<div class="row align-items-center">
+			<div class="col-lg-6 m-b30">
+				<div class="dz-media wow bounceInLeft" data-wow-delay="0.4s">
+					<img src="~/mophy/frontend/images/about/phone.png" alt="image">
+				</div>
+			</div>
+			<div class="col-lg-6">
+				<div class="dz-content">
+					<div class="section-head">
+						<h5 class="sub-title wow fadeInUp" data-wow-delay="0.6s">Features For You</h5>
+						<h2 class="title wow fadeInUp" data-wow-delay="0.8s">WE PROVIDE THE BEST FOR YOU</h2>
+					</div>
+					<ul class="list-check list-box ">
+						<li class="wow fadeInUp" data-wow-delay="1.0s">
+							<svg width="50" height="50" viewBox="0 0 50 50" fill="none" xmlns="http://www.w3.org/2000/svg">
+								<g clip-path="url(#clip0_13_161)">
+									<path d="M49.9995 25.0001L44.3392 18.7157L45.2255 10.3025L36.9487 8.55041L32.7267 1.21606L24.9995 4.6696L23.9565 25.0001L24.9995 45.3305L32.7268 48.784L36.9487 41.4498L45.2255 39.6975L44.3392 31.2843L49.9995 25.0001Z" fill="currentColor" />
+									<path d="M17.2722 1.21606L13.0503 8.55041L4.7735 10.3026L5.65974 18.7157L-0.000488281 25.0001L5.65974 31.2843L4.7735 39.6975L13.0503 41.4498L17.2723 48.784L24.9996 45.3305V4.6696L17.2722 1.21606Z" fill="currentColor" />
+									<path d="M35.4801 19.526L33.2918 17.5728L24.9995 26.863L23.9565 29.1718L24.9995 31.268L35.4801 19.526Z" fill="#fff" />
+									<path d="M16.285 22.791L14.2109 24.8651L22.9311 33.5853L24.9995 31.268V26.863L22.81 29.316L16.285 22.791Z" fill="#fff" />
+								</g>
+								<defs>
+									<clipPath>
+										<rect width="50" height="50" fill="white" transform="translate(-0.000488281)" />
+									</clipPath>
+								</defs>
+							</svg>
+							There are many variations of passages of Lorem the way words which don't look believable.
+						</li>
+						<li class="wow fadeInUp" data-wow-delay="1.2s">
+							<svg width="50" height="50" viewBox="0 0 50 50" fill="none" xmlns="http://www.w3.org/2000/svg">
+								<g clip-path="url(#clip0_13_161)">
+									<path d="M49.9995 25.0001L44.3392 18.7157L45.2255 10.3025L36.9487 8.55041L32.7267 1.21606L24.9995 4.6696L23.9565 25.0001L24.9995 45.3305L32.7268 48.784L36.9487 41.4498L45.2255 39.6975L44.3392 31.2843L49.9995 25.0001Z" fill="currentColor" />
+									<path d="M17.2722 1.21606L13.0503 8.55041L4.7735 10.3026L5.65974 18.7157L-0.000488281 25.0001L5.65974 31.2843L4.7735 39.6975L13.0503 41.4498L17.2723 48.784L24.9996 45.3305V4.6696L17.2722 1.21606Z" fill="currentColor" />
+									<path d="M35.4801 19.526L33.2918 17.5728L24.9995 26.863L23.9565 29.1718L24.9995 31.268L35.4801 19.526Z" fill="#fff" />
+									<path d="M16.285 22.791L14.2109 24.8651L22.9311 33.5853L24.9995 31.268V26.863L22.81 29.316L16.285 22.791Z" fill="#fff" />
+								</g>
+								<defs>
+									<clipPath>
+										<rect width="50" height="50" fill="white" transform="translate(-0.000488281)" />
+									</clipPath>
+								</defs>
+							</svg>
+							There are many variations of passages of Lorem the way words which don't look believable.
+						</li>
+
+					</ul>
+
+					<a href="@Url.Action("AboutUs","Frontend")" class="btn btn-rounded btn-lg btn-transparant btn-lg wow fadeInUp" data-wow-delay="1.4s">GET STARTED</a>
+				</div>
+			</div>
+		</div>
+	</div>
+</section>
+
+
+<!-- Icon Box -->
+<section class="content-inner-2 position-relative">
+	<div class="container">
+		<div class="section-head style-1 text-center">
+			<h5 class="sub-title wow fadeInUp" data-wow-delay="0.4s">SERVICE FOR YOU</h5>
+			<h2 class="title wow fadeInUp" data-wow-delay="0.6s">WHAT WE PROVIDE</h2>
+		</div>
+		<div class="row">
+			<div class="col-xl-3 col-lg-4 col-md-6 col-sm-6 m-b30">
+				<div class="icon-bx-wraper box-hover bg-primary style-3 wow fadeInUp" data-wow-delay="0.8s">
+					<div class="icon-head">Online Courses</div>
+					<span class="data-text">01</span>
+					<div class="box">
+						<div class="icon-media">
+							<i class="fas  fa-store"></i>
+						</div>
+						<div class="icon-content">
+							<p class="text">It is a long established fact that a reader of a page when looking.</p>
+						</div>
+					</div>
+					<a href="" class="text-white">View More <i class="fa fa-arrow-right"></i></a>
+				</div>
+			</div>
+			<div class="col-xl-3 col-lg-4 col-md-6 col-sm-6 m-b30">
+				<div class="icon-bx-wraper box-hover active bg-blue style-3 wow fadeInUp" data-wow-delay="1.0s">
+					<div class="icon-head">Credit Card  </div>
+					<span class="data-text">02</span>
+					<div class="box">
+						<div class="icon-media">
+							<i class="fas text-blue fa-credit-card"></i>
+						</div>
+						<div class="icon-content">
+							<p class="text">It is a long established fact that a reader of a page when looking.</p>
+						</div>
+					</div>
+					<a href="" class="text-white">View More <i class="fa fa-arrow-right"></i></a>
+				</div>
+			</div>
+			<div class="col-xl-3 col-lg-4 col-md-6 col-sm-6 m-b30">
+				<div class="icon-bx-wraper box-hover bg-pink style-3 wow fadeInUp" data-wow-delay="1.2s">
+					<div class="icon-head">Home Loan</div>
+					<span class="data-text">03</span>
+					<div class="box">
+						<div class="icon-media">
+							<i class="fad text-pink fa-dollar-sign"></i>
+						</div>
+						<div class="icon-content">
+							<p class="text">It is a long established fact that a reader of a page when looking.</p>
+						</div>
+					</div>
+					<a href="" class="text-white">View More <i class="fa fa-arrow-right"></i></a>
+				</div>
+			</div>
+			<div class="col-xl-3 col-lg-4 col-md-6 col-sm-6 m-b30">
+				<div class="icon-bx-wraper box-hover bg-orange style-3 wow fadeInUp" data-wow-delay="1.4s">
+					<div class="icon-head">Mobile Banking</div>
+					<span class="data-text">04</span>
+					<div class="box">
+						<div class="icon-media">
+							<i class="fa fa-mobile"></i>
+						</div>
+						<div class="icon-content">
+							<p class="text">It is a long established fact that a reader of a page when looking.</p>
+						</div>
+					</div>
+					<a href="" class="text-white">View More <i class="fa fa-arrow-right"></i></a>
+				</div>
+			</div>
+		</div>
+	</div>
+</section>
+
+<!-- dashboard -->
+<section class="content-inner about-bx4">
+	<div class="container">
+		<div class="row align-items-center">
+			<div class="col-lg-6">
+				<div class="dz-content">
+					<div class="section-head style-1">
+						<h2 class="title wow fadeInUp" data-wow-delay="0.6s" style="visibility: visible; animation-delay: 0.6s; animation-name: fadeInUp;">MOPHY - Payment Admin Dashboard</h2>
+						<p>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et</p>
+					</div>
+					<ul class="list-check list-box m-b50">
+						<li class="wow fadeInUp align-items-center" data-wow-delay="0.2s">
+							<svg width="30" height="30" viewBox="0 0 50 50" fill="none" xmlns="http://www.w3.org/2000/svg">
+								<g clip-path="url(#clip0_13_161)">
+									<path d="M49.9995 25.0001L44.3392 18.7157L45.2255 10.3025L36.9487 8.55041L32.7267 1.21606L24.9995 4.6696L23.9565 25.0001L24.9995 45.3305L32.7268 48.784L36.9487 41.4498L45.2255 39.6975L44.3392 31.2843L49.9995 25.0001Z" fill="currentColor"></path>
+									<path d="M17.2722 1.21606L13.0503 8.55041L4.7735 10.3026L5.65974 18.7157L-0.000488281 25.0001L5.65974 31.2843L4.7735 39.6975L13.0503 41.4498L17.2723 48.784L24.9996 45.3305V4.6696L17.2722 1.21606Z" fill="currentColor"></path>
+									<path d="M35.4801 19.526L33.2918 17.5728L24.9995 26.863L23.9565 29.1718L24.9995 31.268L35.4801 19.526Z" fill="#fff"></path>
+									<path d="M16.285 22.791L14.2109 24.8651L22.9311 33.5853L24.9995 31.268V26.863L22.81 29.316L16.285 22.791Z" fill="#fff"></path>
+								</g>
+								<defs>
+									<clipPath>
+										<rect width="30" height="30" fill="white" transform="translate(-0.000488281)"></rect>
+									</clipPath>
+								</defs>
+							</svg>
+							<h5>Create Account</h5>
+						</li>
+						<li class="wow fadeInUp align-items-center" data-wow-delay="0.4s">
+							<svg width="30" height="30" viewBox="0 0 50 50" fill="none" xmlns="http://www.w3.org/2000/svg">
+								<g clip-path="url(#clip0_13_161)">
+									<path d="M49.9995 25.0001L44.3392 18.7157L45.2255 10.3025L36.9487 8.55041L32.7267 1.21606L24.9995 4.6696L23.9565 25.0001L24.9995 45.3305L32.7268 48.784L36.9487 41.4498L45.2255 39.6975L44.3392 31.2843L49.9995 25.0001Z" fill="currentColor"></path>
+									<path d="M17.2722 1.21606L13.0503 8.55041L4.7735 10.3026L5.65974 18.7157L-0.000488281 25.0001L5.65974 31.2843L4.7735 39.6975L13.0503 41.4498L17.2723 48.784L24.9996 45.3305V4.6696L17.2722 1.21606Z" fill="currentColor"></path>
+									<path d="M35.4801 19.526L33.2918 17.5728L24.9995 26.863L23.9565 29.1718L24.9995 31.268L35.4801 19.526Z" fill="#fff"></path>
+									<path d="M16.285 22.791L14.2109 24.8651L22.9311 33.5853L24.9995 31.268V26.863L22.81 29.316L16.285 22.791Z" fill="#fff"></path>
+								</g>
+								<defs>
+									<clipPath>
+										<rect width="30" height="30" fill="white" transform="translate(-0.000488281)"></rect>
+									</clipPath>
+								</defs>
+							</svg>
+							<h5>Make A Charts Of Payments</h5>
+						</li>
+						<li class="wow fadeInUp align-items-center" data-wow-delay="0.4s">
+							<svg width="30" height="30" viewBox="0 0 50 50" fill="none" xmlns="http://www.w3.org/2000/svg">
+								<g clip-path="url(#clip0_13_161)">
+									<path d="M49.9995 25.0001L44.3392 18.7157L45.2255 10.3025L36.9487 8.55041L32.7267 1.21606L24.9995 4.6696L23.9565 25.0001L24.9995 45.3305L32.7268 48.784L36.9487 41.4498L45.2255 39.6975L44.3392 31.2843L49.9995 25.0001Z" fill="currentColor"></path>
+									<path d="M17.2722 1.21606L13.0503 8.55041L4.7735 10.3026L5.65974 18.7157L-0.000488281 25.0001L5.65974 31.2843L4.7735 39.6975L13.0503 41.4498L17.2723 48.784L24.9996 45.3305V4.6696L17.2722 1.21606Z" fill="currentColor"></path>
+									<path d="M35.4801 19.526L33.2918 17.5728L24.9995 26.863L23.9565 29.1718L24.9995 31.268L35.4801 19.526Z" fill="#fff"></path>
+									<path d="M16.285 22.791L14.2109 24.8651L22.9311 33.5853L24.9995 31.268V26.863L22.81 29.316L16.285 22.791Z" fill="#fff"></path>
+								</g>
+								<defs>
+									<clipPath>
+										<rect width="30" height="30" fill="white" transform="translate(-0.000488281)"></rect>
+									</clipPath>
+								</defs>
+							</svg>
+							<h5>Arrange Your Payemnts By Using Mophy</h5>
+						</li>
+
+					</ul>
+
+				</div>
+			</div>
+			<div class="col-lg-6">
+
+				<div class="dz-media">
+					<div class="twentytwenty-img-area">
+						<div class="twentytwenty-container">
+							<img src="~/mophy/frontend/images/about/pic1.jpg" alt="">
+							<img src="~/mophy/frontend/images/about/pic2.jpg" alt="">
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+</section>
+
+<!--table  -->
+<section class="content-inner-2 overflow-hidden position-relative">
+	<div class="container">
+		<div class="section-head style-1 text-center">
+			<h5 class="sub-title wow fadeInUp" data-wow-delay="0.4s">Process</h5>
+			<h2 class="title wow fadeInUp" data-wow-delay="0.6s">RECENTLY BEST TRANSECTIONS</h2>
+		</div>
+
+		<div class="process-table ">
+			<table class=" table-responsive ck-table">
+				<thead>
+					<tr class="head-row">
+						<th>Name</th>
+						<th class="text-left pe-0">Date</th>
+						<th class="text-center pe-0">Amount</th>
+						<th class="text-start ps-0">Description</th>
+						<th class="text-center pe-0">Details</th>
+					</tr>
+					<tr class="saprator-tr">
+					</tr>
+				</thead>
+
+				<tbody>
+					<tr class="">
+						<td class="">
+							<div class="icon-bx-wraper style-4">
+								<div class="icon-bx">
+									<img src="~/mophy/frontend/images/companys/microsoft.png" alt="">
+								</div>
+								<div class="icon-content">
+									<h4 class="title">Microsoft</h4>
+									<p>Web Designer</p>
+								</div>
+							</div>
+						</td>
+
+						<td class="date-bx text-center">
+							<span class="date">01 Feb 23</span>
+							<div class="time">11:00 PM</div>
+						</td>
+
+						<td class="ammount-bx  text-center">
+							<h4 class="ammount">$89.00</h4>
+						</td>
+
+						<td class="description text-left">
+							It is a long established fact that
+							when looking at its layout.
+						</td>
+
+						<td class="detail-bx text-center">
+							<a href="javascript:void(0)" class="btn btn-rounded btn-s btn-sm btn-transparant">VIEW DETAIL</a>
+						</td>
+					</tr>
+					<tr class="">
+						<td class="">
+							<div class="icon-bx-wraper style-4">
+								<div class="icon-bx">
+									<img src="~/mophy/frontend/images/companys/google.png" alt="">
+								</div>
+								<div class="icon-content">
+									<h4 class="title">Google</h4>
+									<p>Web Designer</p>
+								</div>
+							</div>
+						</td>
+
+						<td class="date-bx text-center">
+							<span class="date">01 Feb 23</span>
+							<div class="time">11:00 PM</div>
+						</td>
+
+						<td class="ammount-bx  text-center">
+							<h4 class="ammount">$89.00</h4>
+						</td>
+
+						<td class="description text-left">
+							It is a long established fact that
+							when looking at its layout.
+						</td>
+
+						<td class="detail-bx text-center">
+							<a href="javascript:void(0)" class="btn btn-rounded btn-sm btn-transparant">VIEW DETAIL</a>
+						</td>
+					</tr>
+					<tr class="">
+						<td class="">
+							<div class="icon-bx-wraper style-4">
+								<div class="icon-bx">
+									<img src="~/mophy/frontend/images/companys/adobe.png" alt="">
+								</div>
+								<div class="icon-content">
+									<h4 class="title">Adobe</h4>
+									<p>Web Designer</p>
+								</div>
+							</div>
+						</td>
+
+						<td class="date-bx text-center">
+							<span class="date">01 Feb 23</span>
+							<div class="time">11:00 PM</div>
+						</td>
+
+						<td class="ammount-bx  text-center">
+							<h4 class="ammount">$89.00</h4>
+						</td>
+
+						<td class="description text-left">
+							It is a long established fact that
+							when looking at its layout.
+						</td>
+
+						<td class="detail-bx text-center">
+							<a href="javascript:void(0)" class="btn btn-rounded btn-sm btn-transparant">VIEW DETAIL</a>
+						</td>
+					</tr>
+					<tr class="">
+						<td class="">
+							<div class="icon-bx-wraper style-4">
+								<div class="icon-bx">
+									<img src="~/mophy/frontend/images/companys/amazon-icon.png" alt="">
+								</div>
+								<div class="icon-content">
+									<h4 class="title">Amazon</h4>
+									<p>Web Designer</p>
+								</div>
+							</div>
+						</td>
+
+						<td class="date-bx text-center">
+							<span class="date">01 Feb 23</span>
+							<div class="time">11:00 PM</div>
+						</td>
+
+						<td class="ammount-bx  text-center">
+							<h4 class="ammount">$89.00</h4>
+						</td>
+
+						<td class="description text-left">
+							It is a long established fact that
+							when looking at its layout.
+						</td>
+
+						<td class="detail-bx text-center">
+							<a href="javascript:void(0)" class="btn btn-rounded btn-sm btn-transparant">VIEW DETAIL</a>
+						</td>
+					</tr>
+					<tr class="">
+						<td class="">
+							<div class="icon-bx-wraper style-4">
+								<div class="icon-bx">
+									<img src="~/mophy/frontend/images/companys/github.png" alt="">
+								</div>
+								<div class="icon-content">
+									<h4 class="title">Github</h4>
+									<p>Web Designer</p>
+								</div>
+							</div>
+						</td>
+
+						<td class="date-bx text-center">
+							<span class="date">01 Feb 23</span>
+							<div class="time">11:00 PM</div>
+						</td>
+
+						<td class="ammount-bx  text-center">
+							<h4 class="ammount">$89.00</h4>
+						</td>
+
+						<td class="description text-left">
+							It is a long established fact that
+							when looking at its layout.
+						</td>
+
+						<td class="detail-bx text-center">
+							<a href="javascript:void(0)" class="btn btn-rounded btn-sm btn-transparant">VIEW DETAIL</a>
+						</td>
+					</tr>
+					<tr class="">
+						<td class="">
+							<div class="icon-bx-wraper style-4">
+								<div class="icon-bx">
+									<img src="~/mophy/frontend/images/companys/microsoft.png" alt="">
+								</div>
+								<div class="icon-content">
+									<h4 class="title">Microsoft</h4>
+									<p>Web Designer</p>
+								</div>
+							</div>
+						</td>
+
+						<td class="date-bx text-center">
+							<span class="date">01 Feb 23</span>
+							<div class="time">11:00 PM</div>
+						</td>
+
+						<td class="ammount-bx  text-center">
+							<h4 class="ammount">$89.00</h4>
+						</td>
+
+						<td class="description text-left">
+							It is a long established fact that
+							when looking at its layout.
+						</td>
+
+						<td class="detail-bx text-center">
+							<a href="javascript:void(0)" class="btn btn-rounded btn-sm btn-transparant">VIEW DETAIL</a>
+						</td>
+					</tr>
+					<tr class="">
+						<td class="">
+							<div class="icon-bx-wraper style-4">
+								<div class="icon-bx">
+									<img src="~/mophy/frontend/images/companys/google.png" alt="">
+								</div>
+								<div class="icon-content">
+									<h4 class="title">Google</h4>
+									<p>Web Designer</p>
+								</div>
+							</div>
+						</td>
+
+						<td class="date-bx text-center">
+							<span class="date">01 Feb 23</span>
+							<div class="time">11:00 PM</div>
+						</td>
+
+						<td class="ammount-bx  text-center">
+							<h4 class="ammount">$89.00</h4>
+						</td>
+
+						<td class="description text-left">
+							It is a long established fact that
+							when looking at its layout.
+						</td>
+
+						<td class="detail-bx text-center">
+							<a href="javascript:void(0)" class="btn btn-rounded btn-sm btn-transparant">VIEW DETAIL</a>
+						</td>
+					</tr>
+					<tr class="">
+						<td class="">
+							<div class="icon-bx-wraper style-4">
+								<div class="icon-bx">
+									<img src="~/mophy/frontend/images/companys/adobe.png" alt="">
+								</div>
+								<div class="icon-content">
+									<h4 class="title">Adobe</h4>
+									<p>Web Designer</p>
+								</div>
+							</div>
+						</td>
+
+						<td class="date-bx text-center">
+							<span class="date">01 Feb 23</span>
+							<div class="time">11:00 PM</div>
+						</td>
+
+						<td class="ammount-bx  text-center">
+							<h4 class="ammount">$89.00</h4>
+						</td>
+
+						<td class="description text-left">
+							It is a long established fact that
+							when looking at its layout.
+						</td>
+
+						<td class="detail-bx text-center">
+							<a href="javascript:void(0)" class="btn btn-rounded btn-sm btn-transparant">VIEW DETAIL</a>
+						</td>
+					</tr>
+				</tbody>
+			</table>
+		</div>
+		<div class="text-center">
+			<a href="" class="btn btn-rounded btn-transparant mt-5 ">VIEW ALL TRANSECTION</a>
+		</div>
+	</div>
+</section>
+
+<!-- Testimonials -->
+<section class="overflow-hidden content-inner-1 bg-light">
+	<div class="container">
+		<div class="section-head style-1 text-center">
+			<h6 class="sub-title text-center">Testimonial</h6>
+			<h2 class="title  text-center ">What Our Clients Say’s</h2>
+		</div>
+		<div class="swiper testimonials-swiper">
+			<div class="swiper-wrapper">
+				<div class="swiper-slide">
+					<div class="testimonial">
+						<div class="profile-info">
+							<div class="testimonial-pic">
+								<img src="~/mophy/frontend/images/testimonials/pic1.jpg" alt="">
+							</div>
+							<div class="testimonial-position">
+								<h5 class="testimonial-name">Alesa jhonson</h5>
+								<span>CEO & Founder</span>
+								<ul class="testimonial-rating">
+									<li><i class="fa-solid fa-star"></i></li>
+									<li><i class="fa-solid fa-star"></i></li>
+									<li><i class="fa-solid fa-star"></i></li>
+									<li><i class="fa-solid fa-star"></i></li>
+									<li><i class="fa-solid fa-star"></i></li>
+								</ul>
+							</div>
+						</div>
+						<p class="testimonial-text">Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen.</p>
+						<div class="quote">
+							<svg width="123" height="122" viewBox="0 0 123 122" fill="none" xmlns="http://www.w3.org/2000/svg">
+								<g opacity="0.15">
+									<path d="M27.2778 17.9409C12.237 17.9409 0.0019989 30.0765 0.0019989 44.9952C0.0019989 59.387 11.3887 71.1911 25.6957 72.0065C25.9435 74.6593 25.7576 81.8804 18.7814 91.9253C18.254 92.6831 18.3498 93.705 19.0047 94.3547C21.8595 97.1862 23.6238 98.9695 24.8586 100.217C26.4747 101.848 27.2123 102.592 28.2914 103.564C28.6573 103.893 29.119 104.059 29.5827 104.059C30.033 104.059 30.4816 103.903 30.8439 103.592C43.0001 93.1 56.504 71.4219 54.5502 44.8574C53.4053 29.2612 41.936 17.9409 27.2778 17.9409ZM29.6014 99.5484C29.0779 99.0366 28.4809 98.4335 27.6007 97.5453C26.531 96.4639 25.0632 94.982 22.8373 92.7668C31.3038 79.8269 29.7046 70.6104 29.0046 69.2886C28.6723 68.6613 27.991 68.2387 27.2778 68.2387C14.3578 68.2387 3.84575 57.812 3.84575 44.9952C3.84575 32.18 14.3578 21.7534 27.2778 21.7534C39.864 21.7534 49.7211 31.5862 50.7176 45.1328C52.9135 75.0112 35.0105 94.4105 29.6014 99.5484Z" fill="var(--primary)" />
+									<path d="M122.809 44.8574C121.66 29.2631 110.189 17.9409 95.5346 17.9409C80.4936 17.9409 68.2566 30.0765 68.2566 44.9952C68.2566 59.387 79.6453 71.1911 93.9542 72.0065C94.2019 74.6574 94.0142 81.8746 87.0362 91.9253C86.5089 92.6831 86.6046 93.705 87.2595 94.3547C90.103 97.175 91.8634 98.9546 93.0984 100.2C94.7218 101.842 95.4633 102.59 96.548 103.566C96.9139 103.893 97.3774 104.059 97.8393 104.059C98.2898 104.059 98.7383 103.903 99.1004 103.59C111.257 93.0981 124.761 71.4202 122.809 44.8574ZM97.8579 99.5484C97.3306 99.0328 96.7282 98.426 95.8403 97.5288C94.7706 96.4489 93.3086 94.971 91.092 92.7668C99.5584 79.825 97.9613 70.6104 97.2631 69.2886C96.9308 68.6632 96.2478 68.2387 95.5346 68.2387C82.6124 68.2387 72.1004 57.812 72.1004 44.9952C72.1004 32.18 82.6124 21.7534 95.5346 21.7534C108.119 21.7534 117.978 31.5862 118.976 45.1347C121.17 75.0093 103.267 94.4105 97.8579 99.5484Z" fill="var(--primary)" />
+								</g>
+							</svg>
+						</div>
+					</div>
+				</div>
+
+				<div class="swiper-slide">
+					<div class="testimonial">
+						<div class="profile-info">
+							<div class="testimonial-pic">
+								<img src="~/mophy/frontend/images/testimonials/pic2.jpg" alt="">
+							</div>
+							<div class="testimonial-position">
+								<h5 class="testimonial-name">Karley Mont</h5>
+								<span>Manager</span>
+								<ul class="testimonial-rating">
+									<li><i class="fa-solid fa-star"></i></li>
+									<li><i class="fa-solid fa-star"></i></li>
+									<li><i class="fa-solid fa-star"></i></li>
+									<li><i class="fa-solid fa-star"></i></li>
+									<li><i class="fa-solid fa-star"></i></li>
+								</ul>
+							</div>
+						</div>
+						<p class="testimonial-text">Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen.</p>
+						<div class="quote">
+							<svg width="123" height="122" viewBox="0 0 123 122" fill="none" xmlns="http://www.w3.org/2000/svg">
+								<g opacity="0.15">
+									<path d="M27.2778 17.9409C12.237 17.9409 0.0019989 30.0765 0.0019989 44.9952C0.0019989 59.387 11.3887 71.1911 25.6957 72.0065C25.9435 74.6593 25.7576 81.8804 18.7814 91.9253C18.254 92.6831 18.3498 93.705 19.0047 94.3547C21.8595 97.1862 23.6238 98.9695 24.8586 100.217C26.4747 101.848 27.2123 102.592 28.2914 103.564C28.6573 103.893 29.119 104.059 29.5827 104.059C30.033 104.059 30.4816 103.903 30.8439 103.592C43.0001 93.1 56.504 71.4219 54.5502 44.8574C53.4053 29.2612 41.936 17.9409 27.2778 17.9409ZM29.6014 99.5484C29.0779 99.0366 28.4809 98.4335 27.6007 97.5453C26.531 96.4639 25.0632 94.982 22.8373 92.7668C31.3038 79.8269 29.7046 70.6104 29.0046 69.2886C28.6723 68.6613 27.991 68.2387 27.2778 68.2387C14.3578 68.2387 3.84575 57.812 3.84575 44.9952C3.84575 32.18 14.3578 21.7534 27.2778 21.7534C39.864 21.7534 49.7211 31.5862 50.7176 45.1328C52.9135 75.0112 35.0105 94.4105 29.6014 99.5484Z" fill="var(--primary)" />
+									<path d="M122.809 44.8574C121.66 29.2631 110.189 17.9409 95.5346 17.9409C80.4936 17.9409 68.2566 30.0765 68.2566 44.9952C68.2566 59.387 79.6453 71.1911 93.9542 72.0065C94.2019 74.6574 94.0142 81.8746 87.0362 91.9253C86.5089 92.6831 86.6046 93.705 87.2595 94.3547C90.103 97.175 91.8634 98.9546 93.0984 100.2C94.7218 101.842 95.4633 102.59 96.548 103.566C96.9139 103.893 97.3774 104.059 97.8393 104.059C98.2898 104.059 98.7383 103.903 99.1004 103.59C111.257 93.0981 124.761 71.4202 122.809 44.8574ZM97.8579 99.5484C97.3306 99.0328 96.7282 98.426 95.8403 97.5288C94.7706 96.4489 93.3086 94.971 91.092 92.7668C99.5584 79.825 97.9613 70.6104 97.2631 69.2886C96.9308 68.6632 96.2478 68.2387 95.5346 68.2387C82.6124 68.2387 72.1004 57.812 72.1004 44.9952C72.1004 32.18 82.6124 21.7534 95.5346 21.7534C108.119 21.7534 117.978 31.5862 118.976 45.1347C121.17 75.0093 103.267 94.4105 97.8579 99.5484Z" fill="var(--primary)" />
+								</g>
+							</svg>
+						</div>
+					</div>
+				</div>
+				<div class="swiper-slide">
+					<div class="testimonial">
+						<div class="profile-info">
+							<div class="testimonial-pic">
+								<img src="~/mophy/frontend/images/testimonials/pic3.jpg" alt="">
+							</div>
+							<div class="testimonial-position">
+								<h5 class="testimonial-name">John Matin</h5>
+								<span>Designer</span>
+								<ul class="testimonial-rating">
+									<li><i class="fa-solid fa-star"></i></li>
+									<li><i class="fa-solid fa-star"></i></li>
+									<li><i class="fa-solid fa-star"></i></li>
+									<li><i class="fa-solid fa-star"></i></li>
+									<li><i class="fa-solid fa-star"></i></li>
+								</ul>
+							</div>
+						</div>
+						<p class="testimonial-text">Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen.</p>
+						<div class="quote">
+							<svg width="123" height="122" viewBox="0 0 123 122" fill="none" xmlns="http://www.w3.org/2000/svg">
+								<g opacity="0.15">
+									<path d="M27.2778 17.9409C12.237 17.9409 0.0019989 30.0765 0.0019989 44.9952C0.0019989 59.387 11.3887 71.1911 25.6957 72.0065C25.9435 74.6593 25.7576 81.8804 18.7814 91.9253C18.254 92.6831 18.3498 93.705 19.0047 94.3547C21.8595 97.1862 23.6238 98.9695 24.8586 100.217C26.4747 101.848 27.2123 102.592 28.2914 103.564C28.6573 103.893 29.119 104.059 29.5827 104.059C30.033 104.059 30.4816 103.903 30.8439 103.592C43.0001 93.1 56.504 71.4219 54.5502 44.8574C53.4053 29.2612 41.936 17.9409 27.2778 17.9409ZM29.6014 99.5484C29.0779 99.0366 28.4809 98.4335 27.6007 97.5453C26.531 96.4639 25.0632 94.982 22.8373 92.7668C31.3038 79.8269 29.7046 70.6104 29.0046 69.2886C28.6723 68.6613 27.991 68.2387 27.2778 68.2387C14.3578 68.2387 3.84575 57.812 3.84575 44.9952C3.84575 32.18 14.3578 21.7534 27.2778 21.7534C39.864 21.7534 49.7211 31.5862 50.7176 45.1328C52.9135 75.0112 35.0105 94.4105 29.6014 99.5484Z" fill="var(-primary)" />
+									<path d="M122.809 44.8574C121.66 29.2631 110.189 17.9409 95.5346 17.9409C80.4936 17.9409 68.2566 30.0765 68.2566 44.9952C68.2566 59.387 79.6453 71.1911 93.9542 72.0065C94.2019 74.6574 94.0142 81.8746 87.0362 91.9253C86.5089 92.6831 86.6046 93.705 87.2595 94.3547C90.103 97.175 91.8634 98.9546 93.0984 100.2C94.7218 101.842 95.4633 102.59 96.548 103.566C96.9139 103.893 97.3774 104.059 97.8393 104.059C98.2898 104.059 98.7383 103.903 99.1004 103.59C111.257 93.0981 124.761 71.4202 122.809 44.8574ZM97.8579 99.5484C97.3306 99.0328 96.7282 98.426 95.8403 97.5288C94.7706 96.4489 93.3086 94.971 91.092 92.7668C99.5584 79.825 97.9613 70.6104 97.2631 69.2886C96.9308 68.6632 96.2478 68.2387 95.5346 68.2387C82.6124 68.2387 72.1004 57.812 72.1004 44.9952C72.1004 32.18 82.6124 21.7534 95.5346 21.7534C108.119 21.7534 117.978 31.5862 118.976 45.1347C121.17 75.0093 103.267 94.4105 97.8579 99.5484Z" fill="var(--primary)" />
+								</g>
+							</svg>
+						</div>
+					</div>
+				</div>
+			</div>
+			<div class="swiper-button-prev"><i class="fa fa-arrow-left"></i></div>
+			<div class="swiper-button-next"><i class="fa fa-arrow-right"></i></div>
+		</div>
+	</div>
+</section>
+
+
+<!--Presentation  -->
+<section class="content-inner">
+	<div class="container">
+		<div class="section-head style-1 mb-5 text-center wow fadeInUp" data-wow-delay="0.5s">
+			<h5 class="sub-title">Perfect Solution</h5>
+			<h2 class="title">What Will Get From App</h2>
+		</div>
+		<div class="row about-bx2">
+			<div class="col-lg-4 col-md-6 section-wraper-left">
+				<div class="icon-bx-wraper box-hover style-1 right m-b50 m-lg-b30 wow fadeInLeft" data-wow-delay="0.2s">
+					<div class="icon-bx-sm bg-primary radius shadow">
+						<a href="javascript:void(0)" class="icon-cell">
+							<svg xmlns="http://www.w3.org/2000/svg" fill="#fff" height="35" width="35" viewBox="0 0 64 64"><g><g data-name="Outline"><circle cx="43" cy="21" r="1"></circle><path d="M25.276,55.64H22.138V52.349a1,1,0,0,0-2,0V56.64a1,1,0,0,0,1,1h4.138a1,1,0,0,0,0-2Z"></path><path d="M21.138,17.946a1,1,0,0,0,1-1V13.655h3.138a1,1,0,0,0,0-2H21.138a1,1,0,0,0-1,1v4.291A1,1,0,0,0,21.138,17.946Z"></path><path d="M38.724,13.655h3.138v3.291a1,1,0,1,0,2,0V12.655a1,1,0,0,0-1-1H38.724a1,1,0,0,0,0,2Z"></path><path d="M34,52H30a1,1,0,0,0,0,2h4a1,1,0,0,0,0-2Z"></path><path d="M54,55H52V53.209l1.836-2.8A1,1,0,0,0,54,49.86V38.65a3.018,3.018,0,0,0-3-3.03,2.959,2.959,0,0,0-1.1.212A3.032,3.032,0,0,0,48,33.764V5a3,3,0,0,0-3-3H19a3,3,0,0,0-3,3V58.93A3.064,3.064,0,0,0,19,62H54a1,1,0,0,0,1-1V56A1,1,0,0,0,54,55ZM51,37.62a1.017,1.017,0,0,1,1,1.03V49.562l-1.836,2.8A1,1,0,0,0,50,52.91V55H40V52.73a1,1,0,0,0-.288-.7l-8.541-8.661a1.043,1.043,0,0,1-.283-.892.995.995,0,0,1,1.749-.524l3.65,3.71A1,1,0,0,0,38,44.96V30.53a1,1,0,0,1,2,0V42a1,1,0,0,0,2,0V35.61a1,1,0,1,1,2,0V42a1,1,0,0,0,2,0V36.62a1,1,0,1,1,2,0V42a1,1,0,0,0,2,0V38.65A1.017,1.017,0,0,1,51,37.62ZM29.423,27.985a1,1,0,0,0,1-1V24.58h2.958v2.405a1,1,0,0,0,2,0V24.58h1.124l.486,3.7A3.511,3.511,0,0,0,36,31.25H26.419l.875-6.67h1.129v2.405A1,1,0,0,0,29.423,27.985Zm3.958-5.405H30.423V21.1a1.479,1.479,0,1,1,2.958,0ZM26.156,33.25H36v2.34H25.849ZM38.547,4l-.535,2.777a.907.907,0,0,1-.928.587H26.916a.907.907,0,0,1-.928-.587L25.453,4ZM18,58.93V5a1,1,0,0,1,1-1h4.416l.608,3.156a2.867,2.867,0,0,0,2.892,2.208H37.084a2.867,2.867,0,0,0,2.892-2.208L40.584,4H45a1,1,0,0,1,1,1V33.763a3.015,3.015,0,0,0-.472.217A2.993,2.993,0,0,0,43,32.58a2.96,2.96,0,0,0-1,.173V30.53a3.018,3.018,0,0,0-3-3.03c-.032,0-.061.008-.093.009l-.454-3.456A1.677,1.677,0,0,0,36.78,22.58h-1.4V21.1a3.479,3.479,0,0,0-6.958,0V22.58h-1.4a1.7,1.7,0,0,0-1.672,1.46L23.817,35.7A1.687,1.687,0,0,0,25.49,37.59H36v4.928l-1.943-1.975a3.019,3.019,0,1,0-4.309,4.229L38,53.141V55H36a1,1,0,0,0-1,1v3.93H19A1,1,0,0,1,18,58.93ZM53,60H37V57H53Z"></path><circle cx="26" cy="53" r="1"></circle></g></g></svg>
+						</a>
+					</div>
+					<div class="icon-content">
+						<h4 class="dz-tilte text-capitalize"><a href="javascript:void(0)">Ready to Use</a></h4>
+						<p>Interdum et malesuada fames ac ante ipsum primis.</p>
+					</div>
+				</div>
+				<div class="icon-bx-wraper box-hover style-1 right m-b50 m-lg-b30 wow fadeInLeft" data-wow-delay="0.4s">
+					<div class="icon-bx-sm bg-primary radius shadow">
+						<a href="javascript:void(0)" class="icon-cell">
+							<svg xmlns="http://www.w3.org/2000/svg" fill="#fff" height="35" width="35" viewBox="4 -4 70 85"><path style="" d="M 4.6876255,-2.23e-6 C 2.1027767,-2.23e-6 5e-7,2.1027777 5e-7,4.6876177 V 70.312868 c 0,2.58485 2.1027762,4.68713 4.687625,4.68713 H 70.312872 c 2.584848,0 4.687123,-2.10228 4.687123,-4.68713 V 4.6876177 c 0,-2.58484 -2.102275,-4.68761993 -4.687123,-4.68761993 z m 0,3.12499993 H 70.312872 c 0.861171,0 1.562125,0.70012 1.562125,1.56262 V 14.062368 H 3.1250003 V 4.6876177 c 0,-0.8625 0.7007864,-1.56262 1.5626252,-1.56262 z m 6.0076695,3.90656 V 10.156558 H 43.750247 V 7.0315577 Z m 41.770055,0 V 10.156558 H 64.305452 V 7.0315577 Z M 3.1250003,17.187368 H 71.874997 v 53.1255 c 0,0.86184 -0.700954,1.56213 -1.562125,1.56213 H 4.6876255 c -0.8618388,0 -1.5626252,-0.70029 -1.5626252,-1.56213 z m 13.1463787,7.01955 v 25.09288 h -3.09471 v 9.31516 h 3.09471 v 6.24124 h 3.124998 v -6.24124 h 3.09496 v -9.31516 h -3.09496 v -25.09288 z m 14.521247,0 v 5.02283 h -3.09571 v 9.31542 h 3.09571 v 26.31103 h 3.12475 v -26.31103 h 3.094208 v -9.31542 h -3.094208 v -5.02283 z m 14.520247,0 v 17.52308 h -3.09546 v 9.31542 h 3.09546 v 13.81078 h 3.125 v -13.81078 h 3.094958 v -9.31542 h -3.094958 v -17.52308 z m 14.519746,0 v 8.14783 h -3.094708 v 9.31517 h 3.094708 v 23.18628 h 3.125751 v -23.18628 h 3.094708 v -9.31517 H 62.95837 v -8.14783 z m -29.010703,8.14783 h 3.064918 v 3.06542 h -3.064918 z m 29.040744,3.12475 h 3.065668 v 3.06567 H 59.86266 Z m -14.520247,9.3755 h 3.06542 v 3.06542 h -3.06542 z m -29.040994,7.56955 h 3.064918 v 3.06566 h -3.064918 z" stroke-width="0.99999994" /></svg>
+						</a>
+					</div>
+					<div class="icon-content">
+						<h4 class="dz-tilte text-capitalize"><a href="javascript:void(0)">Easy Customize</a></h4>
+						<p>Interdum et malesuada fames ac ante ipsum primis.</p>
+					</div>
+				</div>
+				<div class="icon-bx-wraper box-hover style-1 right m-b50 m-lg-b30 wow fadeInLeft" data-wow-delay="0.6s">
+					<div class="icon-bx-sm bg-primary radius shadow">
+						<a href="javascript:void(0)" class="icon-cell">
+							<svg xmlns="http://www.w3.org/2000/svg" height="35" width="35" fill="#fff" viewBox="0 0 128 128"><path d="M72.33,88a16,16,0,1,0,16-16A16,16,0,0,0,72.33,88Zm16-12a12,12,0,1,1-12,12A12,12,0,0,1,88.33,76Z"></path><path d="M85,93.19a2,2,0,0,0,2.83,0l7.54-7.55a2,2,0,1,0-2.82-2.83l-6.13,6.13-3-3a2,2,0,1,0-2.82,2.83Z"></path><path d="M88,60c-3,0-6-1.69-6-4.81a2,2,0,0,0-4,0c0,4.93,3.74,7.86,8,8.62V66a2,2,0,0,0,4,0V63.89c4.65-.66,8-3.84,8-8.48,0-5.22-4.9-7.13-8.84-8.66S83,44.2,83,42.05c0-3.43,3.38-4.34,5.38-4.34s5.15.85,5.15,4a2,2,0,0,0,4,0c0-4.66-3.59-7.36-7.56-7.93V32a2,2,0,0,0-4,0v2c-3.75.82-7,3.56-7,8.08,0,5,4.81,6.92,8.68,8.43S94,53.1,94,55.41C94,58.62,91.24,60,88,60Z"></path><path d="M110,12H66a6,6,0,0,0-6,6V61a2,2,0,0,0,4,0V18a2,2,0,0,1,2-2h9v2a6,6,0,0,0,6,6H95a6,6,0,0,0,6-6V16h9a2,2,0,0,1,2,2v92a2,2,0,0,1-2,2H66a2,2,0,0,1-2-2v-7a2,2,0,0,0-4,0v7a6,6,0,0,0,6,6h44a6,6,0,0,0,6-6V18A6,6,0,0,0,110,12ZM97,18a2,2,0,0,1-2,2H81a2,2,0,0,1-2-2V16H97Z"></path><path d="M63.74,89.23a0,0,0,0,0,0,0,57.51,57.51,0,0,0,3.08-7.74A7.44,7.44,0,0,0,66.2,75a11,11,0,0,0-5.79-4.64c0-3.88-3.49-6.49-7-8.1a9.53,9.53,0,0,0-5.48-6.46c2.55-6.11,5.57-13.7,6.47-16.91,1.5-5.35,3.18-10.74-2.54-12.87-5.34-2-8.58,4.37-10.15,7.41-7.61,14.85-12,21.8-12,21.9-1.78,2.88-2.19,3.43-2.78,3.56a32.4,32.4,0,0,1-3.11-5.59c-3.18-6.53-7-9-11.36-7.38C7.23,47.89,6,53.16,8.47,58.42c3.46,7.43,3.06,17.2,2.21,25.28-.52,5.12.75,9.14,3.8,12a15.92,15.92,0,0,1-.82,2.79,2,2,0,0,0,2.09,2.71,30.75,30.75,0,0,1,13,1.88,44.64,44.64,0,0,1,13.64,8.86,2,2,0,0,0,3-.23c3.6-5,1.9-3.28,4.42-5.46,6.17-5.34,10.31-9.63,13.88-17Zm-1-12.18A3.48,3.48,0,0,1,63,80.24a54.76,54.76,0,0,1-2.84,7.16,2.61,2.61,0,0,1-3.23.88,4,4,0,0,1-2.05-3,9.34,9.34,0,0,0,1.84-3c1.16-3.12,2.17-5.24,2.95-7.8A6.78,6.78,0,0,1,62.74,77.05Zm-6.48-7.54c.5,1-.23,3.27-.73,4.8C55.17,75.42,54,78.07,53,80.82c-.56,1.51-1.72,2.89-3.32,2.7a3.78,3.78,0,0,1-2.9-2.43,6.82,6.82,0,0,0,1.8-2.64C53.2,66.82,53,67.22,53.2,66.7A7.23,7.23,0,0,1,56.26,69.51Zm-7.18-7.39C50.6,65,48.5,66.94,44.85,77c-.6,1.5-1.58,1.83-2.8,1.24a3.75,3.75,0,0,1-1.63-4.15c1-3.4,5.1-12.62,5.91-14.53A5.81,5.81,0,0,1,49.08,62.12Zm-1.85,41.06c-2.76,2.39-1.94,1.72-3.74,4.31A47.35,47.35,0,0,0,30.2,99.31a34.68,34.68,0,0,0-11.91-2.24c.66-2.9-.23-3.63-.71-4-2.38-2-3.33-4.88-2.92-8.94C15.57,75.43,16,65,12.1,56.74c-1.35-2.9-1.35-5.9,1.68-7,.86-.33,3.17-1.19,6.37,5.38,1.58,3.27,1.68,3,5.69,12.29a2,2,0,0,0,3.67-1.58c-.05-.13-.62-1.44-1.35-3.1,2-.61,3-2.26,4.87-5.23.06-.1,4.57-7.29,12.2-22.17,2.27-4.42,3.77-6,5.2-5.49,2.4.9,1.37,3.43.08,8-1.17,4.16-6.39,16.78-8.8,22.29-1.39,3.2-4.25,10-5.11,12.74a7.67,7.67,0,0,0,3.71,8.94,6.68,6.68,0,0,0,2.69.65,7.72,7.72,0,0,0,6.22,5,5.8,5.8,0,0,0,2.08-.12,7.79,7.79,0,0,0,4,4.55,6.73,6.73,0,0,0,2,.54A53,53,0,0,1,47.23,103.18Z"></path><path d="M29,28.24V16.69a2,2,0,1,0-4,0V28.24a2,2,0,0,0,4,0Z"></path><path d="M35.49,32.33,43,23.91a2,2,0,1,0-3-2.66l-7.5,8.42a2,2,0,0,0,3,2.66Z"></path><path d="M21.33,32.49a2,2,0,0,0,.16-2.82L14,21.25a2,2,0,1,0-3,2.66l7.5,8.42A2,2,0,0,0,21.33,32.49Z"></path></svg>
+						</a>
+					</div>
+					<div class="icon-content">
+						<h4 class="dz-tilte text-capitalize"><a href="javascript:void(0)">Awesome UI</a></h4>
+						<p>Interdum et malesuada fames ac ante ipsum primis.</p>
+					</div>
+				</div>
+			</div>
+			<div class="col-lg-4 align-self-center  d-lg-block d-none wow zoomIn" data-wow-delay="0.2s">
+				<div class="dz-media text-center m-b30 anm" data-speed-x="-1" data-speed-scale="-1">
+					<img src="~/mophy/frontend/images/home-banner/phone.png" alt="">
+				</div>
+			</div>
+			<div class="col-lg-4 col-md-6 section-wraper-right">
+				<div class="icon-bx-wraper box-hover style-1 left m-b50 m-lg-b30 wow fadeInRight" data-wow-delay="0.2s">
+					<div class="icon-bx-sm bg-primary radius shadow">
+						<a href="javascript:void(0)" class="icon-cell">
+							<svg xmlns="http://www.w3.org/2000/svg" fill="#fff" height="35" width="35" viewBox="5 4 50 50"><path d="M41.2104492,23.2329102c0-6.184082-5.0307617-11.2148438-11.2148438-11.2148438  c-6.1835938,0-11.2143555,5.0307617-11.2143555,11.2148438c0,6.1835938,5.0307617,11.2143555,11.2143555,11.2143555  C36.1796875,34.4472656,41.2104492,29.4165039,41.2104492,23.2329102z M20.78125,23.2329102  c0-5.0810547,4.1333008-9.2148438,9.2143555-9.2148438s9.2148438,4.1337891,9.2148438,9.2148438  c0,5.0805664-4.1337891,9.2143555-9.2148438,9.2143555S20.78125,28.3134766,20.78125,23.2329102z" /><path d="M35.769043,18.96875c-0.390625-0.390625-1.0234375-0.390625-1.4140625,0l-6.4072266,6.4067383l-2.3110352-2.3105469  c-0.390625-0.390625-1.0234375-0.390625-1.4140625,0s-0.390625,1.0239258,0,1.4140625l3.0180664,3.0175781  c0.1953125,0.1953125,0.4511719,0.2929688,0.7070313,0.2929688s0.5117188-0.0976563,0.7070313-0.2929688l7.1142578-7.1137695  C36.159668,19.9921875,36.159668,19.359375,35.769043,18.96875z" /><path d="M10.1943359,47.425293C10.1943359,51.7416992,20.1577148,54,30,54s19.8056641-2.2583008,19.8056641-6.574707  c0-3.7717285-7.5869751-5.9050903-15.5631104-6.4456787l0.5948486-1.2169189  c7.3188477-2.1269531,12.390625-8.859375,12.390625-16.5327148C47.2280273,13.7294922,39.4990234,6,29.9985352,6  s-17.2299805,7.7294922-17.2299805,17.2299805c0,7.6635742,5.0678711,14.3959961,12.3818359,16.5322266l0.5969849,1.2185059  C17.7774658,41.527771,10.1943359,43.6630859,10.1943359,47.425293z M14.7685547,23.2299805  C14.7685547,14.8320313,21.6005859,8,29.9985352,8c8.3974609,0,15.2294922,6.8320313,15.2294922,15.2299805  c0,6.9199219-4.6650391,12.9736328-11.3447266,14.7216797c-0.2817383,0.0737305-0.5170898,0.2666016-0.6450195,0.5283203  l-1.4476929,2.9619751c-0.0088501,0.017395-0.0174561,0.0336914-0.0252686,0.0516357l-1.7677612,3.6167603l-3.2490234-6.6313477  c-0.1279297-0.2607422-0.3623047-0.453125-0.6430664-0.5268555C19.4301758,36.1943359,14.7685547,30.1401367,14.7685547,23.2299805z   M26.7026367,42.930542l2.3979492,4.8946533c0.1679688,0.3427734,0.5161133,0.5600586,0.8979492,0.5600586h0.0004883  c0.3818359,0,0.7304688-0.2177734,0.8979492-0.5610352l2.3920898-4.8938599  c9.3474731,0.4973755,14.5166016,2.9415894,14.5166016,4.4949341C47.8056641,49.2905273,40.8691406,52,30,52  s-17.8056641-2.7094727-17.8056641-4.574707C12.1943359,45.8772583,17.3606567,43.4355469,26.7026367,42.930542z" /></svg>
+						</a>
+					</div>
+					<div class="icon-content">
+						<h4 class="dz-tilte text-capitalize"><a href="javascript:void(0)">Track Anything</a></h4>
+						<p>Interdum et malesuada fames ac ante ipsum primis.</p>
+					</div>
+				</div>
+				<div class="icon-bx-wraper box-hover style-1 left m-b50 m-lg-b30 wow fadeInRight" data-wow-delay="0.4s">
+					<div class="icon-bx-sm bg-primary radius shadow">
+						<a href="javascript:void(0)" class="icon-cell">
+							<svg xmlns="http://www.w3.org/2000/svg" height="35" width="35" fill="#fff" viewBox="0 0 200 200"><g><g><path fill="#fff" d="M40.59,99.998h-6.353c0-36.26,29.5-65.76,65.763-65.76h3.175v11.978l18.685-18.686L103.175,8.847v11.98    H100c-43.657,0-79.174,35.516-79.174,79.171h-6.353c0-46.095,36.655-83.791,82.351-85.466V4.587c0-1.858,1.108-3.522,2.826-4.237    c1.736-0.711,3.696-0.32,5.005,0.993l26.188,26.187l-26.188,26.189c-1.311,1.313-3.271,1.708-4.992,0.998    c-1.731-0.72-2.84-2.383-2.84-4.242v-9.801C65.535,42.331,40.59,68.307,40.59,99.998z" /></g><g><path fill="#fff" d="M98.583,200c-1.191,0-2.36-0.467-3.24-1.346l-26.188-26.188l26.188-26.186    c1.318-1.32,3.281-1.707,5.003-0.995c1.714,0.706,2.831,2.371,2.831,4.237v9.803c31.286-1.657,56.23-27.634,56.23-59.327h6.353    c0,36.263-29.499,65.762-65.76,65.762h-3.176v-11.977l-18.685,18.683l18.685,18.683v-11.979H100    c43.656,0,79.174-35.517,79.174-79.171h6.353c0,46.095-36.654,83.792-82.35,85.466v9.945c0,1.858-1.11,3.523-2.828,4.237    C99.777,199.884,99.176,200,98.583,200z" /></g><g><path fill="#fff" d="M100,136.349c-20.045,0-36.352-16.306-36.352-36.351c0-20.042,16.307-36.349,36.352-36.349    c20.044,0,36.352,16.306,36.352,36.349C136.352,120.043,120.044,136.349,100,136.349z M100,70.002    c-16.541,0-29.999,13.457-29.999,29.996c0,16.543,13.458,29.998,29.999,29.998c16.541,0,29.999-13.455,29.999-29.998    C129.999,83.459,116.541,70.002,100,70.002z" /><polygon fill="#fff" points="96.586,113.641 82.872,99.928 87.364,95.436 96.585,104.657 112.638,88.601 117.129,93.093   " /></g><g><path fill="#fff" d="M60.936,165.195c-2.121-1.274-4.208-2.669-6.198-4.147l4.208-5.669c1.806,1.341,3.7,2.608,5.625,3.764    L60.936,165.195z M48.975,156.313c-1.833-1.662-3.609-3.435-5.272-5.269l5.228-4.745c1.511,1.665,3.121,3.275,4.786,4.786    L48.975,156.313z M38.969,145.285c-1.478-1.991-2.876-4.075-4.15-6.195l6.049-3.637c1.155,1.924,2.424,3.815,3.767,5.621    L38.969,145.285z M31.295,132.519c-1.062-2.241-2.024-4.56-2.857-6.887l6.645-2.38c0.756,2.109,1.627,4.21,2.589,6.242    L31.295,132.519z M26.271,118.493c-0.601-2.407-1.089-4.869-1.45-7.318l6.984-1.028c0.328,2.22,0.77,4.453,1.315,6.634    L26.271,118.493z" /></g><g><path fill="#fff" d="M168.197,89.849c-0.328-2.225-0.771-4.456-1.315-6.631l6.847-1.715c0.601,2.402,1.089,4.864,1.453,7.318    L168.197,89.849z M164.919,76.744c-0.761-2.118-1.632-4.216-2.592-6.243l6.378-3.024c1.059,2.233,2.021,4.549,2.859,6.885    L164.919,76.744z M159.132,64.543c-1.161-1.927-2.427-3.819-3.767-5.622l5.666-4.21c1.476,1.988,2.873,4.072,4.149,6.196    L159.132,64.543z M151.066,53.693c-1.505-1.66-3.115-3.267-4.783-4.781l4.739-5.23c1.839,1.668,3.615,3.441,5.274,5.272    L151.066,53.693z M141.05,44.616c-1.804-1.34-3.697-2.605-5.625-3.764l3.634-6.052c2.126,1.277,4.211,2.672,6.198,4.15    L141.05,44.616z" /></g></g></svg>
+						</a>
+					</div>
+					<div class="icon-content">
+						<h4 class="dz-tilte text-capitalize"><a href="javascript:void(0)">Free Updates</a></h4>
+						<p>Interdum et malesuada fames ac ante ipsum primis.</p>
+					</div>
+				</div>
+				<div class="icon-bx-wraper box-hover style-1 left m-b50 m-lg-b30 wow fadeInRight" data-wow-delay="0.6s">
+					<div class="icon-bx-sm bg-primary radius shadow">
+						<a href="javascript:void(0)" class="icon-cell">
+							<svg xmlns="http://www.w3.org/2000/svg" height="35" width="35" fill="#fff" version="1.1" viewBox="0 0 65 65"><g><rect x="29.3" y="36.1" width="22.7" height="1.5" /><rect x="29.3" y="40.6" width="19.4" height="1.5" /><path d="M13.3,45.2h12.2V33H13.3V45.2z M14.8,34.5h9.2v9.2h-9.2V34.5z" /><rect x="29.3" y="51.4" width="22.7" height="1.5" /><rect x="29.3" y="56" width="19.4" height="1.5" /><path d="M13.3,60.6h12.2V48.4H13.3V60.6z M14.8,49.9h9.2v9.2h-9.2V49.9z" /><rect x="31.7" y="4.9" width="1.6" height="1.5" /><path d="M46,8.3V7.5c0-1.6-1.3-2.8-2.8-2.8h-5c-0.4-2.8-2.8-5-5.7-5c-2.9,0-5.3,2.2-5.7,5h-5C20.3,4.7,19,6,19,7.5v0.7H7.2v57h50.7   v-57H46z M20.5,7.5c0-0.7,0.6-1.3,1.3-1.3h6.4V5.5c0-2.3,1.9-4.2,4.2-4.2c2.3,0,4.2,1.9,4.2,4.2v0.8h6.4c0.7,0,1.3,0.6,1.3,1.3V11   H20.5V7.5z M56.3,63.8H8.7v-54H19v2.8H46V9.8h10.4V63.8z" /><rect x="29.3" y="20.7" width="22.7" height="1.5" /><rect x="29.3" y="25.3" width="19.4" height="1.5" /><path d="M19.5,16.2l-2.1,4.3l-4.7,0.7l3.5,3.3l-0.8,4.7l4.2-2.3l4.2,2.3l-0.8-4.7l3.5-3.3l-4.7-0.7L19.5,16.2z M21.2,23.9l0.4,2.5   l-2.2-1.2l-2.2,1.2l0.4-2.5l-1.8-1.7l2.5-0.3l1.1-2.3l1.1,2.3l2.5,0.3L21.2,23.9z" /></g></svg>
+						</a>
+					</div>
+					<div class="icon-content">
+						<h4 class="dz-tilte text-capitalize"><a href="javascript:void(0)">Lovely Features</a></h4>
+						<p>Interdum et malesuada fames ac ante ipsum primis.</p>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+</section>
+
+@section Mophy_script
+	{
+	<script src="~/mophy/frontend/js/anm.js"></script><!-- JQUERY.MIN JS -->
+	<script src="~/mophy/frontend/vendor/counter/waypoints-min.js"></script><!-- WAYPOINTS JS -->
+	<script src="~/mophy/frontend/vendor/counter/counterup.min.js"></script><!-- COUNTERUP JS -->
+	<script src="~/mophy/frontend/js/dz.carousel.js"></script><!-- OWL SLIDER -->
+	<script src="~/mophy/frontend/vendor/odometer/odometer.js"></script><!-- ODOMETER -->
+	<script src="~/mophy/frontend/vendor/rangeslider/rangeslider.js"></script><!-- RANGESLIDER -->
+	<script src="~/mophy/frontend/plugin/twentytwenty-master/js/jquery.event.move.js"></script>
+	<script src="~/mophy/frontend/plugin/twentytwenty-master/js/jquery.twentytwenty.js"></script>
+	<script>
+		$(window).on('load', function () {
+			$(".twentytwenty-container[data-orientation!='vertical']").twentytwenty({ default_offset_pct: 0.5 });
+			$(".twentytwenty-container[data-orientation='vertical']").twentytwenty({ default_offset_pct: 0.3, orientation: 'vertical' });
+		});
+	</script>
+}

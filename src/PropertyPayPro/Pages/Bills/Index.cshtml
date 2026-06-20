@@ -7,7 +7,6 @@
 <div class="d-flex justify-content-between align-items-center mb-3">
     <h1>Rent Bills</h1>
     <div>
-        <a asp-page="LateFees" class="btn btn-outline-warning">Late Fees</a>
         <a asp-page="Generate" class="btn btn-success">Generate Bills</a>
     </div>
 </div>
@@ -42,10 +41,7 @@
     @foreach (var c in Model.Charges)
     {
         <tr>
-            <td>
-                @c.PeriodLabel
-                @if (c.Kind == PropertyPayPro.Models.ChargeKind.LateFee) { <span class="badge bg-warning text-dark ms-1">Late fee</span> }
-            </td>
+            <td>@c.PeriodLabel</td>
             <td>@c.Lease!.Tenant!.DisplayName</td>
             <td>@c.Lease.Property!.Name</td>
             <td>@c.DueDate.ToString("yyyy-MM-dd")</td>

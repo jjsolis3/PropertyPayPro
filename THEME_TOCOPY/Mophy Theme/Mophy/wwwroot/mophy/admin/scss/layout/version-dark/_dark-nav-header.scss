@@ -1,0 +1,14 @@
+[data-theme-version="dark"] {
+
+    .nav-control {
+        color: $white;
+    }
+
+    .brand-logo {
+        color: $white;
+
+        &:hover {
+            color: $white;
+        }
+    }
+}

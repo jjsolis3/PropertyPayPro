@@ -1,0 +1,23 @@
+.footer {
+    padding-#{$dz-pos-left}: var(--dz-sidebar-width);
+    background-color: var(--card);
+    
+    .copyright {
+        padding: 0.9375rem;
+		
+        p {
+            text-align: center;
+            margin: 0;
+            color: #918f8f;
+        }
+
+        a{
+            color: var(--primary);
+        }
+		@include custommq($min: 991px) {
+			border-radius:0 0 0 50px;
+		}
+    }
+}
+
+

@@ -264,6 +264,32 @@ namespace PropertyPayPro.Migrations
                     b.ToTable("Leases");
                 });
 
+            modelBuilder.Entity("PropertyPayPro.Models.PaymentAllocation", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<decimal>("Amount")
+                        .HasColumnType("numeric(10,2)");
+
+                    b.Property<int>("RentPaymentId")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("RentalChargeId")
+                        .HasColumnType("integer");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("RentPaymentId");
+
+                    b.HasIndex("RentalChargeId");
+
+                    b.ToTable("PaymentAllocations");
+                });
+
             modelBuilder.Entity("PropertyPayPro.Models.Property", b =>
                 {
                     b.Property<int>("Id")
@@ -343,6 +369,38 @@ namespace PropertyPayPro.Migrations
                     b.HasIndex("LeaseId");
 
                     b.ToTable("RentPayments");
+                });
+
+            modelBuilder.Entity("PropertyPayPro.Models.RentalCharge", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<decimal>("AmountDue")
+                        .HasColumnType("numeric(10,2)");
+
+                    b.Property<DateOnly>("BillingPeriodStart")
+                        .HasColumnType("date");
+
+                    b.Property<DateOnly>("DueDate")
+                        .HasColumnType("date");
+
+                    b.Property<int>("LeaseId")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("Notes")
+                        .HasMaxLength(500)
+                        .HasColumnType("character varying(500)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("LeaseId", "BillingPeriodStart")
+                        .IsUnique();
+
+                    b.ToTable("RentalCharges");
                 });
 
             modelBuilder.Entity("PropertyPayPro.Models.Tenant", b =>
@@ -450,6 +508,25 @@ namespace PropertyPayPro.Migrations
                     b.Navigation("Tenant");
                 });
 
+            modelBuilder.Entity("PropertyPayPro.Models.PaymentAllocation", b =>
+                {
+                    b.HasOne("PropertyPayPro.Models.RentPayment", "Payment")
+                        .WithMany("Allocations")
+                        .HasForeignKey("RentPaymentId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("PropertyPayPro.Models.RentalCharge", "RentalCharge")
+                        .WithMany("Allocations")
+                        .HasForeignKey("RentalChargeId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("Payment");
+
+                    b.Navigation("RentalCharge");
+                });
+
             modelBuilder.Entity("PropertyPayPro.Models.RentPayment", b =>
                 {
                     b.HasOne("PropertyPayPro.Models.Lease", "Lease")
@@ -461,14 +538,37 @@ namespace PropertyPayPro.Migrations
                     b.Navigation("Lease");
                 });
 
+            modelBuilder.Entity("PropertyPayPro.Models.RentalCharge", b =>
+                {
+                    b.HasOne("PropertyPayPro.Models.Lease", "Lease")
+                        .WithMany("Charges")
+                        .HasForeignKey("LeaseId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Lease");
+                });
+
             modelBuilder.Entity("PropertyPayPro.Models.Lease", b =>
                 {
+                    b.Navigation("Charges");
+
                     b.Navigation("Payments");
                 });
 
             modelBuilder.Entity("PropertyPayPro.Models.Property", b =>
                 {
                     b.Navigation("Leases");
+                });
+
+            modelBuilder.Entity("PropertyPayPro.Models.RentPayment", b =>
+                {
+                    b.Navigation("Allocations");
+                });
+
+            modelBuilder.Entity("PropertyPayPro.Models.RentalCharge", b =>
+                {
+                    b.Navigation("Allocations");
                 });
 
             modelBuilder.Entity("PropertyPayPro.Models.Tenant", b =>

@@ -1,0 +1,48 @@
+﻿@{
+    @using Microsoft.Extensions.Configuration
+    @inject IConfiguration Configuration
+}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <partial name="Mophy/Admin/_Meta" />
+    <title>@Configuration.GetSection("DefaultValue")["TitleAdmin"]</title>
+    <!-- Favicon icon -->
+    <link rel="icon" type="image/png" sizes="16x16" href="~/mophy/admin/images/favicon.png">
+
+    <link href="~/mophy/admin/vendor/bootstrap-select/dist/css/bootstrap-select.min.css" rel="stylesheet">
+    <!--**********************************
+        Style script start
+    ***********************************-->
+    @RenderSection("Mophy_style", false)
+    <!--**********************************
+        Style script end
+    ***********************************-->
+    <!-- Style css -->
+    <link class="main-css" href="~/mophy/admin/css/style.css" rel="stylesheet">
+</head>
+<body>
+    <partial name="Mophy/Admin/_PreLoader" />
+    <!--**********************************
+        Main wrapper start
+    ***********************************-->
+    <div id="main-wrapper">
+        <partial name="Mophy/Admin/_NevHeader" />
+        <partial name="Mophy/Admin/_Chatbox" />
+        <partial name="Mophy/Admin/_Header" />
+        <partial name="Mophy/Admin/_Sidebar" />
+        <!--**********************************
+            Content body start
+        ***********************************-->
+        @RenderBody()
+        <!--**********************************
+            Content body end
+        ***********************************-->
+        <partial name="Mophy/Admin/_Footer" />
+    </div>
+    <!--**********************************
+        Main wrapper end
+    ***********************************-->
+    @RenderSection("Mophy_script", false)
+</body>
+</html>
