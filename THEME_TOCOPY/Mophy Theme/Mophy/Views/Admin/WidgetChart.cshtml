@@ -1,0 +1,799 @@
+﻿@{
+	Layout = "~/Views/Shared/_LayoutMophyAdmin.cshtml";
+	ViewData["Title"] = "<<Put your different title string value here for each page>>";
+}
+<div class="content-body default-height">
+	<div class="container-fluid">
+		<div class="page-titles">
+			<ol class="breadcrumb">
+				<li class="breadcrumb-item"><a href="javascript:void(0)">Widget</a></li>
+				<li class="breadcrumb-item active"><a href="javascript:void(0)">Chart</a></li>
+			</ol>
+		</div>
+		<!-- row -->
+		<div class="row">
+			<div class="col-xl-12 col-lg-12 col-sm-12">
+				<div class="row">
+					<div class="col-xl-3 col-xxl-6 col-lg-6 col-sm-6">
+						<div class="widget-stat card bg-primary">
+							<div class="card-header border-0 pb-0">
+								<h3 class="card-title text-white">Total Students</h3>
+								<h5 class="text-white mb-0"><i class="fa fa-caret-up"></i> 422</h5>
+							</div>
+							<div class="card-body text-center">
+								<div class="ico-sparkline">
+									<div id="sparkline12"></div>
+								</div>
+							</div>
+						</div>
+					</div>
+					<div class="col-xl-3 col-xxl-6 col-lg-6 col-sm-6">
+						<div class="widget-stat card bg-warning overflow-hidden">
+							<div class="card-header border-0 ">
+								<h3 class="card-title text-white">New Students</h3>
+								<h5 class="text-white mb-0"><i class="fa fa-caret-up"></i> 357</h5>
+							</div>
+							<div class="card-body text-center p-0">
+								<div class="ico-sparkline">
+									<div id="spark-bar-2"></div>
+								</div>
+							</div>
+						</div>
+					</div>
+					<div class="col-xl-3 col-xxl-6 col-lg-6 col-sm-6">
+						<div class="widget-stat card bg-secondary overflow-hidden">
+							<div class="card-header pb-3 border-0 pb-0">
+								<h3 class="card-title text-white">Total Course</h3>
+								<h5 class="text-white mb-0"><i class="fa fa-caret-up"></i> 547</h5>
+							</div>
+							<div class="card-body p-0">
+								<div class="px-4">
+									<span class="bar1"
+										  data-peity='{ "fill": ["rgb(255, 255, 255)", "rgb(255, 255, 255)"]}'>6,2,8,4,-3,8,1,-3,6,-5,9,2,-8,1,4,8,9,8,2,1</span>
+								</div>
+							</div>
+						</div>
+					</div>
+					<div class="col-xl-3 col-xxl-6 col-lg-6 col-sm-6">
+						<div class="widget-stat card bg-danger overflow-hidden">
+							<div class="card-header pb-3 border-0 pb-0">
+								<h3 class="card-title text-white">Fees Collection</h3>
+								<h5 class="text-white mb-0"><i class="fa fa-caret-up"></i> 3280$</h5>
+							</div>
+							<div class="card-body p-0">
+								<span class="peity-line-2" data-width="100%">7,6,8,7,3,8,3,3,6,5,9,2,8</span>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+			<div class="col-xl-8 col-xxl-8 col-lg-12 col-sm-12">
+				<div id="user-activity" class="card">
+					<div class="card-header border-0 pb-0 d-sm-flex d-block">
+						<h4 class="card-title">Visitor Activity</h4>
+						<div class="card-tabs mb-sm-0 my-2">
+							<ul class="nav nav-tabs" id="myTab" role="tablist">
+								<li class="nav-item" role="presentation">
+									<a class="nav-link active" id="home-tab" href="javascript:void(0);"
+									   data-bs-toggle="tab" data-bs-target="#home-tab-pane" role="tab"
+									   aria-selected="true">Day</a>
+								</li>
+								<li class="nav-item" role="presentation">
+									<a class="nav-link" id="profile-tab" href="javascript:void(0);"
+									   data-bs-toggle="tab" data-bs-target="#profile-tab-pane" role="tab"
+									   aria-selected="false">Month</a>
+								</li>
+								<li class="nav-item" role="presentation">
+									<a class="nav-link" id="contact-tab" href="javascript:void(0);"
+									   data-bs-toggle="tab" data-bs-target="#contact-tab-pane" role="tab"
+									   aria-selected="false"> Year</a>
+								</li>
+							</ul>
+						</div>
+					</div>
+
+					<div class="card-body">
+						<div class="tab-content" id="myTabContent">
+							<div class="tab-pane fade show active" id="user" role="tabpanel">
+								<canvas id="activity" class="chartjs"></canvas>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+			<div class="col-xl-4 col-lg-12 col-sm-12">
+				<div class="card active_users">
+					<div class="card-header bg-primary border-0 pb-0">
+						<h4 class="card-title text-white">Active Users</h4>
+						<span id="counter"></span>
+					</div>
+					<div class="bg-primary">
+						<canvas id="activeUser"></canvas>
+					</div>
+					<div class="card-body pt-0">
+						<div class="list-group-flush mt-4">
+							<div class="list-group-item bg-transparent d-flex justify-content-between border-0 px-0 py-1 fw-semi-bold border-top-0 border-bottom">
+								<p class="mb-0">Top Active Pages</p>
+								<p class="mb-0">Active Users</p>
+							</div>
+							<div class="list-group-item bg-transparent d-flex justify-content-between border-0 border-bottom px-0 py-1">
+								<p class="mb-0">/bootstrap-themes/</p>
+								<p class="mb-0">3</p>
+							</div>
+							<div class="list-group-item bg-transparent d-flex justify-content-between border-0 border-bottom px-0 py-1">
+								<p class="mb-0">/tags/html5/</p>
+								<p class="mb-0">3</p>
+							</div>
+							<div class="list-group-item bg-transparent d-xxl-flex justify-content-between px-0 py-1 d-none">
+								<p class="mb-0">/</p>
+								<p class="mb-0">2</p>
+							</div>
+							<div class="list-group-item bg-transparent d-xxl-flex justify-content-between px-0 py-1 d-none">
+								<p class="mb-0">/preview/falcon/dashboard/</p>
+								<p class="mb-0">2</p>
+							</div>
+							<div class="list-group-item bg-transparent d-flex justify-content-between border-0 border-bottom px-0 py-1">
+								<p class="mb-0">/100-best-themes...all-time/</p>
+								<p class="mb-0">1</p>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+			<div class="col-xl-8 col-lg-12 col-xxl-8 col-sm-12">
+				<div class="row">
+					<div class="col-xl-6 col-lg-6 col-xxl-6 col-md-6">
+						<div class="card">
+							<div class="card-header border-0 pb-0">
+								<div class="clearfix">
+									<h3 class="card-title">Blood pressure</h3>
+									<span>In the normal</span>
+								</div>
+								<div class="clearfix text-center">
+									<h3 class="text-primary mb-0">120/89</h3>
+									<span>mmHG</span>
+								</div>
+							</div>
+							<div class="card-body text-center">
+								<div class="ico-sparkline">
+									<div id="spark-bar"></div>
+								</div>
+							</div>
+						</div>
+					</div>
+					<div class="col-xl-6 col-lg-6 col-xxl-6 col-md-6">
+						<div class="card">
+							<div class="card-header border-0 pb-0">
+								<div class="clearfix">
+									<h3 class="card-title">Heart Rate</h3>
+									<span class="text-danger">Above the normal</span>
+								</div>
+								<div class="clearfix text-center">
+									<h3 class="text-danger mb-0">107</h3>
+									<span>Per Min</span>
+								</div>
+							</div>
+							<div class="card-body text-center">
+								<div class="ico-sparkline">
+									<div id="composite-bar"></div>
+								</div>
+							</div>
+						</div>
+					</div>
+					<div class="col-xl-6 col-lg-6 col-xxl-6 col-md-6">
+						<div class="card overflow-hidden">
+							<div class="card-header border-0 pb-0">
+								<div class="clearfix">
+									<h3 class="card-title">Glucose Rate</h3>
+									<span>In the normal</span>
+								</div>
+								<div class="clearfix text-center">
+									<h3 class="text-success mb-0">97</h3>
+									<span>mg/dl</span>
+								</div>
+							</div>
+							<div class="card-body text-center">
+								<div class="ico-sparkline">
+									<div id="sparkline8"></div>
+								</div>
+							</div>
+						</div>
+					</div>
+					<div class="col-xl-6 col-lg-6 col-xxl-6 col-md-6">
+						<div class="card overflow-hidden">
+							<div class="card-header border-0 pb-0">
+								<div class="clearfix">
+									<h3 class="card-title">Clolesterol</h3>
+									<span>In the normal</span>
+								</div>
+								<div class="clearfix text-center">
+									<h3 class="text-info mb-0">124</h3>
+									<span>mg/dl</span>
+								</div>
+							</div>
+							<div class="card-body text-center">
+								<div class="ico-sparkline">
+									<div id="sparkline9" class="height80;"></div>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+			<div class="col-xl-4 col-lg-12 col-sm-12">
+				<div class="card bgl-primary card-body overflow-hidden p-0 d-flex rounded">
+					<div class="p-0 text-center mt-3">
+						<span class="text-black">Limit</span>
+						<h3 class="text-black fs-20 mb-0 font-w600">$4,000</h3>
+						<small>/$10,000</small>
+					</div>
+					<canvas id="lineCharts" height="100" class="mt-auto line-chart-demo" width="231"
+							style="display: block; box-sizing: border-box; height: 300px; width: 231px;"></canvas>
+				</div>
+			</div>
+			<div class="col-xl-6 col-lg-6 col-xxl-6 col-sm-6">
+				<div class="card bg-primary">
+					<div class="card-body pb-0">
+						<div class="row">
+							<div class="col">
+								<h5 class="text-white">Power</h5>
+								<span class="text-white">2017.1.20</span>
+							</div>
+							<div class="col text-end">
+								<h5 class="text-white"><i class="fa fa-caret-up"></i> 260</h5>
+								<span class="text-white">+12.5(2.8%)</span>
+							</div>
+						</div>
+					</div>
+					<div class="chart-wrapper">
+						<canvas id="chart_widget_1"></canvas>
+					</div>
+				</div>
+			</div>
+			<div class="col-xl-6 col-lg-6 col-xxl-6 col-sm-6">
+				<div class="card bg-success overflow-hidden">
+					<div class="card-body pb-0">
+						<div class="row">
+							<div class="col">
+								<h5 class="text-white">Power</h5>
+								<span class="text-white">2017.1.20</span>
+							</div>
+							<div class="col text-end">
+								<h5 class="text-white"><i class="fa fa-caret-up"></i> 260</h5>
+								<span class="text-white">+12.5(2.8%)</span>
+							</div>
+						</div>
+					</div>
+					<div class="chart-wrapper">
+						<div id="chart_widget_5"></div>
+					</div>
+				</div>
+			</div>
+			<div class="col-xl-4 col-lg-6 col-xxl-4 col-sm-6">
+				<div class="card">
+					<div class="card-body pb-0">
+						<div class="row">
+							<div class="col">
+								<h5>3650</h5>
+								<span>VIEWS OF YOUR PROJECT</span>
+							</div>
+						</div>
+					</div>
+					<div class="chart-wrapper">
+						<canvas id="chart_widget_2"></canvas>
+					</div>
+				</div>
+			</div>
+			<div class="col-xl-4 col-lg-6 col-xxl-4 col-sm-6">
+				<div class="card">
+					<div class="card-body">
+						<h5>Latency</h5>
+					</div>
+					<div class="chart-wrapper">
+						<div id="chart_widget_17"></div>
+					</div>
+				</div>
+			</div>
+			<div class="col-xl-4 col-lg-12 col-xxl-4 col-sm-12">
+				<div class="card">
+					<div class="card-body">
+						<div class="row justify-content-between align-items-center">
+							<div class="col-auto">
+								<h4 class="text-uppercase">74,206 K</h4>
+								<span>Lifetime earnings</span>
+							</div>
+							<div class="col-auto">
+								<div class="chart-wrapper height100">
+									<canvas id="chart_widget_7"></canvas>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+
+			<div class="col-xl-12 col-xxl-12">
+				<div class="row">
+					<div class="col-md-6">
+						<div class="card">
+							<div class="card-body pb-0">
+								<div class="row justify-content-between">
+									<div class="col-auto">
+										<h5>Lorem Ipsum</h5>
+									</div>
+									<div class="col-auto">
+										<h5>
+											<span><i class="fa fa-caret-up"></i></span>
+											<span>2,250</span>
+										</h5>
+									</div>
+								</div>
+							</div>
+							<div class="chart-wrapper">
+								<div id="chart_widget_6"></div>
+							</div>
+							<div class="card-footer">
+								<div class="row">
+									<div class="col text-center">
+										<h5 class="fw-normal">1230</h5>
+										<span>Type A</span>
+									</div>
+									<div class="col text-center">
+										<h5 class="fw-normal">1230</h5>
+										<span>Type A</span>
+									</div>
+									<div class="col text-center">
+										<h5 class="fw-normal">1230</h5>
+										<span>Type A</span>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+					<div class="col-md-6">
+						<div class="card">
+							<div class="card-body pb-0">
+								<div class="row justify-content-between">
+									<div class="col-auto">
+										<h5>Lorem Ipsum</h5>
+									</div>
+									<div class="col-auto">
+										<h5>
+											<span><i class="fa fa-caret-up"></i></span>
+											<span>2,250</span>
+										</h5>
+									</div>
+								</div>
+							</div>
+							<div class="chart-wrapper">
+								<canvas id="chart_widget_3"></canvas>
+							</div>
+							<div class="card-footer">
+								<div class="row">
+									<div class="col text-center">
+										<h5 class="fw-normal">1230</h5>
+										<span>Type A</span>
+									</div>
+									<div class="col text-center">
+										<h5 class="fw-normal">1230</h5>
+										<span>Type A</span>
+									</div>
+									<div class="col text-center">
+										<h5 class="fw-normal">1230</h5>
+										<span>Type A</span>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+			<div class="col-xl-6 col-lg-6">
+				<div class="card overflow-hidden">
+					<div class="card-body pb-0">
+						<h4 class="card-title text-uppercase fw-normal">Market Now</h4>
+						<h2 class="fw-normal text-danger">
+							<span><i class="fa fa-caret-up"></i></span>
+							<span>3454664</span>
+						</h2>
+						<div class="row mt-5">
+							<div class="col text-center">
+								<h5 class="fw-normal">APPL</h5>
+								<span class="text-success">+ 82.24 %</span>
+							</div>
+							<div class="col text-center">
+								<h5 class="fw-normal">FB</h5>
+								<span class="text-danger">- 12.24 %</span>
+							</div>
+							<div class="col text-center">
+								<h5 class="fw-normal">GOOG</h5>
+								<span class="text-success">+ 42.24 %</span>
+							</div>
+						</div>
+					</div>
+					<div class="chart-wrapper">
+						<canvas id="chart_widget_4"></canvas>
+					</div>
+				</div>
+			</div>
+			<div class="col-xl-6 col-lg-6">
+				<div class="card">
+					<div class="card-body pb-0">
+						<h4 class="card-title text-uppercase fw-normal">Sales Analysis</h4>
+						<h2 class="fw-normal text-danger">
+							<span><i class="fa fa-caret-up"></i></span>
+							<span>3454664</span>
+						</h2>
+						<div class="row mt-5">
+							<div class="col text-center">
+								<h5 class="fw-normal">Today</h5>
+								<span class="text-success">+ 8224</span>
+							</div>
+							<div class="col text-center">
+								<h5 class="fw-normal">Today</h5>
+								<span class="text-danger">- 1224</span>
+							</div>
+							<div class="col text-center">
+								<h5 class="fw-normal">Week</h5>
+								<span class="text-success">+ 4224</span>
+							</div>
+						</div>
+					</div>
+					<div class="chart-wrapper">
+						<div id="chart_widget_8"></div>
+					</div>
+				</div>
+			</div>
+			<div class="col-xl-6 col-lg-12">
+				<div class="card">
+					<div class="card-header border-0 pb-0">
+						<h4 class="card-title">Top Products</h4>
+					</div>
+					<div class="card-body pb-0">
+						<div class="widget-media">
+							<ul class="timeline">
+								<li>
+									<div class="timeline-panel">
+										<div class="media me-2">
+											<img alt="image" width="50" src="~/mophy/admin/images/avatar/1.jpg">
+										</div>
+										<div class="media-body">
+											<h5 class="mb-1">Dr sultads Send you Photo</h5>
+											<small class="d-block">29 July 2020 - 02:26 PM</small>
+										</div>
+										<div class="dropdown">
+											<button type="button" class="btn btn-primary light sharp"
+													data-bs-toggle="dropdown">
+												<svg width="18px" height="18px" viewBox="0 0 24 24"
+													 version="1.1">
+													<g stroke="none" stroke-width="1" fill="none"
+													   fill-rule="evenodd">
+														<rect x="0" y="0" width="24" height="24" />
+														<circle fill="#000000" cx="5" cy="12" r="2" />
+														<circle fill="#000000" cx="12" cy="12" r="2" />
+														<circle fill="#000000" cx="19" cy="12" r="2" />
+													</g>
+												</svg>
+											</button>
+											<div class="dropdown-menu dropdown-menu-end">
+												<a class="dropdown-item" href="#">Edit</a>
+												<a class="dropdown-item" href="#">Delete</a>
+											</div>
+										</div>
+									</div>
+								</li>
+								<li>
+									<div class="timeline-panel">
+										<div class="media me-2 media-info">
+											KG
+										</div>
+										<div class="media-body">
+											<h5 class="mb-1">Resport created successfully</h5>
+											<small class="d-block">29 July 2020 - 02:26 PM</small>
+										</div>
+										<div class="dropdown">
+											<button type="button" class="btn btn-info light sharp"
+													data-bs-toggle="dropdown">
+												<svg width="18px" height="18px" viewBox="0 0 24 24"
+													 version="1.1">
+													<g stroke="none" stroke-width="1" fill="none"
+													   fill-rule="evenodd">
+														<rect x="0" y="0" width="24" height="24" />
+														<circle fill="#000000" cx="5" cy="12" r="2" />
+														<circle fill="#000000" cx="12" cy="12" r="2" />
+														<circle fill="#000000" cx="19" cy="12" r="2" />
+													</g>
+												</svg>
+											</button>
+											<div class="dropdown-menu dropdown-menu-end">
+												<a class="dropdown-item" href="#">Edit</a>
+												<a class="dropdown-item" href="#">Delete</a>
+											</div>
+										</div>
+									</div>
+								</li>
+								<li>
+									<div class="timeline-panel">
+										<div class="media me-2 media-success">
+											<i class="fa fa-home"></i>
+										</div>
+										<div class="media-body">
+											<h5 class="mb-1">Reminder : Treatment Time!</h5>
+											<small class="d-block">29 July 2020 - 02:26 PM</small>
+										</div>
+										<div class="dropdown">
+											<button type="button" class="btn btn-success light sharp"
+													data-bs-toggle="dropdown">
+												<svg width="18px" height="18px" viewBox="0 0 24 24"
+													 version="1.1">
+													<g stroke="none" stroke-width="1" fill="none"
+													   fill-rule="evenodd">
+														<rect x="0" y="0" width="24" height="24" />
+														<circle fill="#000000" cx="5" cy="12" r="2" />
+														<circle fill="#000000" cx="12" cy="12" r="2" />
+														<circle fill="#000000" cx="19" cy="12" r="2" />
+													</g>
+												</svg>
+											</button>
+											<div class="dropdown-menu dropdown-menu-end">
+												<a class="dropdown-item" href="#">Edit</a>
+												<a class="dropdown-item" href="#">Delete</a>
+											</div>
+										</div>
+									</div>
+								</li>
+							</ul>
+						</div>
+					</div>
+					<div class="chart-wrapper">
+						<canvas id="chart_widget_9"></canvas>
+					</div>
+				</div>
+			</div>
+			<div class="col-xl-6 col-lg-12">
+				<div class="card">
+					<div class="card-header border-0 pb-0">
+						<h4 class="card-title">Top Products</h4>
+					</div>
+					<div class="card-body pb-0">
+						<div class="widget-media">
+							<ul class="timeline">
+								<li>
+									<div class="timeline-panel">
+										<div class="media me-2">
+											<img alt="image" width="50" src="~/mophy/admin/images/avatar/4.jpg">
+										</div>
+										<div class="media-body">
+											<h5 class="mb-1">Dr sultads Send you Photo</h5>
+											<small class="d-block">29 July 2020 - 02:26 PM</small>
+										</div>
+										<div class="dropdown">
+											<button type="button" class="btn btn-primary light sharp"
+													data-bs-toggle="dropdown">
+												<svg width="18px" height="18px" viewBox="0 0 24 24"
+													 version="1.1">
+													<g stroke="none" stroke-width="1" fill="none"
+													   fill-rule="evenodd">
+														<rect x="0" y="0" width="24" height="24" />
+														<circle fill="#000000" cx="5" cy="12" r="2" />
+														<circle fill="#000000" cx="12" cy="12" r="2" />
+														<circle fill="#000000" cx="19" cy="12" r="2" />
+													</g>
+												</svg>
+											</button>
+											<div class="dropdown-menu dropdown-menu-end">
+												<a class="dropdown-item" href="#">Edit</a>
+												<a class="dropdown-item" href="#">Delete</a>
+											</div>
+										</div>
+									</div>
+								</li>
+								<li>
+									<div class="timeline-panel">
+										<div class="media me-2 media-info">
+											<img alt="image" width="50" src="~/mophy/admin/images/avatar/2.jpg">
+										</div>
+										<div class="media-body">
+											<h5 class="mb-1">Resport created successfully</h5>
+											<small class="d-block">29 July 2020 - 02:26 PM</small>
+										</div>
+										<div class="dropdown">
+											<button type="button" class="btn btn-info light sharp"
+													data-bs-toggle="dropdown">
+												<svg width="18px" height="18px" viewBox="0 0 24 24"
+													 version="1.1">
+													<g stroke="none" stroke-width="1" fill="none"
+													   fill-rule="evenodd">
+														<rect x="0" y="0" width="24" height="24" />
+														<circle fill="#000000" cx="5" cy="12" r="2" />
+														<circle fill="#000000" cx="12" cy="12" r="2" />
+														<circle fill="#000000" cx="19" cy="12" r="2" />
+													</g>
+												</svg>
+											</button>
+											<div class="dropdown-menu dropdown-menu-end">
+												<a class="dropdown-item" href="#">Edit</a>
+												<a class="dropdown-item" href="#">Delete</a>
+											</div>
+										</div>
+									</div>
+								</li>
+								<li>
+									<div class="timeline-panel">
+										<div class="media me-2 media-success">
+											<img alt="image" width="50" src="~/mophy/admin/images/avatar/3.jpg">
+										</div>
+										<div class="media-body">
+											<h5 class="mb-1">Reminder : Treatment Time!</h5>
+											<small class="d-block">29 July 2020 - 02:26 PM</small>
+										</div>
+										<div class="dropdown">
+											<button type="button" class="btn btn-success light sharp"
+													data-bs-toggle="dropdown">
+												<svg width="18px" height="18px" viewBox="0 0 24 24"
+													 version="1.1">
+													<g stroke="none" stroke-width="1" fill="none"
+													   fill-rule="evenodd">
+														<rect x="0" y="0" width="24" height="24" />
+														<circle fill="#000000" cx="5" cy="12" r="2" />
+														<circle fill="#000000" cx="12" cy="12" r="2" />
+														<circle fill="#000000" cx="19" cy="12" r="2" />
+													</g>
+												</svg>
+											</button>
+											<div class="dropdown-menu dropdown-menu-end">
+												<a class="dropdown-item" href="#">Edit</a>
+												<a class="dropdown-item" href="#">Delete</a>
+											</div>
+										</div>
+									</div>
+								</li>
+							</ul>
+						</div>
+					</div>
+					<div class="chart-wrapper">
+						<canvas id="chart_widget_10"></canvas>
+					</div>
+				</div>
+			</div>
+			<div class="col-xl-6 col-xxl-8 col-lg-12">
+				<div class="row">
+					<div class="col-sm-12">
+						<div class="card overflow-hidden">
+							<div class="row no-gutters">
+								<div class="col-5 p-0">
+									<div class="card-body">
+										<h6 class="fw-normal text-uppercase">Weekly sales</h6>
+										<h4>$ 14000</h4>
+										<div>
+											<span class="badge badge-light">60%</span>
+											<span>Higher</span>
+										</div>
+									</div>
+								</div>
+								<div class="col-7 p-0">
+									<div class="chart-wrapper">
+										<canvas id="chart_widget_11"></canvas>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+					<div class="col-sm-6">
+						<div class="card">
+							<div class="card-body">
+								<h5>570</h5>
+								<p>All Sales</p>
+							</div>
+							<div class="chart-wrapper">
+								<canvas id="chart_widget_14"></canvas>
+							</div>
+						</div>
+					</div>
+					<div class="col-sm-6">
+						<div class="card">
+							<div class="card-body">
+								<h5>570</h5>
+								<p>All Sales</p>
+							</div>
+							<div class="chart-wrapper">
+								<canvas id="chart_widget_15"></canvas>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+			<div class="col-xl-6 col-xxl-4 col-lg-12">
+				<div class="card">
+					<div class="chart-wrapper">
+						<canvas id="chart_widget_16"></canvas>
+					</div>
+					<div class="card-body">
+						<h4 class="card-title">Sales Status</h4>
+						<div class="row">
+							<div class="col-12">
+								<div class="d-flex justify-content-between">
+									<h6>67%</h6>
+									<span>Grow</span>
+								</div>
+								<div class="progress">
+									<div class="progress-bar bg-primary" style="width: 80%"></div>
+								</div>
+							</div>
+							<div class="col-12 mt-3">
+								<div class="d-flex justify-content-between">
+									<h6>67%</h6>
+									<span>Grow</span>
+								</div>
+								<div class="progress">
+									<div class="progress-bar bg-success" style="width: 70%"></div>
+								</div>
+							</div>
+							<div class="col-12 mt-3">
+								<div class="d-flex justify-content-between">
+									<h6>67%</h6>
+									<span>Grow</span>
+								</div>
+								<div class="progress">
+									<div class="progress-bar bg-info" style="width: 40%"></div>
+								</div>
+							</div>
+							<div class="col-12 mt-3">
+								<div class="d-flex justify-content-between">
+									<h6>67%</h6>
+									<span>Grow</span>
+								</div>
+								<div class="progress">
+									<div class="progress-bar bg-warning" style="width: 80%"></div>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+
+@section Mophy_style
+{
+	<!-- Chartist -->
+	<link href="~/mophy/admin/vendor/chartist/css/chartist.min.css" rel="stylesheet">
+}
+
+@section Mophy_script
+{
+	<!--**********************************
+		Scripts
+	***********************************-->
+	<!-- Required vendors -->
+	<script src="~/mophy/admin/vendor/global/global.min.js"></script>
+	<script src="~/mophy/admin/vendor/bootstrap-select/dist/js/bootstrap-select.min.js"></script>
+
+	<!-- Chartist -->
+	<script src="~/mophy/admin/vendor/chartist/js/chartist.min.js"></script>
+	<script src="~/mophy/admin/vendor/chartist-plugin-tooltips/js/chartist-plugin-tooltip.min.js"></script>
+
+	<!-- Flot -->
+	<script src="~/mophy/admin/vendor/flot/jquery.flot.js"></script>
+	<script src="~/mophy/admin/vendor/flot/jquery.flot.pie.js"></script>
+	<script src="~/mophy/admin/vendor/flot/jquery.flot.resize.js"></script>
+	<script src="~/mophy/admin/vendor/flot-spline/jquery.flot.spline.min.js"></script>
+
+	<!-- Chart sparkline plugin files -->
+	<script src="~/mophy/admin/vendor/jquery-sparkline/jquery.sparkline.min.js"></script>
+	<script src="~/mophy/admin/js/plugins-init/sparkline-init.js"></script>
+
+	<!-- Chart piety plugin files -->
+	<script src="~/mophy/admin/vendor/peity/jquery.peity.min.js"></script>
+	<script src="~/mophy/admin/js/plugins-init/piety-init.js"></script>
+	<script src="~/mophy/admin/vendor/chart-js/chart.bundle.min.js"></script>
+
+	<!-- Init file -->
+	<script src="~/mophy/admin/js/plugins-init/widgets-script-init.js"></script>
+
+	<script src="~/mophy/admin/js/custom.min.js"></script>
+	<script src="~/mophy/admin/js/deznav-init.js"></script>
+	
+	
+}

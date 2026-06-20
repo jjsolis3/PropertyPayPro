@@ -1,0 +1,178 @@
+﻿@{
+	Layout = "~/Views/Shared/_LayoutMophyAdmin.cshtml";
+	ViewData["Title"] = "<<Put your different title string value here for each page>>";
+}
+<div class="content-body default-height">
+	<div class="container-fluid">
+		<div class="page-titles">
+			<ol class="breadcrumb">
+				<li class="breadcrumb-item"><a href="javascript:void(0)">Shop</a></li>
+				<li class="breadcrumb-item active"><a href="javascript:void(0)">Invoice</a></li>
+			</ol>
+		</div>
+		<div class="row">
+			<div class="col-xl-9">
+
+				<div class="card">
+					<div class="card-header">
+						Invoice <p class="mb-0">13/12/2023</p> <span class="float-right text-warning">
+							<strong class="text-black">Status:</strong> Pending
+						</span>
+					</div>
+					<div class="card-body">
+						<div class="row mb-5">
+							<div class="mt-4 col-xl-5 col-lg-3 col-md-6 col-sm-6">
+								<h6>From:</h6>
+								<div> <strong class="text-black">Webz Poland</strong> </div>
+								<div>Madalinskiego 8</div>
+								<div>71-101 Szczecin, Poland</div>
+								<div>Email: info@webz.com.pl</div>
+								<div>Phone: +48 444 666 3333</div>
+							</div>
+							<div class="mt-4 col-xl-4 col-lg-3 col-md-6 col-sm-6">
+								<h6>To:</h6>
+								<div> <strong class="text-black">Bob Mart</strong> </div>
+								<div>Attn: Daniel Marek</div>
+								<div>43-190 Mikolow, Poland</div>
+								<div>Email: marek@daniel.com</div>
+								<div>Phone: +48 123 456 789</div>
+							</div>
+							<div class="col-xl-3 mt-3">
+								<img src="~/mophy/admin/images/qr.png" alt=""
+									 class="img-fluid width110 float-end">
+							</div>
+
+						</div>
+						<div class="table-responsive">
+							<table class="table table-striped">
+								<thead>
+									<tr>
+										<th class="center">#</th>
+										<th>Item</th>
+										<th>Description</th>
+										<th class="right">Unit Cost</th>
+										<th class="center">Qty</th>
+										<th class="text-end">Total</th>
+									</tr>
+								</thead>
+								<tbody>
+									<tr>
+										<td class="center">1</td>
+										<td class="left strong">Origin License</td>
+										<td class="left">Extended License</td>
+										<td class="right">$999,00</td>
+										<td class="center">1</td>
+										<td class="text-end">$999,00</td>
+									</tr>
+									<tr>
+										<td class="center">2</td>
+										<td class="left">Custom Services</td>
+										<td class="left">Instalation and Customization (cost per hour)</td>
+										<td class="right">$150,00</td>
+										<td class="center">20</td>
+										<td class="text-end">$3.000,00</td>
+									</tr>
+									<tr>
+										<td class="center">3</td>
+										<td class="left">Hosting</td>
+										<td class="left">1 year subcription</td>
+										<td class="right">$499,00</td>
+										<td class="center">1</td>
+										<td class="text-end">$499,00</td>
+									</tr>
+									<tr>
+										<td colspan="3" class="border-0"></td>
+										<td colspan="3" class="border-0 px-0">
+											<table class="table text-nowrap mb-0 border-0">
+												<tbody>
+													<tr>
+														<th class="border-0 text-black">Sub Total</th>
+														<td class="border-0 text-end">$2,364</td>
+													</tr>
+													<tr>
+														<th class="border-0 text-black">
+															Discount <span class="text-danger">(20%)</span>
+														</th>
+														<td class="border-0 text-end">$1,699,40</td>
+													</tr>
+													<tr>
+														<th class="border-0 text-black">
+															GST <span class="text-success">(10%)</span>
+														</th>
+														<td class="border-0 text-end">$1,699,40</td>
+													</tr>
+													<tr>
+														<th class="border-0 text-black">Total</th>
+														<td class="border-0 text-end">
+															$7.477,36 <strong class="text-black">0.15050000 BTC</strong>
+														</td>
+													</tr>
+												</tbody>
+											</table>
+										</td>
+									</tr>
+								</tbody>
+							</table>
+						</div>
+						<hr style="margin-left:-30px; margin-right:-30px; margin-top:0; margin-bottom:0;">
+						<div class="signature-media">
+							<img src="~/mophy/admin/images/signature.png" alt="">
+							<p class="mb-0 text-black fs-14">Head Manager</p>
+
+						</div>
+
+					</div>
+				</div>
+			</div>
+			<div class="col-xl-3">
+				<div class="card h-auto">
+					<div class="card-body">
+						<div class="invoice-logo mb-3">
+							<img class="logo-abbr me-2" src="~/mophy/admin/images/logo.png" alt="">
+							<img class="logo-compact" src="~/mophy/admin/images/logo-text.png" alt="">
+						</div>
+
+						<span>
+							Please send exact amount: <small class="d-block">0.15050000 BTC</small>
+							<strong class="text-black">1DonateWffyhwAjskoEwXt83pHZxhLTr8H</strong>
+						</span><br>
+						<small class="text-muted">Current exchange rate 1BTC = $6590 USD</small>
+						<div class="alert alert-success mb-0 mt-2 fs-15" role="alert">Please remit payment for the invoice bill within 30 days. Thanks </div>
+					</div>
+
+					<div class="card-footer pt-0 border-0">
+						<div>
+							<button class="btn btn-primary btn-sm me-3"
+									onclick="javascript:window.print();">
+								Print <i class="fa-solid fa-print ms-1"></i>
+							</button>
+							<button class="btn btn-secondary btn-sm">
+								Save As PDF<i class="fa-solid fa-file-pdf ms-1"></i>
+							</button>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+
+@section Mophy_style
+{
+	
+}
+
+@section Mophy_script
+{
+	<!--**********************************
+		Scripts
+	***********************************-->
+	<!-- Required vendors -->
+	<script src="~/mophy/admin/vendor/global/global.min.js"></script>
+	<script src="~/mophy/admin/vendor/bootstrap-select/dist/js/bootstrap-select.min.js"></script>
+	<script src="~/mophy/admin/vendor/highlightjs/highlight.pack.min.js"></script>
+	<script src="~/mophy/admin/js/custom.min.js"></script>
+	<script src="~/mophy/admin/js/deznav-init.js"></script>
+	
+	
+}

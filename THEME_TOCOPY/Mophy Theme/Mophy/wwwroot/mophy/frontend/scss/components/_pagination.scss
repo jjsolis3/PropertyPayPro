@@ -1,0 +1,127 @@
+.main-slider{
+	.main-swiper1-pagination {
+	    position: absolute;
+		top: auto !important;
+		height: auto !important;
+		bottom: 30px !important;
+		right: 30px;
+		width: auto;
+		z-index: 9;
+		left: auto;
+		@include respond('phone'){
+			left: 0;
+			top: auto !important;
+			bottom: 0 !important;
+			display: flex;
+			justify-content: center;
+			width: 100%;
+			margin-bottom:30px;
+		}
+		
+		.swiper-pagination-bullet{
+		    font-weight: 400;
+			font-size: 16px;
+			line-height: 55px;
+			margin: 10px 0;
+			text-align: center;
+			opacity: 1;
+			display: block;
+			width: 20px;
+			border-radius: 0;
+			height: 55px;
+			background: transparent;
+			@include transitionMedium;
+			border-bottom:1px solid var(--secondary);
+			
+			&.swiper-pagination-bullet-active {
+				color:var(--primary);
+				border-bottom:1px solid var(--primary);
+			}
+			@include respond('tab-land'){
+				font-size: 16px;
+				line-height: 35px;
+				margin: 5px 0;
+				width: 35px;
+				height: 35px;
+			}
+			&:last-child {
+				border-bottom:0;
+			}
+		}
+	}
+	.main-media{
+		border: 30px solid var(--primary);
+		border-radius: 50%;
+		margin: -50px 0 0 0;
+	
+		img{
+			width: 100%;
+		}
+		@include respond('wide-desktop'){
+			margin: -20px 90px 0px 0;
+		}
+		@include respond('laptop'){
+			margin: -20px 175px 0 -80px;
+		}
+		@include respond('tab-land'){
+			margin: 0;	
+		}
+		@include respond('phone'){
+			margin: 30px 30px 10px;
+			border-width: 15px;
+		}
+	}
+	.banner-bottom{
+		position: absolute;
+		z-index: 1;
+		bottom: 30px;
+		
+		@include respond('tab-land'){
+			display: none;
+		}
+	}
+	.bnr-row{
+		@include respond('tab-land'){
+			align-items: center;
+		}
+	}
+}
+.pagination{
+	margin: 0 -5px;
+    
+	.page-link{
+		height: 45px;
+		width: 45px;
+		border-radius: var(--border-radius-base) !important;
+		padding: 0;
+		display: flex;
+		align-items: center;
+		background-color: #fff;
+		justify-content: center;
+		color: var(--title);
+		font-weight: 500;
+		border: 0;
+		box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+		
+		svg path{
+            fill: var(--title);
+        }
+        &:hover,
+		&:focus,
+		&.active{
+            background-color: var(--primary);
+            color: $white;
+            
+			svg path{
+                fill: $white;
+            }
+        }
+    }
+    .page-item{
+        padding: 0 5px;
+    }
+	
+	&.text-center{
+	    justify-content: center;
+	}
+}

@@ -1,0 +1,21 @@
+﻿@{
+	Layout = "~/Views/Shared/_LayoutMophyAdminAuth.cshtml";
+	ViewData["Title"] = "<<Put your different title string value here for each page>>";
+}
+<div class="authincation fix-wrapper" style="background-image: url(../mophy/admin/images/student-bg.jpg); background-repeat:no-repeat; background-size:cover;">
+    <div class="container">
+        <div class="row align-items-center">
+            <div class="col-lg-6 col-sm-12">
+                <div class="form-input-content  error-page">
+                    <h1 class="error-text text-primary">500</h1>
+                    <h4>Internal Server Error</h4>
+                    <p>You do not have permission to view this resource</p>
+                    <a class="btn btn-primary" href="@Url.Action("Index","Admin")">Back to Home</a>
+                </div>
+            </div>
+            <div class="col-lg-6 col-sm-12">
+                <img class="w-100" src="~/mophy/admin/images/under-m.png" alt="">
+            </div>
+        </div>
+    </div>
+</div>

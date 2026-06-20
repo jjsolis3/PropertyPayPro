@@ -1,0 +1,346 @@
+﻿@{
+	Layout = "~/Views/Shared/_LayoutMophyFrontend.cshtml";
+	ViewData["Title"] = "<<Put your different title string value here for each page>>";
+}
+<!-- Banner  -->
+<div class="dz-bnr-inr dz-bnr-inr-sm text-center position-relative overlay-primary-linear">
+	<div class="move-3">
+		<img src="~/mophy/frontend/images/home-banner/move-1.png" alt="">
+	</div>
+	<div class="container">
+		<div class="dz-bnr-inr-entry">
+			<h1>Blog Details</h1>
+			<!-- Breadcrumb Row -->
+			<nav aria-label="breadcrumb" class="breadcrumb-row m-t15">
+				<ul class="">
+					<li class="breadcrumb-item"><a href="@Url.Action("Index","Frontend")">Home</a></li>
+					<li class="breadcrumb-item  text-black active" aria-current="page">Blog Details</li>
+				</ul>
+			</nav>
+			<!-- Breadcrumb Row End -->
+		</div>
+	</div>
+
+</div>
+<!-- Banner End -->
+<!-- Blog Details -->
+<section class="content-inner position-relative" style="background: white;">
+	<div class="container">
+		<div class="row ">
+			<div class="col-xl-8 col-lg-8">
+				<div class="blog-single pt-20 sidebar dz-card">
+					<div class="dz-media dz-media-rounded rounded">
+						<img src="~/mophy/frontend/images/blog/pic7.jpg" alt="">
+					</div>
+					<div class="dz-info m-b30">
+						<div class="dz-meta">
+							<ul>
+								<li class="post-author">
+									<a href="javascript:void(0);">
+										<img src="~/mophy/frontend/images/avatar/avatar3.jpg" alt="">
+										<span>By Jone Doe</span>
+									</a>
+								</li>
+								<li class="post-date"><a href="javascript:void(0);"> 17 May 2022</a></li>
+								<li class="post-comment"><a href="javascript:void(0);">3 comment</a></li>
+							</ul>
+						</div>
+						<h3 class="dz-title">Manual Cash Handling is a Resource Drain</h3>
+						<div class="dz-post-text">
+							<p>A wonderful serenity has taken possession of my entire soul, like these sweet mornings of spring which I enjoy with my whole heart. I am alone, and feel the charm of existence in this spot, which was created for the bliss of souls like mine. I am so happy</p>
+							<p>For the bliss of souls like mine. I am so happy, my dear friend, so absorbed in the exquisite sense of mere tranquil existence, that I neglect my talents. I should be incapable of drawing a single stroke at the present moment; and yet I feel that I never was a greater artist than now. When, while the lovely valley teems with vapour around me, and the meridian sun strikes the upper surface of the impenetrable foliage of my trees, and but a few stray gleams steal into.</p>
+							<blockquote class="block-quote  style-1">
+								<p>“Contrary to popular belief, Lorem Ipsum is not simply random text. It has roots in a piece of classical Latin literature from 45 BC.<p>
+									<cite> Mophy </cite>
+							</blockquote>
+							<p>The inner sanctuary, I throw myself down among the tall grass by the trickling stream; and, as I lie close to the earth, a thousand unknown plants are noticed by me: when I hear the buzz of the little world among the stalks, and grow familiar with the countless indescribable forms of the insects and flies, then I feel the presence of the Almighty, who formed us in his own image, and the breath.</p>
+							<ul class="m-b30">
+								<li>A wonderful serenity has taken possession.</li>
+								<li>Of my entire soul, like these sweet mornings of spring which.</li>
+								<li>I enjoy with my whole heart.</li>
+								<li>This spot, which was created For the bliss of souls like mine.</li>
+							</ul>
+							<p>The inner sanctuary, I throw myself down among the tall grass by the trickling stream; and, as I lie close to the earth, a thousand unknown plants are noticed by me: when I hear the buzz of the little world among the stalks, and grow familiar with the countless indescribable forms of the insects and flies, then I feel the presence of the Almighty.</p>
+						</div>
+						<div class="dz-share-post">
+							<div class="post-tags">
+								<h6 class="m-b0 m-r10 d-inline">Tags:</h6>
+								<a href="javascript:void(0);"><span>Corporate</span></a>
+								<a href="javascript:void(0);"><span>Blog</span></a>
+								<a href="javascript:void(0);"><span>Marketing</span></a>
+							</div>
+							<div class="dz-social-icon dark">
+								<ul>
+									<li><a href="https://www.facebook.com/dexignzone/"><i class="fab fa-facebook-f"></i></a></li>
+									<li><a href="https://twitter.com/dexignzones"><i class="fab fa-twitter"></i></a></li>
+									<li><a href="https://www.youtube.com/channel/UCGL8V6uxNNMRrk3oZfVct1g"><i class="fab fa-youtube"></i></a></li>
+									<li><a href="https://www.instagram.com/dexignzone/"><i class="fab fa-instagram"></i></a></li>
+								</ul>
+							</div>
+						</div>
+					</div>
+				</div>
+
+				<div class="widget-title">
+					<h4 class="title">Related Blog</h4>
+				</div>
+				<div class="row m-b30 m-sm-b10">
+					<div class="col-md-6 col-xl-6 m-b30">
+						<div class="dz-card style-1 overlay-shine wow fadeInUp" data-wow-delay="1.0s">
+							<div class="dz-media">
+								<a href="@Url.Action("BlogDetails","Frontend")"><img src="~/mophy/frontend/images/blog/pic1.jpg" alt=""></a>
+								<span class="date"><a href="javascript:void(0)">14 Feb 2012</a></span>
+							</div>
+							<div class="dz-info">
+								<div class="dz-meta">
+									<ul>
+										<li class="post-author text-primary">
+											<span>
+												<i class="fa-solid fa-user"></i>
+											</span>
+											By Kk Sharma
+										</li>
+										<li class="post-date text-primary">
+											<span>
+												<i class="fa-solid fa-message"></i>
+											</span>
+											24 Comments
+										</li>
+									</ul>
+								</div>
+								<h5 class="dz-title"><a href="@Url.Action("BlogDetails","Frontend")">How can you make cash management easier?</a></h5>
+								<p>A wonderful serenity has taken of my entire soul, like these.</p>
+								<a href="@Url.Action("ContactUs","Frontend")" class="btn-link">Read More<i class="fa-solid fa-arrow-right"></i></a>
+							</div>
+						</div>
+					</div>
+					<div class="col-md-6 col-xl-6 m-b30">
+						<div class="dz-card style-1 overlay-shine wow fadeInUp" data-wow-delay="1.0s">
+							<div class="dz-media">
+								<a href="@Url.Action("BlogDetails","Frontend")"><img src="~/mophy/frontend/images/blog/pic2.jpg" alt=""></a>
+								<span class="date"><a href="javascript:void(0)">20 Jun 2019</a></span>
+							</div>
+							<div class="dz-info">
+								<div class="dz-meta">
+									<ul>
+										<li class="post-author text-primary">
+											<span>
+												<i class="fa-solid fa-user"></i>
+											</span>
+											By Kk Sharma
+										</li>
+										<li class="post-date text-primary">
+											<span>
+												<i class="fa-solid fa-message"></i>
+											</span>
+											24 Comments
+										</li>
+									</ul>
+								</div>
+								<h5 class="dz-title"><a href="@Url.Action("BlogDetails","Frontend")">Manage your cash using a cash flow plan</a></h5>
+								<p>A wonderful serenity has taken of my entire soul, like these.</p>
+								<a href="@Url.Action("ContactUs","Frontend")" class="btn-link">Read More<i class="fa-solid fa-arrow-right"></i></a>
+							</div>
+						</div>
+					</div>
+				</div>
+				<!-- Comment List -->
+				<div class="clear" id="comment-list">
+					<div class="comments-area" id="comments">
+						<div class="widget-title style-1">
+							<h4 class="title">Comments</h4>
+						</div>
+						<div class="clearfix">
+							<!-- comment list END -->
+							<ol class="comment-list">
+								<li class="comment">
+									<div class="comment-body">
+										<div class="comment-author vcard">
+											<img class="avatar photo" src="~/mophy/frontend/images/avatar/avatar1.jpg" alt="">
+											<cite class="fn">Celesto Anderson</cite>
+										</div>
+										<p>Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.</p>
+										<div class="reply">
+											<a href="javascript:void(0);" class="comment-reply-link"><i class="fa fa-reply"></i>Reply</a>
+										</div>
+									</div>
+									<ol class="children">
+										<li class="comment odd parent">
+											<div class="comment-body">
+												<div class="comment-author vcard">
+													<img class="avatar photo" src="~/mophy/frontend/images/avatar/avatar2.jpg" alt="">
+													<cite class="fn">Jake Johnson</cite>
+												</div>
+												<p>Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.</p>
+												<div class="reply">
+													<a href="javascript:void(0);" class="comment-reply-link"><i class="fa fa-reply"></i>Reply</a>
+												</div>
+											</div>
+											<!-- list END -->
+										</li>
+									</ol>
+									<!-- list END -->
+								</li>
+								<li class="comment">
+									<div class="comment-body">
+										<div class="comment-author vcard">
+											<img class="avatar photo" src="~/mophy/frontend/images/avatar/avatar3.jpg" alt="">
+											<cite class="fn">John Doe</cite>
+										</div>
+										<p>Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.</p>
+										<div class="reply">
+											<a href="javascript:void(0);" class="comment-reply-link"><i class="fa fa-reply"></i>Reply</a>
+										</div>
+									</div>
+								</li>
+								<li class="comment">
+									<div class="comment-body">
+										<div class="comment-author vcard">
+											<img class="avatar photo" src="~/mophy/frontend/images/avatar/avatar1.jpg" alt="">
+											<cite class="fn">Celesto Anderson</cite>
+										</div>
+										<p>Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.</p>
+										<div class="reply">
+											<a href="javascript:void(0);" class="comment-reply-link"><i class="fa fa-reply"></i>Reply</a>
+										</div>
+									</div>
+								</li>
+							</ol>
+							<!-- comment list END -->
+							<!-- Form -->
+							<div class="comment-respond" id="respond">
+								<div class="widget-title style-1">
+									<h4 class="title" id="reply-title">
+										Leave Your Comment
+										<small><a style="display:none;" href="javascript:void(0);" id="cancel-comment-reply-link" rel="nofollow">Cancel reply</a></small>
+									</h4>
+								</div>
+								<form class="comment-form" id="commentform" method="post">
+									<p class="comment-form-author">
+										<label for="author">Name <span class="required">*</span></label>
+										<input type="text" name="Author" placeholder="Author" id="author">
+									</p>
+									<p class="comment-form-email">
+										<label for="email">Email <span class="required">*</span></label>
+										<input type="text" placeholder="Email" name="email" id="email">
+									</p>
+									<p class="comment-form-comment">
+										<label for="comment">Comment</label>
+										<textarea rows="8" name="comment" placeholder="Comment" id="comment"></textarea>
+									</p>
+									<p class="form-submit">
+										<button type="submit" class="btn btn-rounded btn-primary" id="submit">SUBMIT</button>
+									</p>
+								</form>
+							</div>
+							<!-- Form -->
+						</div>
+					</div>
+				</div>
+
+			</div>
+			<div class="col-xl-4 col-lg-4">
+				<aside class="side-bar sticky-top right">
+					<div class="widget">
+						<div class="widget-title">
+							<h4 class="title">Search</h4>
+						</div>
+						<div class="search-bx">
+							<form role="search" method="post">
+								<div class="input-group">
+									<input name="text" class="form-control style-1" placeholder="Search.." type="text">
+									<span class="input-group-btn">
+										<button type="submit" class="btn btn-primary sharp radius-no"><i class="fa-solid fa-magnifying-glass scale3"></i></button>
+									</span>
+								</div>
+							</form>
+						</div>
+					</div>
+
+					<div class="widget widget_categories">
+						<div class="widget-title">
+							<h4 class="title">Categories</h4>
+						</div>
+						<ul>
+							<li class="cat-item"><a href="#">business(10)</a></li>
+							<li class="cat-item"><a href="#">Case Study (13)</a></li>
+							<li class="cat-item"><a href="#">Insights (9)</a></li>
+							<li class="cat-item"><a href="#">World (3)</a></li>
+							<li class="cat-item"><a href="#">Tax Solutions (12)</a></li>
+							<li class="cat-item"><a href="#">Creative (6)</a></li>
+						</ul>
+					</div>
+
+					<div class="widget recent-posts-entry">
+						<div class="widget-title">
+							<h4 class="title">Recent Post</h4>
+						</div>
+						<div class="widget-post-bx">
+							<div class="widget-post clearfix">
+								<div class="dz-media">
+									<img src="~/mophy/frontend/images/blog/small/pic1.jpg" alt="">
+								</div>
+								<div class="dz-info">
+									<h6 class="title"><a href="@Url.Action("BlogDetails","Frontend")">How can you make cash management easier?</a></h6>
+									<div class="dz-meta">
+										<ul>
+											<li class="post-date"><a href="javascript:void(0);"> 17 May 2022</a></li>
+										</ul>
+									</div>
+								</div>
+							</div>
+							<div class="widget-post clearfix">
+								<div class="dz-media">
+									<img src="~/mophy/frontend/images/blog/small/pic2.jpg" alt="">
+								</div>
+								<div class="dz-info">
+									<h6 class="title"><a href="@Url.Action("BlogDetails","Frontend")">Manage your cash using a cash flow plan</a></h6>
+									<div class="dz-meta">
+										<ul>
+											<li class="post-date"><a href="javascript:void(0);"> 07 Jan, 2022</a></li>
+										</ul>
+									</div>
+								</div>
+							</div>
+							<div class="widget-post clearfix">
+								<div class="dz-media">
+									<img src="~/mophy/frontend/images/blog/small/pic3.jpg" alt="">
+								</div>
+								<div class="dz-info">
+									<h6 class="title"><a href="@Url.Action("BlogDetails","Frontend")">What makes up a company’s cash?</a></h6>
+									<div class="dz-meta">
+										<ul>
+											<li class="post-date"><a href="javascript:void(0);"> 25 Aug, 2022</a></li>
+										</ul>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+
+					<div class="widget widget_tag_cloud">
+						<div class="widget-title">
+							<h4 class="title">Popular Tags</h4>
+						</div>
+						<div class="tagcloud">
+							<a href="javascript:void(0);">Business</a>
+							<a href="javascript:void(0);">Corporate</a>
+							<a href="javascript:void(0);">Blog</a>
+							<a href="javascript:void(0);">Marketing</a>
+							<a href="javascript:void(0);">Creative</a>
+							<a href="javascript:void(0);">Web</a>
+							<a href="javascript:void(0);">Workers</a>
+							<a href="javascript:void(0);">Modern</a>
+						</div>
+					</div>
+				</aside>
+			</div>
+		</div>
+	</div>
+</section>
+<!-- Blog Details -->
+@section Mophy_script
+	{
+	<script src="~/mophy/frontend/js/dz.carousel.js"></script><!-- OWL SLIDER -->
+	<script src="~/mophy/frontend/vendor/rangeslider/rangeslider.js"></script><!-- RANGESLIDER -->
+}

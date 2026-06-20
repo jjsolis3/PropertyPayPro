@@ -1,0 +1,79 @@
+/*
+===================================
+    list view
+===================================*/
+
+.new-arrival-content {
+    .item {
+        font-size: 12px;
+        color: var(--text-dark);
+    }
+    h4 {
+        font-size: 16px;
+        font-weight: 600;
+        margin-bottom: .625rem;
+		a{
+			color:var(--text-dark);
+		}
+    }
+    .price {
+        font-weight: 500;
+		color: var(--primary);
+		font-size: 1.125rem;
+		margin-bottom: 0;
+		float: #{$dz-pos-right};
+		@include respond ('phone'){
+			float:none;
+			margin-top:.625rem;
+		}
+    }
+	.discount{
+	    font-size: 0.875rem;
+		margin-#{$dz-pos-right}: .5rem;
+		opacity: 0.8;
+		color: $danger;
+	}
+    p {
+        font-size: .875rem;
+        color: $d-ctl;
+        margin-bottom: .375rem;
+        line-height: 1.5rem;
+    }
+    .text-content {
+        margin-top: 1.125rem;
+    }
+}
+.new-arrival-content.text-center .price {
+	float: unset;
+}
+
+.success-icon {
+    color: $success;
+    font-size: 1rem;
+}
+
+.comment-review {
+    margin-bottom: .9375rem;
+    display: table;
+    width: 100%;
+    .client-review {
+        color: $d-ctl;
+        padding-#{$dz-pos-right}: 20px;
+        text-decoration: underline !important;
+        font-size: .875rem;
+    }
+    .span {
+        color: $d-ctl;
+        font-size: .875rem;
+    }
+	@include respond ('phone'){
+		margin-bottom:0;
+	}
+}
+
+.star-rating li {
+    display: inline-block;
+    i {
+        color: gold;
+    }
+}
