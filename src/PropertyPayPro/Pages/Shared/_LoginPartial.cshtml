@@ -1,13 +1,16 @@
 @using Microsoft.AspNetCore.Identity
-@inject SignInManager<IdentityUser> SignInManager
-@inject UserManager<IdentityUser> UserManager
+@using PropertyPayPro.Models
+@inject SignInManager<ApplicationUser> SignInManager
+@inject UserManager<ApplicationUser> UserManager
 
 <ul class="navbar-nav">
 @if (SignInManager.IsSignedIn(User))
 {
+    var user = await UserManager.GetUserAsync(User);
+    var name = user?.DisplayName ?? User.Identity!.Name!;
     <li class="nav-item">
         <a class="nav-link text-light" asp-area="Identity" asp-page="/Account/Manage/Index">
-            Hello @User.Identity!.Name!
+            Hello @name!
         </a>
     </li>
     <li class="nav-item">
