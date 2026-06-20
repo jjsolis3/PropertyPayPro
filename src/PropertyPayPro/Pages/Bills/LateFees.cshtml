@@ -1,0 +1,63 @@
+@page
+@model PropertyPayPro.Pages.Bills.LateFeesModel
+@{
+    ViewData["Title"] = "Late Fee Suggestions";
+}
+
+<h1>Late Fee Suggestions</h1>
+<p class="text-muted">
+    Rent bills past their due date + grace period that don't yet have a late fee applied.
+    Review and click "Apply" to create a late fee charge for the linked lease.
+</p>
+
+@if (Model.Message is not null)
+{
+    <div class="alert alert-success">@Model.Message</div>
+}
+
+@if (!Model.Candidates.Any())
+{
+    <div class="alert alert-info">No bills currently eligible for a late fee.</div>
+}
+else
+{
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th>Period</th>
+                <th>Tenant</th>
+                <th>Property</th>
+                <th>Due</th>
+                <th>Grace ends</th>
+                <th class="text-end">Balance</th>
+                <th class="text-end">Late fee</th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+        @foreach (var c in Model.Candidates)
+        {
+            <tr>
+                <td>@c.PeriodLabel</td>
+                <td>@c.Lease!.Tenant!.DisplayName</td>
+                <td>@c.Lease.Property!.Name</td>
+                <td>@c.DueDate.ToString("yyyy-MM-dd")</td>
+                <td>@c.DueDate.AddDays(c.Lease.LateFeeGraceDays).ToString("yyyy-MM-dd")</td>
+                <td class="text-end">@c.Balance.ToString("C")</td>
+                <td class="text-end">@c.Lease.LateFeeAmount.ToString("C")</td>
+                <td class="text-end">
+                    <form method="post" asp-page-handler="Apply" class="d-inline">
+                        <input type="hidden" name="chargeId" value="@c.Id" />
+                        <button type="submit" class="btn btn-sm btn-warning"
+                                onclick="return confirm('Apply late fee of @c.Lease.LateFeeAmount.ToString("C") to this lease?')">
+                            Apply
+                        </button>
+                    </form>
+                </td>
+            </tr>
+        }
+        </tbody>
+    </table>
+}
+
+<a asp-page="Index" class="btn btn-outline-secondary">Back to Bills</a>

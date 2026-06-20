@@ -30,6 +30,15 @@ public class Lease
     [Range(1, 31)]
     public int RentDueDay { get; set; } = 1;
 
+    public bool IsMonthToMonth { get; set; }
+
+    [Range(0, 10_000)]
+    [Column(TypeName = "numeric(10,2)")]
+    public decimal LateFeeAmount { get; set; }
+
+    [Range(0, 60)]
+    public int LateFeeGraceDays { get; set; } = 5;
+
     [StringLength(500)]
     public string? Notes { get; set; }
 

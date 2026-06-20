@@ -43,6 +43,22 @@
                     <input asp-for="Lease.RentDueDay" class="form-control" />
                 </div>
             </div>
+            <div class="row">
+                <div class="col mb-3">
+                    <label asp-for="Lease.LateFeeAmount" class="form-label">Late fee</label>
+                    <input asp-for="Lease.LateFeeAmount" class="form-control" />
+                </div>
+                <div class="col mb-3">
+                    <label asp-for="Lease.LateFeeGraceDays" class="form-label">Grace days</label>
+                    <input asp-for="Lease.LateFeeGraceDays" class="form-control" />
+                </div>
+                <div class="col mb-3 align-self-end">
+                    <div class="form-check">
+                        <input asp-for="Lease.IsMonthToMonth" class="form-check-input" />
+                        <label asp-for="Lease.IsMonthToMonth" class="form-check-label">Month-to-month</label>
+                    </div>
+                </div>
+            </div>
             <div class="mb-3">
                 <label asp-for="Lease.Notes" class="form-label"></label>
                 <textarea asp-for="Lease.Notes" class="form-control" rows="3"></textarea>
