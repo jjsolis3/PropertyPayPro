@@ -10,9 +10,12 @@
         currentUser = await UserManager.GetUserAsync(User);
     }
     var displayName = currentUser?.DisplayName ?? User.Identity?.Name ?? "User";
-    var avatarUrl = !string.IsNullOrWhiteSpace(currentUser?.AvatarStorageKey)
+    var hasAvatar = !string.IsNullOrWhiteSpace(currentUser?.AvatarStorageKey);
+    var avatarUrl = hasAvatar
         ? Url.Page("/Account/Manage/Avatar", new { area = "Identity" })
-        : "/mophy/admin/images/profile/17.jpg";
+        : null;
+    var initials = string.Concat(displayName.Split(' ', StringSplitOptions.RemoveEmptyEntries)
+        .Take(2).Select(s => char.ToUpper(s[0])));
 }
 
 <div class="header">
@@ -33,7 +36,16 @@
                                     <span class="text-black">Hello, <strong>@displayName</strong></span>
                                     <p class="fs-12 mb-0">Admin</p>
                                 </div>
-                                <img src="@avatarUrl" width="20" alt="@displayName" />
+                                @if (hasAvatar)
+                                {
+                                    <img src="@avatarUrl" width="32" height="32" alt="@displayName"
+                                         class="rounded-circle" style="object-fit: cover;" />
+                                }
+                                else
+                                {
+                                    <span class="d-inline-flex align-items-center justify-content-center rounded-circle bg-primary text-white fw-bold"
+                                          style="width: 32px; height: 32px; font-size: 0.85rem;">@initials</span>
+                                }
                             </a>
                             <div class="dropdown-menu dropdown-menu-end">
                                 <a asp-area="Identity" asp-page="/Account/Manage/Index" class="dropdown-item ai-icon">

@@ -25,13 +25,21 @@
             <div class="card-body text-center">
                 @{
                     var hasAvatar = !string.IsNullOrWhiteSpace(Model.AvatarStorageKey);
-                    var avatarSrc = hasAvatar
-                        ? Url.Page("./Avatar")
-                        : "/mophy/admin/images/profile/17.jpg";
+                    var initials = string.Concat(Model.CurrentDisplayName
+                        .Split(' ', StringSplitOptions.RemoveEmptyEntries)
+                        .Take(2).Select(s => char.ToUpper(s[0])));
                 }
-                <img src="@avatarSrc" alt="Avatar"
-                     class="rounded-circle mb-3"
-                     style="width: 140px; height: 140px; object-fit: cover;" />
+                @if (hasAvatar)
+                {
+                    <img src="@Url.Page("./Avatar")" alt="Avatar"
+                         class="rounded-circle mb-3"
+                         style="width: 140px; height: 140px; object-fit: cover;" />
+                }
+                else
+                {
+                    <div class="rounded-circle bg-primary text-white d-inline-flex align-items-center justify-content-center mb-3 fw-bold"
+                         style="width: 140px; height: 140px; font-size: 3rem;">@initials</div>
+                }
                 <h4 class="mb-1">@Model.CurrentDisplayName</h4>
                 <p class="text-muted">@Model.Email</p>
 
