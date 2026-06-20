@@ -15,10 +15,11 @@ public class BillingService
     public async Task<int> GenerateChargesForPeriodAsync(int year, int month)
     {
         var periodStart = new DateOnly(year, month, 1);
+        var periodEnd = new DateOnly(year, month, DateTime.DaysInMonth(year, month));
         var dueDate = new DateOnly(year, month, Math.Min(DueDayOfMonth, DateTime.DaysInMonth(year, month)));
 
         var activeLeases = await _db.Leases
-            .Where(l => l.StartDate <= periodStart && l.EndDate >= periodStart)
+            .Where(l => l.StartDate <= periodEnd && l.EndDate >= periodStart)
             .ToListAsync();
 
         var existing = await _db.RentalCharges
