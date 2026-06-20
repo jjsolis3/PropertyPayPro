@@ -5,7 +5,7 @@
 }
 
 <h1 class="text-danger">Delete Lease</h1>
-<p>Are you sure you want to delete the lease for <strong>@Model.Lease!.Tenant!.DisplayName</strong> at <strong>@Model.Lease.Property!.Name</strong>?</p>
+<p>Are you sure you want to delete the lease for <strong>@Model.Lease!.TenantNames</strong> at <strong>@Model.Lease.Property!.Name</strong>?</p>
 
 <form method="post">
     <input type="hidden" asp-for="Lease.Id" />

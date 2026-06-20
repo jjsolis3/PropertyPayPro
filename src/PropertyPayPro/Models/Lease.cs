@@ -10,9 +10,6 @@ public class Lease
     public int PropertyId { get; set; }
     public Property? Property { get; set; }
 
-    public int TenantId { get; set; }
-    public Tenant? Tenant { get; set; }
-
     [DataType(DataType.Date)]
     public DateOnly StartDate { get; set; }
 
@@ -42,7 +39,13 @@ public class Lease
     [StringLength(500)]
     public string? Notes { get; set; }
 
+    public List<Tenant> Tenants { get; set; } = new();
     public List<RentPayment> Payments { get; set; } = new();
     public List<RentalCharge> Charges { get; set; } = new();
     public List<LeaseDocument> Documents { get; set; } = new();
+
+    [NotMapped]
+    public string TenantNames => Tenants is { Count: > 0 }
+        ? string.Join(", ", Tenants.Select(t => t.DisplayName))
+        : "(no tenants)";
 }

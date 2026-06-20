@@ -21,6 +21,9 @@ public class CreateModel : PageModel
         EndDate = DateOnly.FromDateTime(DateTime.UtcNow.AddYears(1))
     };
 
+    [BindProperty]
+    public List<int> SelectedTenantIds { get; set; } = new();
+
     public SelectList Properties { get; private set; } = default!;
     public SelectList Tenants { get; private set; } = default!;
 
@@ -32,11 +35,19 @@ public class CreateModel : PageModel
 
     public async Task<IActionResult> OnPostAsync()
     {
+        if (SelectedTenantIds.Count == 0)
+        {
+            ModelState.AddModelError(string.Empty, "Pick at least one tenant.");
+        }
+
         if (!ModelState.IsValid)
         {
             await LoadSelectListsAsync();
             return Page();
         }
+
+        var tenants = await _db.Tenants.Where(t => SelectedTenantIds.Contains(t.Id)).ToListAsync();
+        Lease.Tenants = tenants;
 
         _db.Leases.Add(Lease);
         await _db.SaveChangesAsync();
@@ -47,6 +58,6 @@ public class CreateModel : PageModel
     {
         Properties = new SelectList(await _db.Properties.OrderBy(p => p.Name).ToListAsync(), "Id", "Name");
         var tenants = await _db.Tenants.OrderBy(t => t.LastName).ToListAsync();
-        Tenants = new SelectList(tenants.Select(t => new { t.Id, Name = t.DisplayName }), "Id", "Name");
+        Tenants = new SelectList(tenants.Select(t => new { t.Id, Name = t.DisplayName }), "Id", "Name", SelectedTenantIds);
     }
 }

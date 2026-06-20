@@ -39,7 +39,7 @@ else
         {
             <tr>
                 <td>@c.PeriodLabel</td>
-                <td>@c.Lease!.Tenant!.DisplayName</td>
+                <td>@c.Lease!.TenantNames</td>
                 <td>@c.Lease.Property!.Name</td>
                 <td>@c.DueDate.ToString("yyyy-MM-dd")</td>
                 <td>@c.DueDate.AddDays(c.Lease.LateFeeGraceDays).ToString("yyyy-MM-dd")</td>

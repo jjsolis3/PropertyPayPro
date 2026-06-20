@@ -11,14 +11,14 @@
 
 <table class="table table-striped">
     <thead>
-        <tr><th>Property</th><th>Tenant</th><th>Start</th><th>End</th><th class="text-end">Rent</th><th></th></tr>
+        <tr><th>Property</th><th>Tenants</th><th>Start</th><th>End</th><th class="text-end">Rent</th><th></th></tr>
     </thead>
     <tbody>
     @foreach (var l in Model.Leases)
     {
         <tr>
             <td>@l.Property!.Name</td>
-            <td>@l.Tenant!.DisplayName</td>
+            <td>@l.TenantNames</td>
             <td>@l.StartDate.ToString("yyyy-MM-dd")</td>
             <td>@l.EndDate.ToString("yyyy-MM-dd")</td>
             <td class="text-end">@l.MonthlyRent.ToString("C")</td>

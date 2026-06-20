@@ -4,41 +4,89 @@
     ViewData["Title"] = "Edit Payment";
 }
 
-<h1>Edit Payment</h1>
+<h1 class="h3 mb-3">Edit Payment</h1>
 
 <div class="row">
-    <div class="col-md-6">
+    <div class="col-md-10">
         <form method="post">
-            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
             <input type="hidden" asp-for="Payment.Id" />
-            <div class="mb-3">
-                <label asp-for="Payment.LeaseId" class="form-label">Lease</label>
-                <select asp-for="Payment.LeaseId" class="form-select" asp-items="Model.Leases"></select>
-            </div>
-            <div class="row">
-                <div class="col mb-3">
-                    <label asp-for="Payment.PaidOn" class="form-label"></label>
-                    <input asp-for="Payment.PaidOn" class="form-control" />
+
+            <div class="card mb-3">
+                <div class="card-body">
+                    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+                    <div class="row">
+                        <div class="col mb-3">
+                            <label asp-for="Payment.LeaseId" class="form-label">Lease</label>
+                            <select asp-for="Payment.LeaseId" class="form-select" asp-items="Model.Leases"></select>
+                        </div>
+                        <div class="col mb-3">
+                            <label asp-for="Payment.PaidOn" class="form-label"></label>
+                            <input asp-for="Payment.PaidOn" class="form-control" />
+                        </div>
+                        <div class="col mb-3">
+                            <label asp-for="Payment.Amount" class="form-label"></label>
+                            <input asp-for="Payment.Amount" class="form-control" id="amountInput" step="0.01" min="0" />
+                        </div>
+                        <div class="col mb-3">
+                            <label asp-for="Payment.Method" class="form-label"></label>
+                            <select asp-for="Payment.Method" class="form-select"
+                                    asp-items="Html.GetEnumSelectList<PropertyPayPro.Models.PaymentMethod>()"></select>
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <label asp-for="Payment.Reference" class="form-label"></label>
+                        <input asp-for="Payment.Reference" class="form-control" />
+                    </div>
+                    <div class="mb-3">
+                        <label asp-for="Payment.Notes" class="form-label"></label>
+                        <textarea asp-for="Payment.Notes" class="form-control" rows="2"></textarea>
+                    </div>
                 </div>
-                <div class="col mb-3">
-                    <label asp-for="Payment.Amount" class="form-label"></label>
-                    <input asp-for="Payment.Amount" class="form-control" />
+            </div>
+
+            <div class="card mb-3">
+                <div class="card-header">
+                    <h4 class="card-title mb-0">Allocate to bills</h4>
                 </div>
-                <div class="col mb-3">
-                    <label asp-for="Payment.Method" class="form-label"></label>
-                    <select asp-for="Payment.Method" class="form-select"
-                            asp-items="Html.GetEnumSelectList<PaymentMethod>()"></select>
+                <div class="card-body">
+                    @if (!Model.OutstandingCharges.Any())
+                    {
+                        <p class="text-muted mb-0">No outstanding bills for this lease. The payment is held as a credit.</p>
+                    }
+                    else
+                    {
+                        <p class="text-muted small">
+                            Adjust the amount applied to each bill. Total can be less than the payment amount;
+                            the remainder is held as a credit.
+                        </p>
+                        <table class="table table-sm">
+                            <thead><tr><th>Period</th><th>Due</th><th class="text-end">Balance</th><th style="width: 10rem;">Apply</th></tr></thead>
+                            <tbody>
+                            @for (int i = 0; i < Model.OutstandingCharges.Count; i++)
+                            {
+                                var c = Model.OutstandingCharges[i];
+                                var current = Model.CurrentAllocations.TryGetValue(c.Id, out var v) ? v : 0m;
+                                var maxAllowed = c.Balance + current; // include current as available
+                                <tr>
+                                    <td>@c.PeriodLabel</td>
+                                    <td>@c.DueDate.ToString("yyyy-MM-dd")</td>
+                                    <td class="text-end">@maxAllowed.ToString("C")</td>
+                                    <td>
+                                        <input type="hidden" name="AllocationChargeIds[@i]" value="@c.Id" />
+                                        <input type="number" step="0.01" min="0" max="@maxAllowed"
+                                               name="AllocationAmounts[@i]" value="@current.ToString("0.00")"
+                                               class="form-control form-control-sm text-end" />
+                                    </td>
+                                </tr>
+                            }
+                            </tbody>
+                        </table>
+                    }
                 </div>
             </div>
-            <div class="mb-3">
-                <label asp-for="Payment.Reference" class="form-label"></label>
-                <input asp-for="Payment.Reference" class="form-control" />
-            </div>
-            <div class="mb-3">
-                <label asp-for="Payment.Notes" class="form-label"></label>
-                <textarea asp-for="Payment.Notes" class="form-control" rows="3"></textarea>
-            </div>
-            <button type="submit" class="btn btn-primary">Save</button>
+
+            <button type="submit" class="btn btn-primary">Save Payment</button>
             <a asp-page="Index" class="btn btn-outline-secondary">Cancel</a>
         </form>
     </div>

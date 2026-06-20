@@ -29,9 +29,11 @@
 
         <div class="row">
             <div class="col">
-                <strong>Tenant</strong><br />
-                @Model.Payment.Lease!.Tenant!.DisplayName<br />
-                @Model.Payment.Lease.Tenant.Email
+                <strong>@(Model.Payment.Lease!.Tenants.Count > 1 ? "Tenants" : "Tenant")</strong><br />
+                @foreach (var t in Model.Payment.Lease.Tenants)
+                {
+                    <div>@t.DisplayName @if (!string.IsNullOrWhiteSpace(t.Email)) { <span class="text-muted">— @t.Email</span> }</div>
+                }
             </div>
             <div class="col">
                 <strong>Property</strong><br />

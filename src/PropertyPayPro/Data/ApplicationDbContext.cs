@@ -31,10 +31,9 @@ public class ApplicationDbContext : IdentityDbContext<ApplicationUser>
             .OnDelete(DeleteBehavior.Restrict);
 
         builder.Entity<Lease>()
-            .HasOne(l => l.Tenant)
+            .HasMany(l => l.Tenants)
             .WithMany(t => t.Leases)
-            .HasForeignKey(l => l.TenantId)
-            .OnDelete(DeleteBehavior.Restrict);
+            .UsingEntity(j => j.ToTable("LeaseTenants"));
 
         builder.Entity<RentPayment>()
             .HasOne(p => p.Lease)

@@ -20,7 +20,7 @@ public class DeleteModel : PageModel
     {
         var entity = await _db.Leases
             .Include(l => l.Property)
-            .Include(l => l.Tenant)
+            .Include(l => l.Tenants)
             .FirstOrDefaultAsync(l => l.Id == id);
         if (entity is null) return NotFound();
         Lease = entity;

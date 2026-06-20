@@ -15,8 +15,8 @@
                 <select asp-for="Lease.PropertyId" class="form-select" asp-items="Model.Properties"></select>
             </div>
             <div class="mb-3">
-                <label asp-for="Lease.TenantId" class="form-label">Tenant</label>
-                <select asp-for="Lease.TenantId" class="form-select" asp-items="Model.Tenants"></select>
+                <label class="form-label">Tenants <small class="text-muted">(hold Ctrl/⌘ to select multiple)</small></label>
+                <select name="SelectedTenantIds" class="form-select" multiple size="6" asp-items="Model.Tenants"></select>
             </div>
             <div class="row">
                 <div class="col mb-3">

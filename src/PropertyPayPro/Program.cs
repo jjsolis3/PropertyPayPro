@@ -51,6 +51,34 @@ app.UseAuthorization();
 
 app.MapRazorPages();
 
+app.MapGet("/api/leases/{leaseId:int}/outstanding-charges", async (
+    int leaseId,
+    ApplicationDbContext db,
+    Microsoft.AspNetCore.Authorization.IAuthorizationService authz,
+    HttpContext ctx) =>
+{
+    if (!(ctx.User.Identity?.IsAuthenticated ?? false)) return Results.Unauthorized();
+
+    var charges = await db.RentalCharges
+        .Where(c => c.LeaseId == leaseId)
+        .Include(c => c.Allocations)
+        .OrderBy(c => c.BillingPeriodStart)
+        .ThenBy(c => c.Kind)
+        .ToListAsync();
+
+    var items = charges
+        .Where(c => c.Balance > 0)
+        .Select(c => new
+        {
+            id = c.Id,
+            label = c.PeriodLabel,
+            dueDate = c.DueDate.ToString("yyyy-MM-dd"),
+            balance = c.Balance
+        });
+
+    return Results.Ok(items);
+});
+
 app.MapPost("/api/jobs/generate-monthly-charges", async (
     HttpContext ctx,
     PropertyPayPro.Services.BillingService billing,

@@ -8,7 +8,17 @@
 
 <dl class="row">
     <dt class="col-sm-3">Property</dt><dd class="col-sm-9">@Model.Lease!.Property!.Name</dd>
-    <dt class="col-sm-3">Tenant</dt><dd class="col-sm-9">@Model.Lease.Tenant!.DisplayName</dd>
+    <dt class="col-sm-3">Tenants</dt>
+    <dd class="col-sm-9">
+        @if (Model.Lease.Tenants.Any())
+        {
+            foreach (var t in Model.Lease.Tenants)
+            {
+                <span class="badge bg-secondary me-1">@t.DisplayName</span>
+            }
+        }
+        else { <span class="text-muted">(none)</span> }
+    </dd>
     <dt class="col-sm-3">Term</dt>
     <dd class="col-sm-9">
         @Model.Lease.StartDate.ToString("yyyy-MM-dd") &mdash; @Model.Lease.EndDate.ToString("yyyy-MM-dd")
