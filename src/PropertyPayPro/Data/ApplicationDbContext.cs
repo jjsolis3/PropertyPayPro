@@ -14,6 +14,8 @@ public class ApplicationDbContext : IdentityDbContext<IdentityUser>
     public DbSet<Tenant> Tenants => Set<Tenant>();
     public DbSet<Lease> Leases => Set<Lease>();
     public DbSet<RentPayment> RentPayments => Set<RentPayment>();
+    public DbSet<RentalCharge> RentalCharges => Set<RentalCharge>();
+    public DbSet<PaymentAllocation> PaymentAllocations => Set<PaymentAllocation>();
 
     protected override void OnModelCreating(ModelBuilder builder)
     {
@@ -36,5 +38,27 @@ public class ApplicationDbContext : IdentityDbContext<IdentityUser>
             .WithMany(l => l.Payments)
             .HasForeignKey(p => p.LeaseId)
             .OnDelete(DeleteBehavior.Cascade);
+
+        builder.Entity<RentalCharge>()
+            .HasOne(c => c.Lease)
+            .WithMany(l => l.Charges)
+            .HasForeignKey(c => c.LeaseId)
+            .OnDelete(DeleteBehavior.Cascade);
+
+        builder.Entity<RentalCharge>()
+            .HasIndex(c => new { c.LeaseId, c.BillingPeriodStart })
+            .IsUnique();
+
+        builder.Entity<PaymentAllocation>()
+            .HasOne(a => a.Payment)
+            .WithMany(p => p.Allocations)
+            .HasForeignKey(a => a.RentPaymentId)
+            .OnDelete(DeleteBehavior.Cascade);
+
+        builder.Entity<PaymentAllocation>()
+            .HasOne(a => a.RentalCharge)
+            .WithMany(c => c.Allocations)
+            .HasForeignKey(a => a.RentalChargeId)
+            .OnDelete(DeleteBehavior.Restrict);
     }
 }

@@ -16,5 +16,35 @@
     <dt class="col-sm-3">Notes</dt><dd class="col-sm-9">@Model.Payment.Notes</dd>
 </dl>
 
+<h3>Allocations</h3>
+@if (Model.Payment.Allocations.Any())
+{
+    <table class="table table-sm">
+        <thead><tr><th>Bill period</th><th>Due date</th><th class="text-end">Applied</th></tr></thead>
+        <tbody>
+        @foreach (var a in Model.Payment.Allocations.OrderBy(x => x.RentalCharge!.BillingPeriodStart))
+        {
+            <tr>
+                <td><a asp-page="/Bills/Details" asp-route-id="@a.RentalChargeId">@a.RentalCharge!.PeriodLabel</a></td>
+                <td>@a.RentalCharge.DueDate.ToString("yyyy-MM-dd")</td>
+                <td class="text-end">@a.Amount.ToString("C")</td>
+            </tr>
+        }
+        </tbody>
+        <tfoot>
+            <tr><th colspan="2" class="text-end">Total applied</th><th class="text-end">@Model.Payment.AllocatedAmount.ToString("C")</th></tr>
+            @if (Model.Payment.UnallocatedAmount > 0)
+            {
+                <tr><th colspan="2" class="text-end text-warning">Unallocated</th><th class="text-end">@Model.Payment.UnallocatedAmount.ToString("C")</th></tr>
+            }
+        </tfoot>
+    </table>
+}
+else
+{
+    <p class="text-muted">This payment has no allocations.</p>
+}
+
+<a asp-page="/Receipts/Show" asp-route-id="@Model.Payment.Id" class="btn btn-success">View Receipt</a>
 <a asp-page="Edit" asp-route-id="@Model.Payment.Id" class="btn btn-primary">Edit</a>
 <a asp-page="Index" class="btn btn-outline-secondary">Back</a>

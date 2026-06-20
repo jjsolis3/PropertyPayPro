@@ -7,14 +7,15 @@
 <h1>Record Payment</h1>
 
 <div class="row">
-    <div class="col-md-6">
+    <div class="col-md-8">
         <form method="post">
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-            <div class="mb-3">
-                <label asp-for="Payment.LeaseId" class="form-label">Lease</label>
-                <select asp-for="Payment.LeaseId" class="form-select" asp-items="Model.Leases"></select>
-            </div>
+
             <div class="row">
+                <div class="col mb-3">
+                    <label asp-for="Payment.LeaseId" class="form-label">Lease</label>
+                    <select asp-for="Payment.LeaseId" class="form-select" asp-items="Model.Leases"></select>
+                </div>
                 <div class="col mb-3">
                     <label asp-for="Payment.PaidOn" class="form-label"></label>
                     <input asp-for="Payment.PaidOn" class="form-control" />
@@ -26,17 +27,54 @@
                 <div class="col mb-3">
                     <label asp-for="Payment.Method" class="form-label"></label>
                     <select asp-for="Payment.Method" class="form-select"
-                            asp-items="Html.GetEnumSelectList<PaymentMethod>()"></select>
+                            asp-items="Html.GetEnumSelectList<PropertyPayPro.Models.PaymentMethod>()"></select>
                 </div>
             </div>
+
             <div class="mb-3">
                 <label asp-for="Payment.Reference" class="form-label"></label>
                 <input asp-for="Payment.Reference" class="form-control" />
             </div>
             <div class="mb-3">
                 <label asp-for="Payment.Notes" class="form-label"></label>
-                <textarea asp-for="Payment.Notes" class="form-control" rows="3"></textarea>
+                <textarea asp-for="Payment.Notes" class="form-control" rows="2"></textarea>
             </div>
+
+            <h4 class="mt-4">Allocate to bills</h4>
+            @if (!Model.OutstandingCharges.Any())
+            {
+                <p class="text-muted">
+                    No outstanding bills for the selected lease. Save the payment to hold the full amount as a credit,
+                    or generate bills first.
+                </p>
+            }
+            else
+            {
+                <p class="text-muted small">
+                    Amounts pre-filled oldest-first. Adjust as needed; total can be less than or equal to the payment amount.
+                </p>
+                <table class="table">
+                    <thead><tr><th>Period</th><th>Due</th><th class="text-end">Balance</th><th>Apply</th></tr></thead>
+                    <tbody>
+                    @for (int i = 0; i < Model.OutstandingCharges.Count; i++)
+                    {
+                        var c = Model.OutstandingCharges[i];
+                        <tr>
+                            <td>@c.PeriodLabel</td>
+                            <td>@c.DueDate.ToString("yyyy-MM-dd")</td>
+                            <td class="text-end">@c.Balance.ToString("C")</td>
+                            <td>
+                                <input type="hidden" name="AllocationChargeIds[@i]" value="@c.Id" />
+                                <input type="number" step="0.01" min="0" max="@c.Balance"
+                                       name="AllocationAmounts[@i]" value="@Model.SuggestedAmounts[i]"
+                                       class="form-control form-control-sm" style="max-width: 8rem;" />
+                            </td>
+                        </tr>
+                    }
+                    </tbody>
+                </table>
+            }
+
             <button type="submit" class="btn btn-primary">Save</button>
             <a asp-page="Index" class="btn btn-outline-secondary">Cancel</a>
         </form>

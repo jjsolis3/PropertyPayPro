@@ -1,0 +1,40 @@
+@page "{id:int}"
+@model PropertyPayPro.Pages.Bills.EditModel
+@{
+    ViewData["Title"] = "Edit Bill";
+}
+
+<h1>Edit Bill</h1>
+
+<div class="row">
+    <div class="col-md-6">
+        <form method="post">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <input type="hidden" asp-for="Charge.Id" />
+            <input type="hidden" asp-for="Charge.LeaseId" />
+
+            <div class="mb-3">
+                <label asp-for="Charge.BillingPeriodStart" class="form-label"></label>
+                <input asp-for="Charge.BillingPeriodStart" class="form-control" />
+            </div>
+            <div class="mb-3">
+                <label asp-for="Charge.DueDate" class="form-label"></label>
+                <input asp-for="Charge.DueDate" class="form-control" />
+            </div>
+            <div class="mb-3">
+                <label asp-for="Charge.AmountDue" class="form-label"></label>
+                <input asp-for="Charge.AmountDue" class="form-control" />
+            </div>
+            <div class="mb-3">
+                <label asp-for="Charge.Notes" class="form-label"></label>
+                <textarea asp-for="Charge.Notes" class="form-control" rows="3"></textarea>
+            </div>
+            <button type="submit" class="btn btn-primary">Save</button>
+            <a asp-page="Details" asp-route-id="@Model.Charge.Id" class="btn btn-outline-secondary">Cancel</a>
+            <button type="submit" asp-page-handler="Delete" class="btn btn-outline-danger float-end"
+                    onclick="return confirm('Delete this bill? This cannot be undone if no payments are applied.')">Delete</button>
+        </form>
+    </div>
+</div>
+
+@section Scripts { <partial name="_ValidationScriptsPartial" /> }

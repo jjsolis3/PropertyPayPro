@@ -13,6 +13,8 @@ public class IndexModel : PageModel
     public int PropertyCount { get; private set; }
     public int ActiveLeaseCount { get; private set; }
     public decimal CollectedThisMonth { get; private set; }
+    public decimal OutstandingBalance { get; private set; }
+    public int OverdueCount { get; private set; }
 
     public async Task OnGetAsync()
     {
@@ -24,5 +26,12 @@ public class IndexModel : PageModel
         CollectedThisMonth = await _db.RentPayments
             .Where(p => p.PaidOn >= firstOfMonth)
             .SumAsync(p => (decimal?)p.Amount) ?? 0m;
+
+        var charges = await _db.RentalCharges
+            .Include(c => c.Allocations)
+            .ToListAsync();
+
+        OutstandingBalance = charges.Sum(c => c.Balance);
+        OverdueCount = charges.Count(c => c.Status == Models.ChargeStatus.Overdue);
     }
 }

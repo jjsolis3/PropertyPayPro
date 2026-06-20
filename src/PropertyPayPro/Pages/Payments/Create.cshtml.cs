@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.EntityFrameworkCore;
 using PropertyPayPro.Data;
 using PropertyPayPro.Models;
+using PropertyPayPro.Services;
 
 namespace PropertyPayPro.Pages.Payments;
 
@@ -12,7 +13,13 @@ namespace PropertyPayPro.Pages.Payments;
 public class CreateModel : PageModel
 {
     private readonly ApplicationDbContext _db;
-    public CreateModel(ApplicationDbContext db) => _db = db;
+    private readonly BillingService _billing;
+
+    public CreateModel(ApplicationDbContext db, BillingService billing)
+    {
+        _db = db;
+        _billing = billing;
+    }
 
     [BindProperty]
     public RentPayment Payment { get; set; } = new()
@@ -20,12 +27,21 @@ public class CreateModel : PageModel
         PaidOn = DateOnly.FromDateTime(DateTime.UtcNow)
     };
 
+    [BindProperty]
+    public List<int> AllocationChargeIds { get; set; } = new();
+
+    [BindProperty]
+    public List<decimal> AllocationAmounts { get; set; } = new();
+
     public SelectList Leases { get; private set; } = default!;
+    public List<RentalCharge> OutstandingCharges { get; private set; } = new();
+    public List<decimal> SuggestedAmounts { get; private set; } = new();
 
     public async Task<IActionResult> OnGetAsync(int? leaseId)
     {
         if (leaseId is int id) Payment.LeaseId = id;
-        await LoadSelectListAsync();
+        await LoadLeasesAsync();
+        await LoadOutstandingAsync();
         return Page();
     }
 
@@ -33,16 +49,40 @@ public class CreateModel : PageModel
     {
         if (!ModelState.IsValid)
         {
-            await LoadSelectListAsync();
+            await LoadLeasesAsync();
+            await LoadOutstandingAsync();
+            return Page();
+        }
+
+        var totalAllocated = AllocationAmounts.Where(a => a > 0).Sum();
+        if (totalAllocated > Payment.Amount)
+        {
+            ModelState.AddModelError(string.Empty,
+                $"Total allocated ({totalAllocated:C}) exceeds payment amount ({Payment.Amount:C}).");
+            await LoadLeasesAsync();
+            await LoadOutstandingAsync();
             return Page();
         }
 
         _db.RentPayments.Add(Payment);
         await _db.SaveChangesAsync();
-        return RedirectToPage("Index");
+
+        for (var i = 0; i < AllocationChargeIds.Count && i < AllocationAmounts.Count; i++)
+        {
+            if (AllocationAmounts[i] <= 0) continue;
+            _db.PaymentAllocations.Add(new PaymentAllocation
+            {
+                RentPaymentId = Payment.Id,
+                RentalChargeId = AllocationChargeIds[i],
+                Amount = AllocationAmounts[i]
+            });
+        }
+        await _db.SaveChangesAsync();
+
+        return RedirectToPage("/Receipts/Show", new { id = Payment.Id });
     }
 
-    private async Task LoadSelectListAsync()
+    private async Task LoadLeasesAsync()
     {
         var leases = await _db.Leases
             .Include(l => l.Property)
@@ -53,5 +93,31 @@ public class CreateModel : PageModel
         Leases = new SelectList(
             leases.Select(l => new { l.Id, Label = $"{l.Tenant!.DisplayName} — {l.Property!.Name}" }),
             "Id", "Label");
+    }
+
+    private async Task LoadOutstandingAsync()
+    {
+        if (Payment.LeaseId == 0) return;
+
+        var charges = await _db.RentalCharges
+            .Where(c => c.LeaseId == Payment.LeaseId)
+            .Include(c => c.Allocations)
+            .OrderBy(c => c.BillingPeriodStart)
+            .ToListAsync();
+
+        OutstandingCharges = charges.Where(c => c.Balance > 0).ToList();
+
+        var remaining = Payment.Amount;
+        foreach (var c in OutstandingCharges)
+        {
+            if (remaining <= 0)
+            {
+                SuggestedAmounts.Add(0m);
+                continue;
+            }
+            var apply = Math.Min(c.Balance, remaining);
+            SuggestedAmounts.Add(apply);
+            remaining -= apply;
+        }
     }
 }

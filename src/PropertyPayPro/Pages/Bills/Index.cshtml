@@ -1,0 +1,75 @@
+@page
+@model PropertyPayPro.Pages.Bills.IndexModel
+@{
+    ViewData["Title"] = "Rent Bills";
+}
+
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <h1>Rent Bills</h1>
+    <div>
+        <a asp-page="Generate" class="btn btn-success">Generate Bills</a>
+    </div>
+</div>
+
+<form method="get" class="row g-2 mb-3">
+    <div class="col-auto">
+        <select asp-for="StatusFilter" asp-items="Html.GetEnumSelectList<PropertyPayPro.Models.ChargeStatus>()" class="form-select">
+            <option value="">All statuses</option>
+        </select>
+    </div>
+    <div class="col-auto">
+        <button type="submit" class="btn btn-outline-primary">Filter</button>
+        <a asp-page="Index" class="btn btn-outline-secondary">Reset</a>
+    </div>
+</form>
+
+<table class="table table-striped">
+    <thead>
+        <tr>
+            <th>Period</th>
+            <th>Tenant</th>
+            <th>Property</th>
+            <th>Due</th>
+            <th class="text-end">Amount</th>
+            <th class="text-end">Paid</th>
+            <th class="text-end">Balance</th>
+            <th>Status</th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+    @foreach (var c in Model.Charges)
+    {
+        <tr>
+            <td>@c.PeriodLabel</td>
+            <td>@c.Lease!.Tenant!.DisplayName</td>
+            <td>@c.Lease.Property!.Name</td>
+            <td>@c.DueDate.ToString("yyyy-MM-dd")</td>
+            <td class="text-end">@c.AmountDue.ToString("C")</td>
+            <td class="text-end">@c.AmountPaid.ToString("C")</td>
+            <td class="text-end">@c.Balance.ToString("C")</td>
+            <td>
+                @switch (c.Status)
+                {
+                    case PropertyPayPro.Models.ChargeStatus.Paid:
+                        <span class="badge bg-success">Paid</span>
+                        break;
+                    case PropertyPayPro.Models.ChargeStatus.PartiallyPaid:
+                        <span class="badge bg-warning text-dark">Partial</span>
+                        break;
+                    case PropertyPayPro.Models.ChargeStatus.Overdue:
+                        <span class="badge bg-danger">Overdue</span>
+                        break;
+                    default:
+                        <span class="badge bg-secondary">Unpaid</span>
+                        break;
+                }
+            </td>
+            <td class="text-end">
+                <a asp-page="Details" asp-route-id="@c.Id" class="btn btn-sm btn-outline-secondary">Details</a>
+                <a asp-page="Edit" asp-route-id="@c.Id" class="btn btn-sm btn-outline-primary">Edit</a>
+            </td>
+        </tr>
+    }
+    </tbody>
+</table>

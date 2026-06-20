@@ -6,11 +6,11 @@
 
 <div class="text-center">
     <h1 class="display-5">PropertyPayPro</h1>
-    <p class="lead">Manage your properties, leases, and rent payments in one place.</p>
+    <p class="lead">Manage your properties, leases, bills, and payments in one place.</p>
 </div>
 
 <div class="row mt-4 g-3">
-    <div class="col-md-4">
+    <div class="col-md-3">
         <div class="card text-bg-light h-100">
             <div class="card-body">
                 <h5 class="card-title">Properties</h5>
@@ -19,7 +19,7 @@
             </div>
         </div>
     </div>
-    <div class="col-md-4">
+    <div class="col-md-3">
         <div class="card text-bg-light h-100">
             <div class="card-body">
                 <h5 class="card-title">Active Leases</h5>
@@ -28,13 +28,30 @@
             </div>
         </div>
     </div>
-    <div class="col-md-4">
+    <div class="col-md-3">
+        <div class="card text-bg-light h-100">
+            <div class="card-body">
+                <h5 class="card-title">Outstanding Balance</h5>
+                <p class="display-6">@Model.OutstandingBalance.ToString("C")</p>
+                <a class="btn btn-primary" asp-page="/Bills/Index">View Bills</a>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
         <div class="card text-bg-light h-100">
             <div class="card-body">
                 <h5 class="card-title">Collected This Month</h5>
                 <p class="display-6">@Model.CollectedThisMonth.ToString("C")</p>
-                <a class="btn btn-primary" asp-page="/Payments/Index">View</a>
+                <a class="btn btn-primary" asp-page="/Payments/Index">View Payments</a>
             </div>
         </div>
     </div>
 </div>
+
+@if (Model.OverdueCount > 0)
+{
+    <div class="alert alert-warning mt-4">
+        <strong>@Model.OverdueCount overdue bill(s).</strong>
+        <a asp-page="/Bills/Index" asp-route-StatusFilter="Overdue" class="alert-link">Review overdue</a>
+    </div>
+}
