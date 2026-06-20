@@ -1,0 +1,96 @@
+@page "{id:int}"
+@model PropertyPayPro.Pages.Receipts.ShowModel
+@{
+    ViewData["Title"] = $"Receipt #{Model.Payment!.Id}";
+}
+
+<div class="d-flex justify-content-between align-items-center mb-3 d-print-none">
+    <h1>Receipt #@Model.Payment.Id</h1>
+    <div>
+        <button class="btn btn-primary" onclick="window.print()">Print</button>
+        <a asp-page="/Payments/Index" class="btn btn-outline-secondary">Back</a>
+    </div>
+</div>
+
+<div class="card">
+    <div class="card-body">
+        <div class="d-flex justify-content-between">
+            <div>
+                <h4 class="mb-1">PropertyPayPro</h4>
+                <div class="text-muted">Payment Receipt</div>
+            </div>
+            <div class="text-end">
+                <div><strong>Receipt #</strong> @Model.Payment.Id</div>
+                <div><strong>Date received:</strong> @Model.Payment.PaidOn.ToString("yyyy-MM-dd")</div>
+            </div>
+        </div>
+
+        <hr />
+
+        <div class="row">
+            <div class="col">
+                <strong>Tenant</strong><br />
+                @Model.Payment.Lease!.Tenant!.DisplayName<br />
+                @Model.Payment.Lease.Tenant.Email
+            </div>
+            <div class="col">
+                <strong>Property</strong><br />
+                @Model.Payment.Lease.Property!.Name<br />
+                @Model.Payment.Lease.Property.AddressLine1, @Model.Payment.Lease.Property.City
+            </div>
+            <div class="col text-end">
+                <strong>Method</strong><br />
+                @Model.Payment.Method
+                @if (!string.IsNullOrWhiteSpace(Model.Payment.Reference))
+                {
+                    <br /><span class="text-muted">Ref: @Model.Payment.Reference</span>
+                }
+            </div>
+        </div>
+
+        <hr />
+
+        <h5>Amount received: <span class="float-end">@Model.Payment.Amount.ToString("C")</span></h5>
+
+        <h6 class="mt-4">Applied to:</h6>
+        @if (Model.Payment.Allocations.Any())
+        {
+            <table class="table">
+                <thead><tr><th>Billing period</th><th>Due date</th><th class="text-end">Applied</th></tr></thead>
+                <tbody>
+                @foreach (var a in Model.Payment.Allocations.OrderBy(x => x.RentalCharge!.BillingPeriodStart))
+                {
+                    <tr>
+                        <td>@a.RentalCharge!.PeriodLabel</td>
+                        <td>@a.RentalCharge.DueDate.ToString("yyyy-MM-dd")</td>
+                        <td class="text-end">@a.Amount.ToString("C")</td>
+                    </tr>
+                }
+                </tbody>
+                <tfoot>
+                    <tr><th colspan="2" class="text-end">Total applied</th><th class="text-end">@Model.Payment.AllocatedAmount.ToString("C")</th></tr>
+                    @if (Model.Payment.UnallocatedAmount > 0)
+                    {
+                        <tr><th colspan="2" class="text-end text-warning">Unallocated (credit)</th><th class="text-end">@Model.Payment.UnallocatedAmount.ToString("C")</th></tr>
+                    }
+                </tfoot>
+            </table>
+        }
+        else
+        {
+            <p class="text-warning">No allocations recorded. The full amount is held as a credit on this lease.</p>
+        }
+
+        @if (!string.IsNullOrWhiteSpace(Model.Payment.Notes))
+        {
+            <div class="mt-3"><strong>Notes:</strong> @Model.Payment.Notes</div>
+        }
+    </div>
+</div>
+
+<style>
+    @@media print {
+        nav, footer, .d-print-none { display: none !important; }
+        .card { border: none !important; }
+    }
+</style>

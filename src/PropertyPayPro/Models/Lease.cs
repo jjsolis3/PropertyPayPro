@@ -34,4 +34,5 @@ public class Lease
     public string? Notes { get; set; }
 
     public List<RentPayment> Payments { get; set; } = new();
+    public List<RentalCharge> Charges { get; set; } = new();
 }

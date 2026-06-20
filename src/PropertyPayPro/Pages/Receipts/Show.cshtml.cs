@@ -5,13 +5,13 @@ using Microsoft.EntityFrameworkCore;
 using PropertyPayPro.Data;
 using PropertyPayPro.Models;
 
-namespace PropertyPayPro.Pages.Payments;
+namespace PropertyPayPro.Pages.Receipts;
 
 [Authorize]
-public class DetailsModel : PageModel
+public class ShowModel : PageModel
 {
     private readonly ApplicationDbContext _db;
-    public DetailsModel(ApplicationDbContext db) => _db = db;
+    public ShowModel(ApplicationDbContext db) => _db = db;
 
     public RentPayment? Payment { get; private set; }
 

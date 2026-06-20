@@ -1,0 +1,48 @@
+@page "{id:int}"
+@model PropertyPayPro.Pages.Bills.DetailsModel
+@{
+    ViewData["Title"] = "Bill Details";
+}
+
+<h1>@Model.Charge!.PeriodLabel — @Model.Charge.Lease!.Tenant!.DisplayName</h1>
+
+<dl class="row">
+    <dt class="col-sm-3">Property</dt><dd class="col-sm-9">@Model.Charge.Lease.Property!.Name</dd>
+    <dt class="col-sm-3">Billing period</dt><dd class="col-sm-9">@Model.Charge.PeriodLabel</dd>
+    <dt class="col-sm-3">Due date</dt><dd class="col-sm-9">@Model.Charge.DueDate.ToString("yyyy-MM-dd")</dd>
+    <dt class="col-sm-3">Amount due</dt><dd class="col-sm-9">@Model.Charge.AmountDue.ToString("C")</dd>
+    <dt class="col-sm-3">Amount paid</dt><dd class="col-sm-9">@Model.Charge.AmountPaid.ToString("C")</dd>
+    <dt class="col-sm-3">Balance</dt><dd class="col-sm-9"><strong>@Model.Charge.Balance.ToString("C")</strong></dd>
+    <dt class="col-sm-3">Status</dt><dd class="col-sm-9">@Model.Charge.Status</dd>
+    <dt class="col-sm-3">Notes</dt><dd class="col-sm-9">@Model.Charge.Notes</dd>
+</dl>
+
+<h3>Payments applied</h3>
+@if (Model.Charge.Allocations.Any())
+{
+    <table class="table table-sm">
+        <thead><tr><th>Date</th><th>Method</th><th>Reference</th><th class="text-end">Amount applied</th><th></th></tr></thead>
+        <tbody>
+        @foreach (var a in Model.Charge.Allocations.OrderByDescending(x => x.Payment!.PaidOn))
+        {
+            <tr>
+                <td>@a.Payment!.PaidOn.ToString("yyyy-MM-dd")</td>
+                <td>@a.Payment.Method</td>
+                <td>@a.Payment.Reference</td>
+                <td class="text-end">@a.Amount.ToString("C")</td>
+                <td class="text-end">
+                    <a asp-page="/Receipts/Show" asp-route-id="@a.RentPaymentId" class="btn btn-sm btn-outline-secondary">Receipt</a>
+                </td>
+            </tr>
+        }
+        </tbody>
+    </table>
+}
+else
+{
+    <p class="text-muted">No payments applied yet.</p>
+}
+
+<a asp-page="/Payments/Create" asp-route-leaseId="@Model.Charge.LeaseId" class="btn btn-success">Record Payment</a>
+<a asp-page="Edit" asp-route-id="@Model.Charge.Id" class="btn btn-primary">Edit</a>
+<a asp-page="Index" class="btn btn-outline-secondary">Back</a>

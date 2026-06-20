@@ -23,6 +23,7 @@ builder.Services
     .AddEntityFrameworkStores<ApplicationDbContext>();
 
 builder.Services.AddRazorPages();
+builder.Services.AddScoped<PropertyPayPro.Services.BillingService>();
 
 var app = builder.Build();
 
@@ -47,5 +48,32 @@ app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapRazorPages();
+
+app.MapPost("/api/jobs/generate-monthly-charges", async (
+    HttpContext ctx,
+    PropertyPayPro.Services.BillingService billing,
+    IConfiguration config,
+    int? year,
+    int? month) =>
+{
+    var expectedToken = config["JOB_TOKEN"];
+    if (string.IsNullOrWhiteSpace(expectedToken))
+    {
+        return Results.Problem("JOB_TOKEN is not configured.", statusCode: 500);
+    }
+
+    var providedToken = ctx.Request.Headers["X-Job-Token"].ToString();
+    if (providedToken != expectedToken)
+    {
+        return Results.Unauthorized();
+    }
+
+    var now = DateTime.UtcNow;
+    var y = year ?? now.Year;
+    var m = month ?? now.Month;
+
+    var created = await billing.GenerateChargesForPeriodAsync(y, m);
+    return Results.Ok(new { year = y, month = m, created });
+});
 
 app.Run();

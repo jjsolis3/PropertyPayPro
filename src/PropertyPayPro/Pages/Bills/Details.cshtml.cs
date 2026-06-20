@@ -5,7 +5,7 @@ using Microsoft.EntityFrameworkCore;
 using PropertyPayPro.Data;
 using PropertyPayPro.Models;
 
-namespace PropertyPayPro.Pages.Payments;
+namespace PropertyPayPro.Pages.Bills;
 
 [Authorize]
 public class DetailsModel : PageModel
@@ -13,15 +13,15 @@ public class DetailsModel : PageModel
     private readonly ApplicationDbContext _db;
     public DetailsModel(ApplicationDbContext db) => _db = db;
 
-    public RentPayment? Payment { get; private set; }
+    public RentalCharge? Charge { get; private set; }
 
     public async Task<IActionResult> OnGetAsync(int id)
     {
-        Payment = await _db.RentPayments
-            .Include(p => p.Lease).ThenInclude(l => l!.Property)
-            .Include(p => p.Lease).ThenInclude(l => l!.Tenant)
-            .Include(p => p.Allocations).ThenInclude(a => a.RentalCharge)
-            .FirstOrDefaultAsync(p => p.Id == id);
-        return Payment is null ? NotFound() : Page();
+        Charge = await _db.RentalCharges
+            .Include(c => c.Lease).ThenInclude(l => l!.Property)
+            .Include(c => c.Lease).ThenInclude(l => l!.Tenant)
+            .Include(c => c.Allocations).ThenInclude(a => a.Payment)
+            .FirstOrDefaultAsync(c => c.Id == id);
+        return Charge is null ? NotFound() : Page();
     }
 }

@@ -33,4 +33,12 @@ public class RentPayment
 
     [StringLength(500)]
     public string? Notes { get; set; }
+
+    public List<PaymentAllocation> Allocations { get; set; } = new();
+
+    [NotMapped]
+    public decimal AllocatedAmount => Allocations?.Sum(a => a.Amount) ?? 0m;
+
+    [NotMapped]
+    public decimal UnallocatedAmount => Amount - AllocatedAmount;
 }
