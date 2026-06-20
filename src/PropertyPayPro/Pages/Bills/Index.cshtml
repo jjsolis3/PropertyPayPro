@@ -5,71 +5,136 @@
 }
 
 <div class="d-flex justify-content-between align-items-center mb-3">
-    <h1>Rent Bills</h1>
+    <h1 class="h3 mb-0">Rent Bills</h1>
     <div>
-        <a asp-page="Generate" class="btn btn-success">Generate Bills</a>
+        <a asp-page="LateFees" class="btn btn-outline-warning">Late Fees</a>
+        <button type="button" class="btn btn-success" data-bs-toggle="modal" data-bs-target="#generateBillsModal">
+            <i class="las la-plus"></i> Generate Bills
+        </button>
     </div>
 </div>
 
-<form method="get" class="row g-2 mb-3">
-    <div class="col-auto">
-        <select asp-for="StatusFilter" asp-items="Html.GetEnumSelectList<PropertyPayPro.Models.ChargeStatus>()" class="form-select">
-            <option value="">All statuses</option>
-        </select>
+@if (TempData["GenerateMessage"] is string okMsg)
+{
+    <div class="alert alert-success alert-dismissible fade show">
+        @okMsg
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
     </div>
-    <div class="col-auto">
-        <button type="submit" class="btn btn-outline-primary">Filter</button>
-        <a asp-page="Index" class="btn btn-outline-secondary">Reset</a>
+}
+@if (TempData["GenerateError"] is string errMsg)
+{
+    <div class="alert alert-danger alert-dismissible fade show">
+        @errMsg
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
     </div>
-</form>
+}
 
-<table class="table table-striped">
-    <thead>
-        <tr>
-            <th>Period</th>
-            <th>Tenant</th>
-            <th>Property</th>
-            <th>Due</th>
-            <th class="text-end">Amount</th>
-            <th class="text-end">Paid</th>
-            <th class="text-end">Balance</th>
-            <th>Status</th>
-            <th></th>
-        </tr>
-    </thead>
-    <tbody>
-    @foreach (var c in Model.Charges)
-    {
-        <tr>
-            <td>@c.PeriodLabel</td>
-            <td>@c.Lease!.Tenant!.DisplayName</td>
-            <td>@c.Lease.Property!.Name</td>
-            <td>@c.DueDate.ToString("yyyy-MM-dd")</td>
-            <td class="text-end">@c.AmountDue.ToString("C")</td>
-            <td class="text-end">@c.AmountPaid.ToString("C")</td>
-            <td class="text-end">@c.Balance.ToString("C")</td>
-            <td>
-                @switch (c.Status)
+<div class="card">
+    <div class="card-body">
+        <form method="get" class="row g-2 mb-3">
+            <div class="col-auto">
+                <select asp-for="StatusFilter" asp-items="Html.GetEnumSelectList<PropertyPayPro.Models.ChargeStatus>()" class="form-select">
+                    <option value="">All statuses</option>
+                </select>
+            </div>
+            <div class="col-auto">
+                <button type="submit" class="btn btn-outline-primary">Filter</button>
+                <a asp-page="Index" class="btn btn-outline-secondary">Reset</a>
+            </div>
+        </form>
+
+        <div class="table-responsive">
+            <table class="table table-striped mb-0">
+                <thead>
+                    <tr>
+                        <th>Period</th>
+                        <th>Tenant</th>
+                        <th>Property</th>
+                        <th>Due</th>
+                        <th class="text-end">Amount</th>
+                        <th class="text-end">Paid</th>
+                        <th class="text-end">Balance</th>
+                        <th>Status</th>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody>
+                @foreach (var c in Model.Charges)
                 {
-                    case PropertyPayPro.Models.ChargeStatus.Paid:
-                        <span class="badge bg-success">Paid</span>
-                        break;
-                    case PropertyPayPro.Models.ChargeStatus.PartiallyPaid:
-                        <span class="badge bg-warning text-dark">Partial</span>
-                        break;
-                    case PropertyPayPro.Models.ChargeStatus.Overdue:
-                        <span class="badge bg-danger">Overdue</span>
-                        break;
-                    default:
-                        <span class="badge bg-secondary">Unpaid</span>
-                        break;
+                    <tr>
+                        <td>
+                            @c.PeriodLabel
+                            @if (c.Kind == PropertyPayPro.Models.ChargeKind.LateFee) { <span class="badge bg-warning text-dark ms-1">Late fee</span> }
+                        </td>
+                        <td>@c.Lease!.Tenant!.DisplayName</td>
+                        <td>@c.Lease.Property!.Name</td>
+                        <td>@c.DueDate.ToString("yyyy-MM-dd")</td>
+                        <td class="text-end">@c.AmountDue.ToString("C")</td>
+                        <td class="text-end">@c.AmountPaid.ToString("C")</td>
+                        <td class="text-end">@c.Balance.ToString("C")</td>
+                        <td>
+                            @switch (c.Status)
+                            {
+                                case PropertyPayPro.Models.ChargeStatus.Paid:
+                                    <span class="badge bg-success">Paid</span>
+                                    break;
+                                case PropertyPayPro.Models.ChargeStatus.PartiallyPaid:
+                                    <span class="badge bg-warning text-dark">Partial</span>
+                                    break;
+                                case PropertyPayPro.Models.ChargeStatus.Overdue:
+                                    <span class="badge bg-danger">Overdue</span>
+                                    break;
+                                default:
+                                    <span class="badge bg-secondary">Unpaid</span>
+                                    break;
+                            }
+                        </td>
+                        <td class="text-end">
+                            <a asp-page="Details" asp-route-id="@c.Id" class="btn btn-sm btn-outline-secondary">Details</a>
+                            <a asp-page="Edit" asp-route-id="@c.Id" class="btn btn-sm btn-outline-primary">Edit</a>
+                        </td>
+                    </tr>
                 }
-            </td>
-            <td class="text-end">
-                <a asp-page="Details" asp-route-id="@c.Id" class="btn btn-sm btn-outline-secondary">Details</a>
-                <a asp-page="Edit" asp-route-id="@c.Id" class="btn btn-sm btn-outline-primary">Edit</a>
-            </td>
-        </tr>
-    }
-    </tbody>
-</table>
+                @if (!Model.Charges.Any())
+                {
+                    <tr><td colspan="9" class="text-center text-muted py-3">No bills yet. Click <strong>Generate Bills</strong> to create them for the current month.</td></tr>
+                }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<!-- Generate Bills Modal -->
+<div class="modal fade" id="generateBillsModal" tabindex="-1" aria-labelledby="generateBillsModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <form method="post" asp-page-handler="Generate">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="generateBillsModalLabel">Generate Monthly Bills</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <p class="text-muted">
+                        Creates a rent charge for every active lease for the selected month.
+                        Bills are due on the 15th. Running this again for the same month is safe — duplicates are skipped.
+                    </p>
+                    <div class="row g-2">
+                        <div class="col">
+                            <label asp-for="GenerateYear" class="form-label">Year</label>
+                            <input asp-for="GenerateYear" type="number" min="2020" max="2100" class="form-control" />
+                        </div>
+                        <div class="col">
+                            <label asp-for="GenerateMonth" class="form-label">Month</label>
+                            <input asp-for="GenerateMonth" type="number" min="1" max="12" class="form-control" />
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-primary">Generate</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>

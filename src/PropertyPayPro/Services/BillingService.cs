@@ -55,7 +55,8 @@ public class BillingService
         var today = DateOnly.FromDateTime(DateTime.UtcNow);
         var rentCharges = await _db.RentalCharges
             .Where(c => c.Kind == ChargeKind.Rent)
-            .Include(c => c.Lease)
+            .Include(c => c.Lease).ThenInclude(l => l!.Tenant)
+            .Include(c => c.Lease).ThenInclude(l => l!.Property)
             .Include(c => c.Allocations)
             .ToListAsync();
 
