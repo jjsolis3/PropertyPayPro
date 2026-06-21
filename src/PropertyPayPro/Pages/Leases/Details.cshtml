@@ -96,4 +96,5 @@ else
 
 <a asp-page="Edit" asp-route-id="@Model.Lease.Id" class="btn btn-primary">Edit</a>
 <a asp-page="/Payments/Create" asp-route-leaseId="@Model.Lease.Id" class="btn btn-success">Record Payment</a>
+<a asp-page="/Reports/Statement" asp-route-leaseId="@Model.Lease.Id" class="btn btn-outline-info">View Statement</a>
 <a asp-page="Index" class="btn btn-outline-secondary">Back</a>

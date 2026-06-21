@@ -14,11 +14,13 @@ public class CreateModel : PageModel
 {
     private readonly ApplicationDbContext _db;
     private readonly BillingService _billing;
+    private readonly MailService _mail;
 
-    public CreateModel(ApplicationDbContext db, BillingService billing)
+    public CreateModel(ApplicationDbContext db, BillingService billing, MailService mail)
     {
         _db = db;
         _billing = billing;
+        _mail = mail;
     }
 
     [BindProperty]
@@ -78,6 +80,22 @@ public class CreateModel : PageModel
             });
         }
         await _db.SaveChangesAsync();
+
+        if (_mail.IsConfigured)
+        {
+            var baseUrl = $"{Request.Scheme}://{Request.Host}";
+            try
+            {
+                var log = await _mail.SendReceiptAsync(baseUrl, Payment.Id);
+                TempData["EmailStatus"] = log.Status == EmailStatus.Sent
+                    ? $"Receipt emailed to {log.ToAddress}."
+                    : $"Receipt not emailed: {log.Error}";
+            }
+            catch (Exception ex)
+            {
+                TempData["EmailStatus"] = $"Receipt not emailed: {ex.Message}";
+            }
+        }
 
         return RedirectToPage("/Receipts/Show", new { id = Payment.Id });
     }
