@@ -19,6 +19,7 @@ public class ApplicationDbContext : IdentityDbContext<ApplicationUser>
     public DbSet<LeaseDocument> LeaseDocuments => Set<LeaseDocument>();
     public DbSet<PropertyExpense> PropertyExpenses => Set<PropertyExpense>();
     public DbSet<ServiceTicket> ServiceTickets => Set<ServiceTicket>();
+    public DbSet<EmailLog> EmailLogs => Set<EmailLog>();
 
     protected override void OnModelCreating(ModelBuilder builder)
     {

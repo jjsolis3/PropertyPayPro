@@ -21,6 +21,9 @@ public class Tenant
     [StringLength(500)]
     public string? Notes { get; set; }
 
+    public bool ReceiveReceipts { get; set; } = true;
+    public bool ReceiveReminders { get; set; } = true;
+
     public List<Lease> Leases { get; set; } = new();
 
     public string DisplayName => $"{FirstName} {LastName}".Trim();
