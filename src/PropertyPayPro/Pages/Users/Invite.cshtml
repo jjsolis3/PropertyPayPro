@@ -1,0 +1,68 @@
+@page
+@model PropertyPayPro.Pages.Users.InviteModel
+@{
+    ViewData["Title"] = "Invite User";
+}
+
+<h1 class="h3 mb-3">Invite User</h1>
+
+<div class="row">
+    <div class="col-md-8">
+        @if (!string.IsNullOrEmpty(Model.InviteLink))
+        {
+            <div class="alert alert-success">
+                <h5 class="alert-heading">Invitation created for @Model.InviteEmail</h5>
+                <p class="mb-2">Share this one-time link so they can set their password and log in:</p>
+                <div class="input-group">
+                    <input type="text" readonly value="@Model.InviteLink" class="form-control" onclick="this.select()" />
+                    <button type="button" class="btn btn-outline-primary"
+                            onclick="navigator.clipboard.writeText('@Model.InviteLink'); PPS.toast.success('Invite link copied.');">
+                        Copy
+                    </button>
+                </div>
+                <small class="text-muted d-block mt-2">
+                    Once SMTP is configured, this link will be emailed automatically. For now, copy and send it manually.
+                </small>
+                <div class="mt-3">
+                    <a asp-page="Index" class="btn btn-outline-secondary">Back to Users</a>
+                    <a asp-page="Invite" class="btn btn-success">Invite Another</a>
+                </div>
+            </div>
+        }
+        else
+        {
+            <div class="card">
+                <div class="card-body">
+                    <form method="post">
+                        <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+                        <div class="row">
+                            <div class="col mb-3">
+                                <label asp-for="Input.FirstName" class="form-label"></label>
+                                <input asp-for="Input.FirstName" class="form-control" />
+                                <span asp-validation-for="Input.FirstName" class="text-danger"></span>
+                            </div>
+                            <div class="col mb-3">
+                                <label asp-for="Input.LastName" class="form-label"></label>
+                                <input asp-for="Input.LastName" class="form-control" />
+                                <span asp-validation-for="Input.LastName" class="text-danger"></span>
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <label asp-for="Input.Email" class="form-label"></label>
+                            <input asp-for="Input.Email" class="form-control" type="email" />
+                            <span asp-validation-for="Input.Email" class="text-danger"></span>
+                        </div>
+                        <div class="form-check mb-3">
+                            <input asp-for="Input.MakeAdmin" class="form-check-input" />
+                            <label asp-for="Input.MakeAdmin" class="form-check-label"></label>
+                        </div>
+                        <button type="submit" class="btn btn-primary">Create Invitation</button>
+                        <a asp-page="Index" class="btn btn-outline-secondary">Cancel</a>
+                    </form>
+                </div>
+            </div>
+        }
+    </div>
+</div>
+
+@section Scripts { <partial name="_ValidationScriptsPartial" /> }

@@ -1,0 +1,87 @@
+@page
+@model PropertyPayPro.Pages.Users.IndexModel
+@{
+    ViewData["Title"] = "Users";
+}
+
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <h1 class="h3 mb-0">Users</h1>
+    <a asp-page="Invite" class="btn btn-success">Invite User</a>
+</div>
+
+@if (TempData["Message"] is string msg)
+{
+    <div class="alert alert-success alert-dismissible fade show">@msg
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+}
+@if (TempData["Error"] is string err)
+{
+    <div class="alert alert-danger alert-dismissible fade show">@err
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+}
+@if (TempData["ResetLink"] is string resetLink)
+{
+    <div class="alert alert-info alert-dismissible fade show">
+        <strong>Password reset link for @TempData["ResetForEmail"]:</strong>
+        <div class="mt-2 input-group">
+            <input type="text" readonly value="@resetLink" class="form-control" onclick="this.select()" />
+            <button type="button" class="btn btn-outline-primary" onclick="navigator.clipboard.writeText('@resetLink'); PPS.toast.success('Link copied.');">Copy</button>
+        </div>
+        <small class="text-muted">Send this link to the user. It expires per Identity defaults (one day).</small>
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+}
+
+<div class="card">
+    <div class="card-body">
+        <table class="table table-striped mb-0">
+            <thead>
+                <tr>
+                    <th>Email</th>
+                    <th>Name</th>
+                    <th>Role</th>
+                    <th>Status</th>
+                    <th class="text-end"></th>
+                </tr>
+            </thead>
+            <tbody>
+            @foreach (var u in Model.Users)
+            {
+                <tr>
+                    <td>@u.Email</td>
+                    <td>@u.DisplayName</td>
+                    <td>
+                        @if (u.IsAdmin) { <span class="badge bg-primary">Admin</span> }
+                        else { <span class="badge bg-secondary">User</span> }
+                    </td>
+                    <td>
+                        @if (u.LockedOut) { <span class="badge bg-danger">Locked</span> }
+                        else { <span class="badge bg-success">Active</span> }
+                    </td>
+                    <td class="text-end">
+                        <form method="post" asp-page-handler="ResetPassword" asp-route-id="@u.Id" class="d-inline">
+                            <button type="submit" class="btn btn-sm btn-outline-primary">Reset Password</button>
+                        </form>
+                        <form method="post" asp-page-handler="ToggleAdmin" asp-route-id="@u.Id" class="d-inline">
+                            <button type="submit" class="btn btn-sm btn-outline-secondary">
+                                @(u.IsAdmin ? "Remove Admin" : "Make Admin")
+                            </button>
+                        </form>
+                        <form method="post" asp-page-handler="ToggleLockout" asp-route-id="@u.Id" class="d-inline">
+                            <button type="submit" class="btn btn-sm @(u.LockedOut ? "btn-outline-success" : "btn-outline-danger")">
+                                @(u.LockedOut ? "Unlock" : "Lock")
+                            </button>
+                        </form>
+                    </td>
+                </tr>
+            }
+            @if (!Model.Users.Any())
+            {
+                <tr><td colspan="5" class="text-center text-muted py-3">No users yet.</td></tr>
+            }
+            </tbody>
+        </table>
+    </div>
+</div>

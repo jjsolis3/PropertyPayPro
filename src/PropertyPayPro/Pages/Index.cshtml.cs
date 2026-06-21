@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.EntityFrameworkCore;
 using PropertyPayPro.Data;
@@ -5,6 +6,7 @@ using PropertyPayPro.Models;
 
 namespace PropertyPayPro.Pages;
 
+[Authorize]
 public class IndexModel : PageModel
 {
     private readonly ApplicationDbContext _db;
