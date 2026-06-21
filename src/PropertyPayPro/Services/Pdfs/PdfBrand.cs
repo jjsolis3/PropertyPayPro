@@ -5,7 +5,7 @@ namespace PropertyPayPro.Services.Pdfs;
 public static class PdfBrand
 {
     public const string AppName = "PropertyPayPro";
-    public const string FontFamily = Fonts.Helvetica;
+    public const string FontFamily = Fonts.Arial;
 
     // Brand colors
     public const string Primary = "#1f3a8a";    // deep blue
