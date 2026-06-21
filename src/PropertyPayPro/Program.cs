@@ -53,6 +53,7 @@ builder.Services
 
 builder.Services.AddScoped<PropertyPayPro.Services.BillingService>();
 builder.Services.AddSingleton<PropertyPayPro.Services.IDocumentStorage, PropertyPayPro.Services.LocalFileSystemDocumentStorage>();
+builder.Services.AddHealthChecks();
 
 var app = builder.Build();
 
@@ -85,6 +86,8 @@ app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapRazorPages();
+app.MapHealthChecks("/health")
+   .AllowAnonymous();
 
 app.MapGet("/api/leases/{leaseId:int}/outstanding-charges", async (
     int leaseId,
