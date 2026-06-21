@@ -4,7 +4,19 @@
     ViewData["Title"] = "Bill Details";
 }
 
-<h1>@Model.Charge!.PeriodLabel — @Model.Charge.Lease!.TenantNames</h1>
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <h1 class="h3 mb-0">@Model.Charge!.PeriodLabel — @Model.Charge.Lease!.TenantNames</h1>
+    <form method="post" asp-page-handler="GeneratePdf" asp-route-id="@Model.Charge.Id" class="d-inline">
+        <button type="submit" class="btn btn-outline-primary">Generate Bill PDF</button>
+    </form>
+</div>
+
+@if (TempData["PdfStatus"] is string ps)
+{
+    <div class="alert alert-info alert-dismissible fade show">@ps
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+}
 
 <dl class="row">
     <dt class="col-sm-3">Property</dt><dd class="col-sm-9">@Model.Charge.Lease.Property!.Name</dd>
@@ -41,6 +53,29 @@
 else
 {
     <p class="text-muted">No payments applied yet.</p>
+}
+
+@if (Model.Documents.Any())
+{
+    <h3>Generated PDFs</h3>
+    <table class="table table-sm">
+        <thead><tr><th>Kind</th><th>File</th><th>Generated</th><th class="text-end">Size</th><th></th></tr></thead>
+        <tbody>
+        @foreach (var d in Model.Documents)
+        {
+            <tr>
+                <td>@d.Kind</td>
+                <td>@d.FileName</td>
+                <td>@d.CreatedUtc.ToLocalTime().ToString("yyyy-MM-dd HH:mm")</td>
+                <td class="text-end">@($"{d.SizeBytes / 1024.0:N1} KB")</td>
+                <td class="text-end">
+                    <a asp-page="/Documents/Index" asp-page-handler="Download" asp-route-id="@d.Id"
+                       class="btn btn-sm btn-outline-primary">Download</a>
+                </td>
+            </tr>
+        }
+        </tbody>
+    </table>
 }
 
 <a asp-page="/Payments/Create" asp-route-leaseId="@Model.Charge.LeaseId" class="btn btn-success">Record Payment</a>

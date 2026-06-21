@@ -13,17 +13,20 @@ public class StatementModel : PageModel
 {
     private readonly ApplicationDbContext _db;
     private readonly MailService _mail;
+    private readonly PdfService _pdf;
 
-    public StatementModel(ApplicationDbContext db, MailService mail)
+    public StatementModel(ApplicationDbContext db, MailService mail, PdfService pdf)
     {
         _db = db;
         _mail = mail;
+        _pdf = pdf;
     }
 
     public Lease? Lease { get; private set; }
     public List<RentalCharge> UnpaidCharges { get; private set; } = new();
     public DateOnly ReportDate { get; private set; } = DateOnly.FromDateTime(DateTime.UtcNow);
     public bool MailConfigured => _mail.IsConfigured;
+    public GeneratedDocument? LatestStatementPdf { get; private set; }
 
     public decimal TotalDue => UnpaidCharges.Sum(c => c.AmountDue);
     public decimal TotalPaid => UnpaidCharges.Sum(c => c.AmountPaid);
@@ -57,6 +60,20 @@ public class StatementModel : PageModel
         return RedirectToPage(new { leaseId });
     }
 
+    public async Task<IActionResult> OnPostGeneratePdfAsync(int leaseId)
+    {
+        try
+        {
+            await _pdf.GenerateUnpaidStatementAsync(leaseId);
+            TempData["EmailStatus"] = "Statement PDF generated.";
+        }
+        catch (Exception ex)
+        {
+            TempData["EmailStatus"] = $"PDF generation failed: {ex.Message}";
+        }
+        return RedirectToPage(new { leaseId });
+    }
+
     private async Task LoadAsync(int leaseId)
     {
         Lease = await _db.Leases
@@ -66,5 +83,10 @@ public class StatementModel : PageModel
             .FirstOrDefaultAsync(l => l.Id == leaseId);
         if (Lease is null) return;
         UnpaidCharges = Lease.Charges.Where(c => c.Balance > 0).OrderBy(c => c.DueDate).ToList();
+
+        LatestStatementPdf = await _db.GeneratedDocuments
+            .Where(d => d.LeaseId == leaseId && d.Kind == GeneratedDocumentKind.UnpaidStatement)
+            .OrderByDescending(d => d.CreatedUtc)
+            .FirstOrDefaultAsync();
     }
 }

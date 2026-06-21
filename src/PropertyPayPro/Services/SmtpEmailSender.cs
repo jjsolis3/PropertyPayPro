@@ -18,7 +18,12 @@ public class SmtpEmailSender : IEmailSender
 
     public bool IsConfigured => _options.IsConfigured;
 
-    public async Task SendAsync(string toAddress, string subject, string htmlBody, CancellationToken ct = default)
+    public async Task SendAsync(
+        string toAddress,
+        string subject,
+        string htmlBody,
+        IReadOnlyList<EmailAttachment>? attachments = null,
+        CancellationToken ct = default)
     {
         if (!IsConfigured)
         {
@@ -30,7 +35,16 @@ public class SmtpEmailSender : IEmailSender
         message.From.Add(new MailboxAddress(_options.FromName, _options.FromAddress));
         message.To.Add(MailboxAddress.Parse(toAddress));
         message.Subject = subject;
-        message.Body = new BodyBuilder { HtmlBody = htmlBody }.ToMessageBody();
+
+        var bodyBuilder = new BodyBuilder { HtmlBody = htmlBody };
+        if (attachments is { Count: > 0 })
+        {
+            foreach (var a in attachments)
+            {
+                bodyBuilder.Attachments.Add(a.FileName, a.Content, ContentType.Parse(a.ContentType));
+            }
+        }
+        message.Body = bodyBuilder.ToMessageBody();
 
         using var client = new SmtpClient();
         var socketOption = _options.UseStartTls ? SecureSocketOptions.StartTls : SecureSocketOptions.SslOnConnect;
@@ -39,6 +53,7 @@ public class SmtpEmailSender : IEmailSender
         await client.SendAsync(message, ct);
         await client.DisconnectAsync(true, ct);
 
-        _logger.LogInformation("Email sent to {To} — subject: {Subject}", toAddress, subject);
+        _logger.LogInformation("Email sent to {To} — subject: {Subject} ({Attachments} attachments)",
+            toAddress, subject, attachments?.Count ?? 0);
     }
 }

@@ -66,6 +66,7 @@ builder.Services.Configure<PropertyPayPro.Services.EmailOptions>(options =>
 });
 builder.Services.AddSingleton<PropertyPayPro.Services.IEmailSender, PropertyPayPro.Services.SmtpEmailSender>();
 builder.Services.AddScoped<PropertyPayPro.Services.MailService>();
+builder.Services.AddScoped<PropertyPayPro.Services.PdfService>();
 
 var app = builder.Build();
 

@@ -20,6 +20,7 @@ public class ApplicationDbContext : IdentityDbContext<ApplicationUser>
     public DbSet<PropertyExpense> PropertyExpenses => Set<PropertyExpense>();
     public DbSet<ServiceTicket> ServiceTickets => Set<ServiceTicket>();
     public DbSet<EmailLog> EmailLogs => Set<EmailLog>();
+    public DbSet<GeneratedDocument> GeneratedDocuments => Set<GeneratedDocument>();
 
     protected override void OnModelCreating(ModelBuilder builder)
     {
@@ -81,5 +82,15 @@ public class ApplicationDbContext : IdentityDbContext<ApplicationUser>
             .WithMany()
             .HasForeignKey(t => t.PropertyId)
             .OnDelete(DeleteBehavior.Restrict);
+
+        builder.Entity<GeneratedDocument>()
+            .HasOne(d => d.Lease).WithMany().HasForeignKey(d => d.LeaseId)
+            .OnDelete(DeleteBehavior.SetNull);
+        builder.Entity<GeneratedDocument>()
+            .HasOne(d => d.RentalCharge).WithMany().HasForeignKey(d => d.RentalChargeId)
+            .OnDelete(DeleteBehavior.SetNull);
+        builder.Entity<GeneratedDocument>()
+            .HasOne(d => d.RentPayment).WithMany().HasForeignKey(d => d.RentPaymentId)
+            .OnDelete(DeleteBehavior.SetNull);
     }
 }

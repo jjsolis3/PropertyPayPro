@@ -8,12 +8,21 @@ public class MailService
 {
     private readonly ApplicationDbContext _db;
     private readonly IEmailSender _sender;
+    private readonly PdfService _pdf;
+    private readonly IDocumentStorage _storage;
     private readonly ILogger<MailService> _logger;
 
-    public MailService(ApplicationDbContext db, IEmailSender sender, ILogger<MailService> logger)
+    public MailService(
+        ApplicationDbContext db,
+        IEmailSender sender,
+        PdfService pdf,
+        IDocumentStorage storage,
+        ILogger<MailService> logger)
     {
         _db = db;
         _sender = sender;
+        _pdf = pdf;
+        _storage = storage;
         _logger = logger;
     }
 
@@ -39,7 +48,12 @@ public class MailService
         var unpaid = lease.Charges.Where(c => c.Balance > 0).ToList();
         var subject = $"Rental Statement — {lease.Property!.Name}";
         var body = EmailComposer.ComposeStatement(baseUrl, lease, unpaid, DateOnly.FromDateTime(DateTime.UtcNow));
-        return await TrySendAsync(EmailKind.Statement, tenant.Email!, subject, body, leaseId: leaseId, ct: ct);
+
+        var pdfDoc = await _pdf.GenerateUnpaidStatementAsync(leaseId, ct);
+        var attachments = await LoadAttachmentsAsync(pdfDoc, ct);
+
+        return await TrySendAsync(EmailKind.Statement, tenant.Email!, subject, body, attachments,
+            leaseId: leaseId, ct: ct);
     }
 
     public async Task<EmailLog> SendReceiptAsync(string baseUrl, int paymentId, CancellationToken ct = default)
@@ -61,17 +75,30 @@ public class MailService
 
         var subject = $"Payment Receipt #{payment.Id} — {payment.Lease!.Property!.Name}";
         var body = EmailComposer.ComposeReceipt(baseUrl, payment);
-        return await TrySendAsync(EmailKind.Receipt, tenant.Email!, subject, body,
+
+        var pdfDoc = await _pdf.GenerateReceiptAsync(paymentId, ct);
+        var attachments = await LoadAttachmentsAsync(pdfDoc, ct);
+
+        return await TrySendAsync(EmailKind.Receipt, tenant.Email!, subject, body, attachments,
             leaseId: payment.LeaseId, paymentId: payment.Id, ct: ct);
+    }
+
+    private async Task<List<EmailAttachment>> LoadAttachmentsAsync(GeneratedDocument doc, CancellationToken ct)
+    {
+        await using var stream = await _storage.OpenReadAsync(doc.StorageKey, ct);
+        using var ms = new MemoryStream();
+        await stream.CopyToAsync(ms, ct);
+        return new List<EmailAttachment> { new(doc.FileName, "application/pdf", ms.ToArray()) };
     }
 
     private async Task<EmailLog> TrySendAsync(
         EmailKind kind, string to, string subject, string body,
+        IReadOnlyList<EmailAttachment>? attachments = null,
         int? leaseId = null, int? paymentId = null, CancellationToken ct = default)
     {
         try
         {
-            await _sender.SendAsync(to, subject, body, ct);
+            await _sender.SendAsync(to, subject, body, attachments, ct);
             return await LogAsync(kind, EmailStatus.Sent, to, subject, error: null,
                 leaseId: leaseId, paymentId: paymentId, ct: ct);
         }
