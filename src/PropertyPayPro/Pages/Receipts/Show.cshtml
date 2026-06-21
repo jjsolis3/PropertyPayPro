@@ -7,10 +7,32 @@
 <div class="d-flex justify-content-between align-items-center mb-3 d-print-none">
     <h1>Receipt #@Model.Payment.Id</h1>
     <div>
+        @if (Model.LatestReceiptPdf is not null)
+        {
+            <a asp-page="/Documents/Index" asp-page-handler="Download" asp-route-id="@Model.LatestReceiptPdf.Id"
+               class="btn btn-outline-primary">Download PDF</a>
+        }
+        <form method="post" asp-page-handler="GeneratePdf" asp-route-id="@Model.Payment.Id" class="d-inline">
+            <button type="submit" class="btn btn-outline-secondary">Regenerate PDF</button>
+        </form>
+        @if (Model.MailConfigured)
+        {
+            <form method="post" asp-page-handler="Email" asp-route-id="@Model.Payment.Id" class="d-inline">
+                <button type="submit" class="btn btn-outline-success">Email Receipt</button>
+            </form>
+        }
         <button class="btn btn-primary" onclick="window.print()">Print</button>
         <a asp-page="/Payments/Index" class="btn btn-outline-secondary">Back</a>
     </div>
 </div>
+
+@if (TempData["EmailStatus"] is string emailStatus)
+{
+    <div class="alert alert-info alert-dismissible fade show d-print-none">
+        @emailStatus
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+}
 
 <div class="card">
     <div class="card-body">

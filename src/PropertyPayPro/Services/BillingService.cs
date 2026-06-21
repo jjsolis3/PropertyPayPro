@@ -9,8 +9,13 @@ public class BillingService
     public const int DueDayOfMonth = 15;
 
     private readonly ApplicationDbContext _db;
+    private readonly PdfService _pdf;
 
-    public BillingService(ApplicationDbContext db) => _db = db;
+    public BillingService(ApplicationDbContext db, PdfService pdf)
+    {
+        _db = db;
+        _pdf = pdf;
+    }
 
     public async Task<int> GenerateChargesForPeriodAsync(int year, int month)
     {
@@ -30,24 +35,32 @@ public class BillingService
             .Select(c => c.LeaseId)
             .ToListAsync();
 
-        var created = 0;
+        var newCharges = new List<RentalCharge>();
         foreach (var lease in activeLeases)
         {
             if (existing.Contains(lease.Id)) continue;
 
-            _db.RentalCharges.Add(new RentalCharge
+            var charge = new RentalCharge
             {
                 LeaseId = lease.Id,
                 Kind = ChargeKind.Rent,
                 BillingPeriodStart = periodStart,
                 DueDate = dueDate,
                 AmountDue = lease.MonthlyRent
-            });
-            created++;
+            };
+            _db.RentalCharges.Add(charge);
+            newCharges.Add(charge);
         }
 
         await _db.SaveChangesAsync();
-        return created;
+
+        foreach (var c in newCharges)
+        {
+            try { await _pdf.GenerateBillAsync(c.Id); }
+            catch { /* don't fail the whole generation if a PDF fails */ }
+        }
+
+        return newCharges.Count;
     }
 
     public async Task<List<RentalCharge>> GetLateFeeCandidatesAsync()

@@ -14,11 +14,15 @@ public class CreateModel : PageModel
 {
     private readonly ApplicationDbContext _db;
     private readonly BillingService _billing;
+    private readonly MailService _mail;
+    private readonly PdfService _pdf;
 
-    public CreateModel(ApplicationDbContext db, BillingService billing)
+    public CreateModel(ApplicationDbContext db, BillingService billing, MailService mail, PdfService pdf)
     {
         _db = db;
         _billing = billing;
+        _mail = mail;
+        _pdf = pdf;
     }
 
     [BindProperty]
@@ -67,6 +71,7 @@ public class CreateModel : PageModel
         _db.RentPayments.Add(Payment);
         await _db.SaveChangesAsync();
 
+        var allocatedChargeIds = new List<int>();
         for (var i = 0; i < AllocationChargeIds.Count && i < AllocationAmounts.Count; i++)
         {
             if (AllocationAmounts[i] <= 0) continue;
@@ -76,8 +81,38 @@ public class CreateModel : PageModel
                 RentalChargeId = AllocationChargeIds[i],
                 Amount = AllocationAmounts[i]
             });
+            allocatedChargeIds.Add(AllocationChargeIds[i]);
         }
         await _db.SaveChangesAsync();
+
+        // Generate the receipt PDF (always, even if email isn't configured) — it's the
+        // archival record. MailService re-uses it as the email attachment.
+        try { await _pdf.GenerateReceiptAsync(Payment.Id); }
+        catch (Exception ex) { TempData["PdfStatus"] = $"Receipt PDF not generated: {ex.Message}"; }
+
+        // For every charge this payment touched, if it's now fully paid, generate the
+        // "Bill Paid in Full" confirmation PDF.
+        foreach (var chargeId in allocatedChargeIds.Distinct())
+        {
+            try { await _pdf.GenerateBillPaidConfirmationIfClosedAsync(chargeId); }
+            catch { /* don't fail save if confirmation PDF fails */ }
+        }
+
+        if (_mail.IsConfigured)
+        {
+            var baseUrl = $"{Request.Scheme}://{Request.Host}";
+            try
+            {
+                var log = await _mail.SendReceiptAsync(baseUrl, Payment.Id);
+                TempData["EmailStatus"] = log.Status == EmailStatus.Sent
+                    ? $"Receipt emailed to {log.ToAddress}."
+                    : $"Receipt not emailed: {log.Error}";
+            }
+            catch (Exception ex)
+            {
+                TempData["EmailStatus"] = $"Receipt not emailed: {ex.Message}";
+            }
+        }
 
         return RedirectToPage("/Receipts/Show", new { id = Payment.Id });
     }

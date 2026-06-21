@@ -62,9 +62,19 @@
                 </ul>
             </li>
             <li>
-                <a class="ai-icon" asp-page="/Reports/Receivables">
+                <a class="has-arrow ai-icon" href="javascript:void(0)" aria-expanded="false">
                     <i class="flaticon-381-controls-3"></i>
                     <span class="nav-text">Reports</span>
+                </a>
+                <ul aria-expanded="false">
+                    <li><a asp-page="/Reports/Receivables">Receivables Summary</a></li>
+                    <li><a asp-page="/Reports/UnpaidBills">Unpaid Bills</a></li>
+                </ul>
+            </li>
+            <li>
+                <a class="ai-icon" asp-page="/Documents/Index">
+                    <i class="flaticon-381-folder"></i>
+                    <span class="nav-text">Documents</span>
                 </a>
             </li>
             @if (isAdmin)

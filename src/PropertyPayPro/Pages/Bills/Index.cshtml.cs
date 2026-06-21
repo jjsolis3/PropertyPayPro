@@ -13,12 +13,16 @@ public class IndexModel : PageModel
 {
     private readonly ApplicationDbContext _db;
     private readonly BillingService _billing;
+    private readonly MailService _mail;
 
-    public IndexModel(ApplicationDbContext db, BillingService billing)
+    public IndexModel(ApplicationDbContext db, BillingService billing, MailService mail)
     {
         _db = db;
         _billing = billing;
+        _mail = mail;
     }
+
+    public bool MailConfigured => _mail.IsConfigured;
 
     [BindProperty(SupportsGet = true)]
     public ChargeStatus? StatusFilter { get; set; }
@@ -56,6 +60,32 @@ public class IndexModel : PageModel
         TempData["GenerateMessage"] = created == 0
             ? $"No new bills generated for {periodLabel} (existing bills were skipped)."
             : $"Generated {created} new bill(s) for {periodLabel}.";
+        return RedirectToPage();
+    }
+
+    public async Task<IActionResult> OnPostSendAllStatementsAsync()
+    {
+        if (!_mail.IsConfigured)
+        {
+            TempData["GenerateError"] = "SMTP is not configured.";
+            return RedirectToPage();
+        }
+
+        var charges = await _db.RentalCharges.Include(c => c.Allocations).ToListAsync();
+        var leaseIds = charges.Where(c => c.Balance > 0).Select(c => c.LeaseId).Distinct().ToList();
+        var baseUrl = $"{Request.Scheme}://{Request.Host}";
+        int sent = 0, skipped = 0, failed = 0;
+        foreach (var leaseId in leaseIds)
+        {
+            try
+            {
+                var log = await _mail.SendStatementAsync(baseUrl, leaseId);
+                if (log.Status == EmailStatus.Sent) sent++;
+                else skipped++;
+            }
+            catch { failed++; }
+        }
+        TempData["GenerateMessage"] = $"Statements: {sent} sent, {skipped} skipped (no email/disabled), {failed} failed.";
         return RedirectToPage();
     }
 

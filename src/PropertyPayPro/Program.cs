@@ -55,6 +55,20 @@ builder.Services.AddScoped<PropertyPayPro.Services.BillingService>();
 builder.Services.AddSingleton<PropertyPayPro.Services.IDocumentStorage, PropertyPayPro.Services.LocalFileSystemDocumentStorage>();
 builder.Services.AddHealthChecks();
 
+builder.Services.Configure<PropertyPayPro.Services.EmailOptions>(options =>
+{
+    options.Host = builder.Configuration["SMTP_HOST"] ?? "";
+    if (int.TryParse(builder.Configuration["SMTP_PORT"], out var port)) options.Port = port;
+    options.User = builder.Configuration["SMTP_USER"] ?? "";
+    options.Password = builder.Configuration["SMTP_PASSWORD"] ?? "";
+    options.FromAddress = builder.Configuration["SMTP_FROM"] ?? options.User;
+    options.FromName = builder.Configuration["SMTP_FROM_NAME"] ?? "PropertyPayPro";
+    if (bool.TryParse(builder.Configuration["SMTP_USE_STARTTLS"], out var tls)) options.UseStartTls = tls;
+});
+builder.Services.AddSingleton<PropertyPayPro.Services.IEmailSender, PropertyPayPro.Services.SmtpEmailSender>();
+builder.Services.AddScoped<PropertyPayPro.Services.MailService>();
+builder.Services.AddScoped<PropertyPayPro.Services.PdfService>();
+
 var app = builder.Build();
 
 using (var scope = app.Services.CreateScope())

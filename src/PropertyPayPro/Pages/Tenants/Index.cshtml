@@ -37,7 +37,14 @@
             {
                 <tr>
                     <td>@t.DisplayName</td>
-                    <td>@t.Email</td>
+                    <td>
+                        @t.Email
+                        @if (!string.IsNullOrWhiteSpace(t.Email))
+                        {
+                            if (t.ReceiveReceipts) { <span class="badge bg-success-subtle text-success ms-1" title="Receives receipts">Receipts</span> }
+                            if (t.ReceiveReminders) { <span class="badge bg-info-subtle text-info ms-1" title="Receives statements/reminders">Reminders</span> }
+                        }
+                    </td>
                     <td>@t.Phone</td>
                     <td class="text-end">
                         <a asp-page="Details" asp-route-id="@t.Id" class="btn btn-sm btn-outline-secondary">Details</a>

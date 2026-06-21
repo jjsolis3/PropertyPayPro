@@ -1,0 +1,142 @@
+@page
+@model PropertyPayPro.Pages.Reports.StatementModel
+@{
+    ViewData["Title"] = $"Statement — {Model.Lease!.Property!.Name}";
+    var tenantsWithEmail = Model.Lease!.Tenants.Where(t => t.ReceiveReminders && !string.IsNullOrWhiteSpace(t.Email)).ToList();
+}
+
+<div class="d-flex justify-content-between align-items-center mb-3 d-print-none">
+    <h1 class="h3 mb-0">Rental Account Statement</h1>
+    <div>
+        @if (Model.LatestStatementPdf is not null)
+        {
+            <a asp-page="/Documents/Index" asp-page-handler="Download" asp-route-id="@Model.LatestStatementPdf.Id"
+               class="btn btn-outline-primary">Download PDF</a>
+        }
+        <form method="post" asp-page-handler="GeneratePdf" asp-route-leaseId="@Model.Lease.Id" class="d-inline">
+            <button type="submit" class="btn btn-outline-secondary">Generate PDF</button>
+        </form>
+        @if (Model.MailConfigured && tenantsWithEmail.Any())
+        {
+            <form method="post" asp-page-handler="Send" asp-route-leaseId="@Model.Lease.Id" class="d-inline">
+                <button type="submit" class="btn btn-outline-success">Email to Tenant</button>
+            </form>
+        }
+        <button class="btn btn-primary" onclick="window.print()">Print</button>
+        <a asp-page="/Leases/Details" asp-route-id="@Model.Lease.Id" class="btn btn-outline-secondary">Back</a>
+    </div>
+</div>
+
+@if (TempData["EmailStatus"] is string emailStatus)
+{
+    <div class="alert alert-info alert-dismissible fade show d-print-none">
+        @emailStatus
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+}
+
+<div class="card">
+    <div class="card-body">
+        <div class="text-center mb-3 d-none d-print-block">
+            <img src="/img/brand/PPS_Logo_Main.png" alt="PropertyPayPro" style="max-width: 200px;" />
+        </div>
+
+        <h2 class="text-center">@Model.Lease.Property!.Name</h2>
+        <p class="text-center text-muted mb-4">Rental Account Statement</p>
+
+        <p><strong>Report Date:</strong> @Model.ReportDate.ToString("MMMM d, yyyy")</p>
+
+        <div class="row mb-4">
+            <div class="col-md-6">
+                <strong>Property</strong><br />
+                @Model.Lease.Property.Name<br />
+                @Model.Lease.Property.AddressLine1<br />
+                @Model.Lease.Property.City, @Model.Lease.Property.State @Model.Lease.Property.PostalCode
+            </div>
+            <div class="col-md-6">
+                <strong>Tenant(s)</strong>
+                @foreach (var t in Model.Lease.Tenants)
+                {
+                    <div>
+                        @t.DisplayName
+                        @if (!string.IsNullOrWhiteSpace(t.Email)) { <span class="text-muted">— @t.Email</span> }
+                        @if (!t.ReceiveReminders) { <span class="badge bg-secondary ms-1" title="Reminders disabled">🔕</span> }
+                    </div>
+                }
+            </div>
+        </div>
+
+        <h4>Unpaid Invoices</h4>
+        @if (!Model.UnpaidCharges.Any())
+        {
+            <div class="alert alert-success">No unpaid invoices on this lease.</div>
+        }
+        else
+        {
+            <div class="table-responsive">
+                <table class="table table-bordered">
+                    <thead class="table-light">
+                        <tr>
+                            <th>Invoice #</th>
+                            <th>Period</th>
+                            <th>Due Date</th>
+                            <th class="text-end">Amount Due</th>
+                            <th class="text-end">Paid</th>
+                            <th class="text-end">Balance</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                    @foreach (var c in Model.UnpaidCharges)
+                    {
+                        <tr>
+                            <td>@c.Id.ToString("D8")</td>
+                            <td>@c.BillingPeriodStart.ToString("MMM yyyy")</td>
+                            <td>@c.DueDate.ToString("yyyy-MM-dd")</td>
+                            <td class="text-end">@c.AmountDue.ToString("C")</td>
+                            <td class="text-end">@c.AmountPaid.ToString("C")</td>
+                            <td class="text-end fw-bold">@c.Balance.ToString("C")</td>
+                            <td>
+                                @switch (c.Status)
+                                {
+                                    case PropertyPayPro.Models.ChargeStatus.Overdue:
+                                        <span class="badge bg-danger">Overdue</span>
+                                        break;
+                                    case PropertyPayPro.Models.ChargeStatus.PartiallyPaid:
+                                        <span class="badge bg-warning text-dark">Partial</span>
+                                        break;
+                                    default:
+                                        <span class="badge bg-secondary">Unpaid</span>
+                                        break;
+                                }
+                            </td>
+                        </tr>
+                    }
+                    </tbody>
+                    <tfoot class="table-light fw-bold">
+                        <tr>
+                            <td colspan="3" class="text-end">TOTAL</td>
+                            <td class="text-end">@Model.TotalDue.ToString("C")</td>
+                            <td class="text-end">@Model.TotalPaid.ToString("C")</td>
+                            <td class="text-end text-danger">@Model.TotalBalance.ToString("C")</td>
+                            <td></td>
+                        </tr>
+                    </tfoot>
+                </table>
+            </div>
+
+            <p class="text-muted mt-3">
+                Please remit payment for any outstanding balance at your earliest convenience.
+                If you've already paid, please disregard this statement.
+            </p>
+        }
+    </div>
+</div>
+
+<style>
+    @@media print {
+        nav, footer, .d-print-none, .deznav, .header { display: none !important; }
+        .content-body { margin-left: 0 !important; }
+        .card { border: none !important; }
+    }
+</style>
