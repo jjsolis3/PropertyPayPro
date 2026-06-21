@@ -1,7 +1,13 @@
+using System.Globalization;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Localization;
 using Microsoft.EntityFrameworkCore;
 using PropertyPayPro.Data;
 using PropertyPayPro.Models;
+
+var usCulture = new CultureInfo("en-US");
+CultureInfo.DefaultThreadCurrentCulture = usCulture;
+CultureInfo.DefaultThreadCurrentUICulture = usCulture;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -43,6 +49,13 @@ if (!app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 app.UseStaticFiles();
+
+app.UseRequestLocalization(new RequestLocalizationOptions
+{
+    DefaultRequestCulture = new RequestCulture(usCulture),
+    SupportedCultures = new[] { usCulture },
+    SupportedUICultures = new[] { usCulture }
+});
 
 app.UseRouting();
 

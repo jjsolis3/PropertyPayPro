@@ -1,33 +1,58 @@
 @page
 @model PropertyPayPro.Pages.Leases.IndexModel
+@using PropertyPayPro.Pages.Shared
 @{
     ViewData["Title"] = "Leases";
 }
 
 <div class="d-flex justify-content-between align-items-center mb-3">
-    <h1>Leases</h1>
+    <h1 class="h3 mb-0">Leases</h1>
     <a asp-page="Create" class="btn btn-success">New Lease</a>
 </div>
 
-<table class="table table-striped">
-    <thead>
-        <tr><th>Property</th><th>Tenants</th><th>Start</th><th>End</th><th class="text-end">Rent</th><th></th></tr>
-    </thead>
-    <tbody>
-    @foreach (var l in Model.Leases)
-    {
-        <tr>
-            <td>@l.Property!.Name</td>
-            <td>@l.TenantNames</td>
-            <td>@l.StartDate.ToString("yyyy-MM-dd")</td>
-            <td>@l.EndDate.ToString("yyyy-MM-dd")</td>
-            <td class="text-end">@l.MonthlyRent.ToString("C")</td>
-            <td class="text-end">
-                <a asp-page="Details" asp-route-id="@l.Id" class="btn btn-sm btn-outline-secondary">Details</a>
-                <a asp-page="Edit" asp-route-id="@l.Id" class="btn btn-sm btn-outline-primary">Edit</a>
-                <a asp-page="Delete" asp-route-id="@l.Id" class="btn btn-sm btn-outline-danger">Delete</a>
-            </td>
-        </tr>
-    }
-    </tbody>
-</table>
+<div class="row">
+    <partial name="_KpiCard" model="@(new KpiCardModel {
+        Label = "Active Leases", Value = Model.ActiveCount.ToString(),
+        Color = "primary", Icon = "flaticon-381-notepad" })" />
+    <partial name="_KpiCard" model="@(new KpiCardModel {
+        Label = "Expiring in 30 days", Value = Model.ExpiringSoonCount.ToString(),
+        Color = "warning", Icon = "flaticon-381-time" })" />
+    <partial name="_KpiCard" model="@(new KpiCardModel {
+        Label = "Monthly Rent Roll", Value = Model.MonthlyRentRoll.ToString("C"),
+        Color = "info", Icon = "las la-dollar-sign" })" />
+    <partial name="_KpiCard" model="@(new KpiCardModel {
+        Label = "Unpaid (Active)", Value = Model.UnpaidTotal.ToString("C"),
+        Color = "danger", Icon = "flaticon-381-list",
+        LinkPage = "/Bills/Index", LinkText = "View bills" })" />
+</div>
+
+<div class="card">
+    <div class="card-body">
+        <table class="table table-striped mb-0">
+            <thead>
+                <tr><th>Property</th><th>Tenants</th><th>Start</th><th>End</th><th class="text-end">Rent</th><th></th></tr>
+            </thead>
+            <tbody>
+            @foreach (var l in Model.Leases)
+            {
+                <tr>
+                    <td>@l.Property!.Name</td>
+                    <td>@l.TenantNames</td>
+                    <td>@l.StartDate.ToString("yyyy-MM-dd")</td>
+                    <td>@(l.IsMonthToMonth ? "M2M" : l.EndDate.ToString("yyyy-MM-dd"))</td>
+                    <td class="text-end">@l.MonthlyRent.ToString("C")</td>
+                    <td class="text-end">
+                        <a asp-page="Details" asp-route-id="@l.Id" class="btn btn-sm btn-outline-secondary">Details</a>
+                        <a asp-page="Edit" asp-route-id="@l.Id" class="btn btn-sm btn-outline-primary">Edit</a>
+                        <a asp-page="Delete" asp-route-id="@l.Id" class="btn btn-sm btn-outline-danger">Delete</a>
+                    </td>
+                </tr>
+            }
+            @if (!Model.Leases.Any())
+            {
+                <tr><td colspan="6" class="text-center text-muted py-3">No leases yet.</td></tr>
+            }
+            </tbody>
+        </table>
+    </div>
+</div>

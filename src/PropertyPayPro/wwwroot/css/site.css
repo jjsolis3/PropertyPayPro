@@ -1,3 +1,18 @@
 html { position: relative; min-height: 100%; }
 body { margin-bottom: 60px; }
 .footer { padding: 12px 0; }
+
+/* PropertyPayPro brand logos: show only ONE at a time based on sidebar state.
+   Default (sidebar expanded): wordmark only.
+   Sidebar collapsed (.menu-toggle on html/body): compact mark only.
+   Mobile: always compact mark. */
+.nav-header .logo-abbr { display: none; }
+.nav-header .brand-title { display: inline-block; max-width: 8rem; height: auto; }
+
+.menu-toggle .nav-header .logo-abbr { display: inline-block; }
+.menu-toggle .nav-header .brand-title { display: none; }
+
+@media only screen and (max-width: 767px) {
+    .nav-header .logo-abbr { display: inline-block; }
+    .nav-header .brand-title { display: none; }
+}
