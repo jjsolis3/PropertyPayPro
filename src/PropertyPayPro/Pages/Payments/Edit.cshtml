@@ -8,7 +8,7 @@
 
 <div class="row">
     <div class="col-md-10">
-        <form method="post">
+        <form method="post" id="paymentForm">
             <input type="hidden" asp-for="Payment.Id" />
 
             <div class="card mb-3">
@@ -57,31 +57,52 @@
                     else
                     {
                         <p class="text-muted small">
-                            Adjust the amount applied to each bill. Total can be less than the payment amount;
+                            Check a bill to apply funds. The total can be less than the payment amount;
                             the remainder is held as a credit.
                         </p>
-                        <table class="table table-sm">
-                            <thead><tr><th>Period</th><th>Due</th><th class="text-end">Balance</th><th style="width: 10rem;">Apply</th></tr></thead>
-                            <tbody>
-                            @for (int i = 0; i < Model.OutstandingCharges.Count; i++)
-                            {
-                                var c = Model.OutstandingCharges[i];
-                                var current = Model.CurrentAllocations.TryGetValue(c.Id, out var v) ? v : 0m;
-                                var maxAllowed = c.Balance + current; // include current as available
-                                <tr>
-                                    <td>@c.PeriodLabel</td>
-                                    <td>@c.DueDate.ToString("yyyy-MM-dd")</td>
-                                    <td class="text-end">@maxAllowed.ToString("C")</td>
-                                    <td>
-                                        <input type="hidden" name="AllocationChargeIds[@i]" value="@c.Id" />
-                                        <input type="number" step="0.01" min="0" max="@maxAllowed"
-                                               name="AllocationAmounts[@i]" value="@current.ToString("0.00")"
-                                               class="form-control form-control-sm text-end" />
-                                    </td>
-                                </tr>
-                            }
-                            </tbody>
-                        </table>
+                        <div class="table-responsive">
+                            <table class="table table-sm align-middle">
+                                <thead>
+                                    <tr>
+                                        <th style="width: 2.5rem;"></th>
+                                        <th>Period</th>
+                                        <th>Due</th>
+                                        <th class="text-end">Available</th>
+                                        <th class="text-end" style="width: 10rem;">Apply</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="allocationTbody">
+                                @for (int i = 0; i < Model.OutstandingCharges.Count; i++)
+                                {
+                                    var c = Model.OutstandingCharges[i];
+                                    var current = Model.CurrentAllocations.TryGetValue(c.Id, out var v) ? v : 0m;
+                                    var maxAllowed = c.Balance + current;
+                                    var isChecked = current > 0;
+                                    <tr data-row="@i">
+                                        <td>
+                                            <input type="checkbox" class="form-check-input alloc-check" data-row="@i" @(isChecked ? "checked" : "") />
+                                        </td>
+                                        <td>@c.PeriodLabel</td>
+                                        <td>@c.DueDate.ToString("yyyy-MM-dd")</td>
+                                        <td class="text-end">@maxAllowed.ToString("C")</td>
+                                        <td>
+                                            <input type="hidden" name="AllocationChargeIds[@i]" value="@c.Id" />
+                                            <input type="number" step="0.01" min="0" max="@maxAllowed"
+                                                   name="AllocationAmounts[@i]" value="@current.ToString("0.00")"
+                                                   data-row="@i" @(isChecked ? "" : "disabled")
+                                                   class="form-control form-control-sm alloc-amount text-end" />
+                                        </td>
+                                    </tr>
+                                }
+                                </tbody>
+                                <tfoot>
+                                    <tr>
+                                        <th colspan="4" class="text-end">Total allocated</th>
+                                        <th class="text-end" id="allocationTotal">$0.00</th>
+                                    </tr>
+                                </tfoot>
+                            </table>
+                        </div>
                     }
                 </div>
             </div>
@@ -92,4 +113,53 @@
     </div>
 </div>
 
-@section Scripts { <partial name="_ValidationScriptsPartial" /> }
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+    <script>
+        (function () {
+            const amountInput = document.getElementById('amountInput');
+            const tbody = document.getElementById('allocationTbody');
+            const totalEl = document.getElementById('allocationTotal');
+            const form = document.getElementById('paymentForm');
+            if (!tbody) return;
+
+            const fmt = n => '$' + (Number(n) || 0).toFixed(2);
+
+            function recalc() {
+                let total = 0;
+                tbody.querySelectorAll('.alloc-amount').forEach(el => total += Number(el.value) || 0);
+                totalEl.textContent = fmt(total);
+                const pay = Number(amountInput.value) || 0;
+                totalEl.classList.toggle('text-danger', total > pay + 0.001);
+            }
+
+            tbody.querySelectorAll('.alloc-check').forEach(c => c.addEventListener('change', e => {
+                const i = e.target.dataset.row;
+                const amt = tbody.querySelector(`.alloc-amount[data-row="${i}"]`);
+                if (e.target.checked) {
+                    amt.disabled = false;
+                    if (Number(amt.value) === 0) amt.value = amt.max;
+                    amt.focus(); amt.select();
+                } else {
+                    amt.value = '0';
+                    amt.disabled = true;
+                }
+                recalc();
+            }));
+            tbody.querySelectorAll('.alloc-amount').forEach(el => el.addEventListener('input', recalc));
+            amountInput.addEventListener('input', recalc);
+
+            form.addEventListener('submit', (e) => {
+                let total = 0;
+                tbody.querySelectorAll('.alloc-amount').forEach(el => total += Number(el.value) || 0);
+                const pay = Number(amountInput.value) || 0;
+                if (total > pay + 0.001) {
+                    e.preventDefault();
+                    PPS.toast.error(`Allocated ${fmt(total)} exceeds payment amount ${fmt(pay)}. Adjust before saving.`);
+                }
+            });
+
+            recalc();
+        })();
+    </script>
+}

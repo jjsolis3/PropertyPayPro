@@ -1,63 +1,88 @@
 @page
 @model PropertyPayPro.Pages.ServiceTickets.IndexModel
+@using PropertyPayPro.Pages.Shared
 @{
     ViewData["Title"] = "Service Tickets";
 }
 
 <div class="d-flex justify-content-between align-items-center mb-3">
-    <h1>Service Tickets</h1>
+    <h1 class="h3 mb-0">Service Tickets</h1>
     <a asp-page="Create" class="btn btn-success">New Ticket</a>
 </div>
 
-<table class="table table-striped">
-    <thead>
-        <tr>
-            <th>Property</th>
-            <th>Category</th>
-            <th>Title</th>
-            <th>Vendor</th>
-            <th>Reported</th>
-            <th>Resolved</th>
-            <th class="text-end">Cost</th>
-            <th>Status</th>
-            <th></th>
-        </tr>
-    </thead>
-    <tbody>
-    @foreach (var t in Model.Tickets)
-    {
-        <tr>
-            <td>@t.Property!.Name</td>
-            <td>@t.Category</td>
-            <td>@t.Title</td>
-            <td>@t.Vendor</td>
-            <td>@t.ReportedOn.ToString("yyyy-MM-dd")</td>
-            <td>@(t.ResolvedOn?.ToString("yyyy-MM-dd") ?? "—")</td>
-            <td class="text-end">@(t.Cost?.ToString("C") ?? "—")</td>
-            <td>
-                @switch (t.Status)
-                {
-                    case PropertyPayPro.Models.ServiceTicketStatus.Completed:
-                        <span class="badge bg-success">Completed</span>
-                        break;
-                    case PropertyPayPro.Models.ServiceTicketStatus.InProgress:
-                        <span class="badge bg-info">In progress</span>
-                        break;
-                    case PropertyPayPro.Models.ServiceTicketStatus.Cancelled:
-                        <span class="badge bg-secondary">Cancelled</span>
-                        break;
-                    default:
-                        <span class="badge bg-warning text-dark">Open</span>
-                        break;
-                }
-                @if (t.PassThroughToTenant) { <span class="badge bg-info ms-1">Pass-through</span> }
-            </td>
-            <td class="text-end">
-                <a asp-page="Details" asp-route-id="@t.Id" class="btn btn-sm btn-outline-secondary">Details</a>
-                <a asp-page="Edit" asp-route-id="@t.Id" class="btn btn-sm btn-outline-primary">Edit</a>
-                <a asp-page="Delete" asp-route-id="@t.Id" class="btn btn-sm btn-outline-danger">Delete</a>
-            </td>
-        </tr>
-    }
-    </tbody>
-</table>
+<div class="row">
+    <partial name="_KpiCard" model="@(new KpiCardModel {
+        Label = "Open Tickets", Value = Model.OpenCount.ToString(),
+        Color = "warning", Icon = "flaticon-381-list" })" />
+    <partial name="_KpiCard" model="@(new KpiCardModel {
+        Label = "Scheduled This Week", Value = Model.ScheduledThisWeek.ToString(),
+        Color = "info", Icon = "flaticon-381-time" })" />
+    <partial name="_KpiCard" model="@(new KpiCardModel {
+        Label = "Spent This Month", Value = Model.SpentThisMonth.ToString("C"),
+        Color = "primary", Icon = "las la-dollar-sign" })" />
+    <partial name="_KpiCard" model="@(new KpiCardModel {
+        Label = "Avg Resolution", Value = $"{Model.AvgDaysToResolve} days",
+        SubText = "Closed in last 90 days",
+        Color = "success", Icon = "flaticon-381-notepad" })" />
+</div>
+
+<div class="card">
+    <div class="card-body">
+        <table class="table table-striped mb-0">
+            <thead>
+                <tr>
+                    <th>Property</th>
+                    <th>Category</th>
+                    <th>Title</th>
+                    <th>Vendor</th>
+                    <th>Reported</th>
+                    <th>Resolved</th>
+                    <th class="text-end">Cost</th>
+                    <th>Status</th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+            @foreach (var t in Model.Tickets)
+            {
+                <tr>
+                    <td>@t.Property!.Name</td>
+                    <td>@t.Category</td>
+                    <td>@t.Title</td>
+                    <td>@t.Vendor</td>
+                    <td>@t.ReportedOn.ToString("yyyy-MM-dd")</td>
+                    <td>@(t.ResolvedOn?.ToString("yyyy-MM-dd") ?? "—")</td>
+                    <td class="text-end">@(t.Cost?.ToString("C") ?? "—")</td>
+                    <td>
+                        @switch (t.Status)
+                        {
+                            case PropertyPayPro.Models.ServiceTicketStatus.Completed:
+                                <span class="badge bg-success">Completed</span>
+                                break;
+                            case PropertyPayPro.Models.ServiceTicketStatus.InProgress:
+                                <span class="badge bg-info">In progress</span>
+                                break;
+                            case PropertyPayPro.Models.ServiceTicketStatus.Cancelled:
+                                <span class="badge bg-secondary">Cancelled</span>
+                                break;
+                            default:
+                                <span class="badge bg-warning text-dark">Open</span>
+                                break;
+                        }
+                        @if (t.PassThroughToTenant) { <span class="badge bg-info ms-1">Pass-through</span> }
+                    </td>
+                    <td class="text-end">
+                        <a asp-page="Details" asp-route-id="@t.Id" class="btn btn-sm btn-outline-secondary">Details</a>
+                        <a asp-page="Edit" asp-route-id="@t.Id" class="btn btn-sm btn-outline-primary">Edit</a>
+                        <a asp-page="Delete" asp-route-id="@t.Id" class="btn btn-sm btn-outline-danger">Delete</a>
+                    </td>
+                </tr>
+            }
+            @if (!Model.Tickets.Any())
+            {
+                <tr><td colspan="9" class="text-center text-muted py-3">No service tickets yet.</td></tr>
+            }
+            </tbody>
+        </table>
+    </div>
+</div>

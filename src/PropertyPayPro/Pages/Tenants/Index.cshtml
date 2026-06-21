@@ -1,31 +1,56 @@
 @page
 @model PropertyPayPro.Pages.Tenants.IndexModel
+@using PropertyPayPro.Pages.Shared
 @{
     ViewData["Title"] = "Tenants";
 }
 
 <div class="d-flex justify-content-between align-items-center mb-3">
-    <h1>Tenants</h1>
+    <h1 class="h3 mb-0">Tenants</h1>
     <a asp-page="Create" class="btn btn-success">New Tenant</a>
 </div>
 
-<table class="table table-striped">
-    <thead>
-        <tr><th>Name</th><th>Email</th><th>Phone</th><th></th></tr>
-    </thead>
-    <tbody>
-    @foreach (var t in Model.Tenants)
-    {
-        <tr>
-            <td>@t.DisplayName</td>
-            <td>@t.Email</td>
-            <td>@t.Phone</td>
-            <td class="text-end">
-                <a asp-page="Details" asp-route-id="@t.Id" class="btn btn-sm btn-outline-secondary">Details</a>
-                <a asp-page="Edit" asp-route-id="@t.Id" class="btn btn-sm btn-outline-primary">Edit</a>
-                <a asp-page="Delete" asp-route-id="@t.Id" class="btn btn-sm btn-outline-danger">Delete</a>
-            </td>
-        </tr>
-    }
-    </tbody>
-</table>
+<div class="row">
+    <partial name="_KpiCard" model="@(new KpiCardModel {
+        Label = "Total Tenants", Value = Model.TotalCount.ToString(),
+        Color = "primary", Icon = "flaticon-381-user-9" })" />
+    <partial name="_KpiCard" model="@(new KpiCardModel {
+        Label = "Active", Value = Model.ActiveCount.ToString(),
+        SubText = "On at least one active lease",
+        Color = "success", Icon = "flaticon-381-notepad" })" />
+    <partial name="_KpiCard" model="@(new KpiCardModel {
+        Label = "With Overdue Balance", Value = Model.WithOverdueCount.ToString(),
+        Color = "danger", Icon = "flaticon-381-warning" })" />
+    <partial name="_KpiCard" model="@(new KpiCardModel {
+        Label = "Avg Tenure", Value = $"{Model.AvgTenureMonths} mo",
+        Color = "info", Icon = "flaticon-381-time" })" />
+</div>
+
+<div class="card">
+    <div class="card-body">
+        <table class="table table-striped mb-0">
+            <thead>
+                <tr><th>Name</th><th>Email</th><th>Phone</th><th></th></tr>
+            </thead>
+            <tbody>
+            @foreach (var t in Model.Tenants)
+            {
+                <tr>
+                    <td>@t.DisplayName</td>
+                    <td>@t.Email</td>
+                    <td>@t.Phone</td>
+                    <td class="text-end">
+                        <a asp-page="Details" asp-route-id="@t.Id" class="btn btn-sm btn-outline-secondary">Details</a>
+                        <a asp-page="Edit" asp-route-id="@t.Id" class="btn btn-sm btn-outline-primary">Edit</a>
+                        <a asp-page="Delete" asp-route-id="@t.Id" class="btn btn-sm btn-outline-danger">Delete</a>
+                    </td>
+                </tr>
+            }
+            @if (!Model.Tenants.Any())
+            {
+                <tr><td colspan="4" class="text-center text-muted py-3">No tenants yet.</td></tr>
+            }
+            </tbody>
+        </table>
+    </div>
+</div>

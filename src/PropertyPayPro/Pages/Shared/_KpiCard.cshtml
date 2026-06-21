@@ -1,0 +1,30 @@
+@*
+    Reusable KPI card for index pages.
+    Pass a KpiCardModel via @await Html.PartialAsync("_KpiCard", model).
+*@
+@model PropertyPayPro.Pages.Shared.KpiCardModel
+<div class="col-xl-3 col-sm-6">
+    <div class="card overflow-hidden h-100">
+        <div class="card-body">
+            <div class="d-flex align-items-center justify-content-between">
+                <div>
+                    <p class="text-muted mb-1">@Model.Label</p>
+                    <h3 class="text-black mb-0">@Model.Value</h3>
+                    @if (!string.IsNullOrWhiteSpace(Model.SubText))
+                    {
+                        <small class="text-muted">@Model.SubText</small>
+                    }
+                </div>
+                <span class="bgl-@Model.Color text-@Model.Color rounded-circle p-3">
+                    <i class="@Model.Icon"></i>
+                </span>
+            </div>
+            @if (!string.IsNullOrWhiteSpace(Model.LinkPage))
+            {
+                <a asp-page="@Model.LinkPage" class="text-primary fs-14 mt-3 d-inline-block">
+                    @(Model.LinkText ?? "View") <i class="las la-arrow-right"></i>
+                </a>
+            }
+        </div>
+    </div>
+</div>

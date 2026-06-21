@@ -1,5 +1,6 @@
 @page
 @model PropertyPayPro.Pages.Bills.IndexModel
+@using PropertyPayPro.Pages.Shared
 @{
     ViewData["Title"] = "Rent Bills";
 }
@@ -12,6 +13,25 @@
             <i class="las la-plus"></i> Generate Bills
         </button>
     </div>
+</div>
+
+<div class="row">
+    <partial name="_KpiCard" model="@(new KpiCardModel {
+        Label = "Outstanding", Value = Model.OutstandingTotal.ToString("C"),
+        Color = "warning", Icon = "flaticon-381-list" })" />
+    <partial name="_KpiCard" model="@(new KpiCardModel {
+        Label = "Overdue", Value = Model.OverdueCount.ToString(),
+        SubText = Model.OverdueTotal.ToString("C"),
+        Color = "danger", Icon = "flaticon-381-warning" })" />
+    <partial name="_KpiCard" model="@(new KpiCardModel {
+        Label = "Collected This Month", Value = Model.CollectedThisMonth.ToString("C"),
+        Color = "success", Icon = "las la-dollar-sign",
+        LinkPage = "/Payments/Index", LinkText = "View payments" })" />
+    <partial name="_KpiCard" model="@(new KpiCardModel {
+        Label = "Late Fees", Value = Model.LateFeeCount.ToString(),
+        SubText = Model.LateFeeTotal.ToString("C"),
+        Color = "info", Icon = "flaticon-381-time",
+        LinkPage = "/Bills/LateFees", LinkText = "Manage" })" />
 </div>
 
 @if (TempData["GenerateMessage"] is string okMsg)

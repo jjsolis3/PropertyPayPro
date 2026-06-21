@@ -31,6 +31,13 @@ public class IndexModel : PageModel
 
     public IList<RentalCharge> Charges { get; private set; } = new List<RentalCharge>();
 
+    public decimal OutstandingTotal { get; private set; }
+    public int OverdueCount { get; private set; }
+    public decimal OverdueTotal { get; private set; }
+    public decimal CollectedThisMonth { get; private set; }
+    public int LateFeeCount { get; private set; }
+    public decimal LateFeeTotal { get; private set; }
+
     public async Task OnGetAsync()
     {
         await LoadChargesAsync();
@@ -54,18 +61,29 @@ public class IndexModel : PageModel
 
     private async Task LoadChargesAsync()
     {
-        var query = _db.RentalCharges
+        var today = DateOnly.FromDateTime(DateTime.UtcNow);
+        var firstOfMonth = new DateOnly(today.Year, today.Month, 1);
+
+        var allCharges = await _db.RentalCharges
             .Include(c => c.Lease).ThenInclude(l => l!.Property)
             .Include(c => c.Lease).ThenInclude(l => l!.Tenants)
             .Include(c => c.Allocations)
             .OrderByDescending(c => c.BillingPeriodStart)
-            .AsQueryable();
+            .ToListAsync();
 
-        var list = await query.ToListAsync();
-        if (StatusFilter.HasValue)
-        {
-            list = list.Where(c => c.Status == StatusFilter.Value).ToList();
-        }
-        Charges = list;
+        OutstandingTotal = allCharges.Sum(c => c.Balance);
+        var overdue = allCharges.Where(c => c.Status == ChargeStatus.Overdue).ToList();
+        OverdueCount = overdue.Count;
+        OverdueTotal = overdue.Sum(c => c.Balance);
+        CollectedThisMonth = await _db.RentPayments
+            .Where(p => p.PaidOn >= firstOfMonth)
+            .SumAsync(p => (decimal?)p.Amount) ?? 0m;
+        var lateFees = allCharges.Where(c => c.Kind == ChargeKind.LateFee).ToList();
+        LateFeeCount = lateFees.Count;
+        LateFeeTotal = lateFees.Sum(c => c.AmountDue);
+
+        Charges = StatusFilter.HasValue
+            ? allCharges.Where(c => c.Status == StatusFilter.Value).ToList()
+            : allCharges;
     }
 }
