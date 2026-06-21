@@ -1,4 +1,5 @@
 using System.Globalization;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Localization;
 using Microsoft.EntityFrameworkCore;
@@ -27,9 +28,29 @@ builder.Services
         options.Password.RequireNonAlphanumeric = false;
         options.Password.RequiredLength = 8;
     })
+    .AddRoles<IdentityRole>()
     .AddEntityFrameworkStores<ApplicationDbContext>();
 
-builder.Services.AddRazorPages();
+builder.Services.AddAuthorization(options =>
+{
+    options.FallbackPolicy = new AuthorizationPolicyBuilder()
+        .RequireAuthenticatedUser()
+        .Build();
+});
+
+builder.Services
+    .AddRazorPages(options =>
+    {
+        // Login and the password reset flow stay open. Everything else (including
+        // the dashboard at "/") is gated by the fallback policy above.
+        options.Conventions.AllowAnonymousToAreaPage("Identity", "/Account/Login");
+        options.Conventions.AllowAnonymousToAreaPage("Identity", "/Account/Logout");
+        options.Conventions.AllowAnonymousToAreaPage("Identity", "/Account/ForgotPassword");
+        options.Conventions.AllowAnonymousToAreaPage("Identity", "/Account/ResetPassword");
+        options.Conventions.AllowAnonymousToAreaPage("Identity", "/Account/AccessDenied");
+        options.Conventions.AllowAnonymousToPage("/Error");
+    });
+
 builder.Services.AddScoped<PropertyPayPro.Services.BillingService>();
 builder.Services.AddSingleton<PropertyPayPro.Services.IDocumentStorage, PropertyPayPro.Services.LocalFileSystemDocumentStorage>();
 
@@ -39,6 +60,7 @@ using (var scope = app.Services.CreateScope())
 {
     var db = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
     db.Database.Migrate();
+    await PropertyPayPro.Data.IdentitySeed.EnsureAdminAsync(scope.ServiceProvider, app.Configuration);
 }
 
 if (!app.Environment.IsDevelopment())
@@ -117,6 +139,6 @@ app.MapPost("/api/jobs/generate-monthly-charges", async (
 
     var created = await billing.GenerateChargesForPeriodAsync(y, m);
     return Results.Ok(new { year = y, month = m, created });
-});
+}).AllowAnonymous();
 
 app.Run();
