@@ -1,50 +1,77 @@
 @page
 @model PropertyPayPro.Pages.Expenses.IndexModel
+@using PropertyPayPro.Pages.Shared
 @{
     ViewData["Title"] = "Property Expenses";
 }
 
 <div class="d-flex justify-content-between align-items-center mb-3">
-    <h1>Property Expenses</h1>
+    <h1 class="h3 mb-0">Property Expenses</h1>
     <a asp-page="Create" class="btn btn-success">New Expense</a>
 </div>
 
-<table class="table table-striped">
-    <thead>
-        <tr>
-            <th>Property</th>
-            <th>Category</th>
-            <th>Vendor</th>
-            <th>Description</th>
-            <th>Due</th>
-            <th>Paid</th>
-            <th class="text-end">Amount</th>
-            <th>Status</th>
-            <th></th>
-        </tr>
-    </thead>
-    <tbody>
-    @foreach (var e in Model.Expenses)
-    {
-        <tr>
-            <td>@e.Property!.Name</td>
-            <td>@e.Category</td>
-            <td>@e.Vendor</td>
-            <td>@e.Description</td>
-            <td>@(e.DueDate?.ToString("yyyy-MM-dd") ?? "—")</td>
-            <td>@(e.PaidOn?.ToString("yyyy-MM-dd") ?? "—")</td>
-            <td class="text-end">@e.AmountDue.ToString("C")</td>
-            <td>
-                @if (e.IsPaid) { <span class="badge bg-success">Paid</span> }
-                else { <span class="badge bg-secondary">Open</span> }
-                @if (e.PassThroughToTenant) { <span class="badge bg-info ms-1">Pass-through</span> }
-            </td>
-            <td class="text-end">
-                <a asp-page="Details" asp-route-id="@e.Id" class="btn btn-sm btn-outline-secondary">Details</a>
-                <a asp-page="Edit" asp-route-id="@e.Id" class="btn btn-sm btn-outline-primary">Edit</a>
-                <a asp-page="Delete" asp-route-id="@e.Id" class="btn btn-sm btn-outline-danger">Delete</a>
-            </td>
-        </tr>
-    }
-    </tbody>
-</table>
+<div class="row">
+    <partial name="_KpiCard" model="@(new KpiCardModel {
+        Label = "Spent This Month", Value = Model.SpentThisMonth.ToString("C"),
+        Color = "primary", Icon = "las la-dollar-sign" })" />
+    <partial name="_KpiCard" model="@(new KpiCardModel {
+        Label = "Spent YTD", Value = Model.SpentYearToDate.ToString("C"),
+        Color = "info", Icon = "flaticon-381-list" })" />
+    <partial name="_KpiCard" model="@(new KpiCardModel {
+        Label = "Open Expenses", Value = Model.OpenCount.ToString(),
+        SubText = Model.OpenTotal.ToString("C"),
+        Color = "warning", Icon = "flaticon-381-warning" })" />
+    <partial name="_KpiCard" model="@(new KpiCardModel {
+        Label = $"Top Category ({Model.TopCategoryLabel})",
+        Value = Model.TopCategoryAmount.ToString("C"),
+        SubText = "Year to date",
+        Color = "success", Icon = "flaticon-381-notepad" })" />
+</div>
+
+<div class="card">
+    <div class="card-body">
+        <table class="table table-striped mb-0">
+            <thead>
+                <tr>
+                    <th>Property</th>
+                    <th>Category</th>
+                    <th>Vendor</th>
+                    <th>Description</th>
+                    <th>Due</th>
+                    <th>Paid</th>
+                    <th class="text-end">Amount</th>
+                    <th>Status</th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+            @foreach (var e in Model.Expenses)
+            {
+                <tr>
+                    <td>@e.Property!.Name</td>
+                    <td>@e.Category</td>
+                    <td>@e.Vendor</td>
+                    <td>@e.Description</td>
+                    <td>@(e.DueDate?.ToString("yyyy-MM-dd") ?? "—")</td>
+                    <td>@(e.PaidOn?.ToString("yyyy-MM-dd") ?? "—")</td>
+                    <td class="text-end">@e.AmountDue.ToString("C")</td>
+                    <td>
+                        @if (e.IsPaid) { <span class="badge bg-success">Paid</span> }
+                        else { <span class="badge bg-secondary">Open</span> }
+                        @if (e.PassThroughToTenant) { <span class="badge bg-info ms-1">Pass-through</span> }
+                    </td>
+                    <td class="text-end">
+                        <a asp-page="Details" asp-route-id="@e.Id" class="btn btn-sm btn-outline-secondary">Details</a>
+                        <a asp-page="Edit" asp-route-id="@e.Id" class="btn btn-sm btn-outline-primary">Edit</a>
+                        <a asp-page="Delete" asp-route-id="@e.Id" class="btn btn-sm btn-outline-danger">Delete</a>
+                    </td>
+                </tr>
+            }
+            @if (!Model.Expenses.Any())
+            {
+                <tr><td colspan="9" class="text-center text-muted py-3">No expenses recorded yet.</td></tr>
+            }
+            </tbody>
+        </table>
+    </div>
+</div>

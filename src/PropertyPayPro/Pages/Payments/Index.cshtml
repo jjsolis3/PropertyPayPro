@@ -1,34 +1,60 @@
 @page
 @model PropertyPayPro.Pages.Payments.IndexModel
+@using PropertyPayPro.Pages.Shared
 @{
     ViewData["Title"] = "Rent Payments";
 }
 
 <div class="d-flex justify-content-between align-items-center mb-3">
-    <h1>Rent Payments</h1>
+    <h1 class="h3 mb-0">Rent Payments</h1>
     <a asp-page="Create" class="btn btn-success">Record Payment</a>
 </div>
 
-<table class="table table-striped">
-    <thead>
-        <tr><th>Date</th><th>Tenant</th><th>Property</th><th>Method</th><th class="text-end">Amount</th><th></th></tr>
-    </thead>
-    <tbody>
-    @foreach (var p in Model.Payments)
-    {
-        <tr>
-            <td>@p.PaidOn.ToString("yyyy-MM-dd")</td>
-            <td>@p.Lease!.TenantNames</td>
-            <td>@p.Lease.Property!.Name</td>
-            <td>@p.Method</td>
-            <td class="text-end">@p.Amount.ToString("C")</td>
-            <td class="text-end">
-                <a asp-page="/Receipts/Show" asp-route-id="@p.Id" class="btn btn-sm btn-outline-success">Receipt</a>
-                <a asp-page="Details" asp-route-id="@p.Id" class="btn btn-sm btn-outline-secondary">Details</a>
-                <a asp-page="Edit" asp-route-id="@p.Id" class="btn btn-sm btn-outline-primary">Edit</a>
-                <a asp-page="Delete" asp-route-id="@p.Id" class="btn btn-sm btn-outline-danger">Delete</a>
-            </td>
-        </tr>
-    }
-    </tbody>
-</table>
+<div class="row">
+    <partial name="_KpiCard" model="@(new KpiCardModel {
+        Label = "Collected This Month", Value = Model.CollectedThisMonth.ToString("C"),
+        Color = "success", Icon = "las la-dollar-sign" })" />
+    <partial name="_KpiCard" model="@(new KpiCardModel {
+        Label = "Collected YTD", Value = Model.CollectedYearToDate.ToString("C"),
+        Color = "primary", Icon = "flaticon-381-list" })" />
+    <partial name="_KpiCard" model="@(new KpiCardModel {
+        Label = "Average Payment", Value = Model.AveragePayment.ToString("C"),
+        SubText = $"Across {Model.Payments.Count} payment(s)",
+        Color = "info", Icon = "flaticon-381-notepad" })" />
+    <partial name="_KpiCard" model="@(new KpiCardModel {
+        Label = "Unallocated Credits", Value = Model.UnallocatedCredits.ToString("C"),
+        SubText = "Held against future bills",
+        Color = "warning", Icon = "flaticon-381-time" })" />
+</div>
+
+<div class="card">
+    <div class="card-body">
+        <table class="table table-striped mb-0">
+            <thead>
+                <tr><th>Date</th><th>Tenant</th><th>Property</th><th>Method</th><th class="text-end">Amount</th><th></th></tr>
+            </thead>
+            <tbody>
+            @foreach (var p in Model.Payments)
+            {
+                <tr>
+                    <td>@p.PaidOn.ToString("yyyy-MM-dd")</td>
+                    <td>@p.Lease!.TenantNames</td>
+                    <td>@p.Lease.Property!.Name</td>
+                    <td><span class="badge badge-outline-primary">@p.Method</span></td>
+                    <td class="text-end fw-bold">@p.Amount.ToString("C")</td>
+                    <td class="text-end">
+                        <a asp-page="/Receipts/Show" asp-route-id="@p.Id" class="btn btn-sm btn-outline-success">Receipt</a>
+                        <a asp-page="Details" asp-route-id="@p.Id" class="btn btn-sm btn-outline-secondary">Details</a>
+                        <a asp-page="Edit" asp-route-id="@p.Id" class="btn btn-sm btn-outline-primary">Edit</a>
+                        <a asp-page="Delete" asp-route-id="@p.Id" class="btn btn-sm btn-outline-danger">Delete</a>
+                    </td>
+                </tr>
+            }
+            @if (!Model.Payments.Any())
+            {
+                <tr><td colspan="6" class="text-center text-muted py-3">No payments yet. Click <strong>Record Payment</strong>.</td></tr>
+            }
+            </tbody>
+        </table>
+    </div>
+</div>
