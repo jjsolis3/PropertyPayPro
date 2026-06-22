@@ -1,0 +1,35 @@
+@*
+    Reusable detail-page identity block (avatar/icon + title + subtitle + badges).
+    Pages wrap it with action buttons in the same card.
+*@
+@model PropertyPayPro.Pages.Shared.DetailHeaderModel
+
+<div class="d-flex flex-wrap align-items-center gap-3">
+    <div class="flex-shrink-0 d-flex align-items-center justify-content-center rounded-circle bgl-@Model.IconColor text-@Model.IconColor"
+         style="width: 64px; height: 64px;">
+        @if (!string.IsNullOrWhiteSpace(Model.IconClass))
+        {
+            <i class="@Model.IconClass" style="font-size: 1.75rem;"></i>
+        }
+        else if (!string.IsNullOrWhiteSpace(Model.Initials))
+        {
+            <span class="fw-bold" style="font-size: 1.25rem;">@Model.Initials</span>
+        }
+    </div>
+    <div class="flex-grow-1">
+        <h1 class="h3 mb-1">@Model.Title</h1>
+        @if (!string.IsNullOrWhiteSpace(Model.Subtitle))
+        {
+            <div class="text-muted">@Model.Subtitle</div>
+        }
+        @if (Model.Badges.Any())
+        {
+            <div class="mt-2 d-flex flex-wrap gap-1">
+                @foreach (var b in Model.Badges)
+                {
+                    <span class="badge bg-@b.Color" title="@b.Title">@b.Text</span>
+                }
+            </div>
+        }
+    </div>
+</div>

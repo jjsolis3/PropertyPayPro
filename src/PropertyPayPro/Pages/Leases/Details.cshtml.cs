@@ -21,6 +21,13 @@ public class DetailsModel : PageModel
     }
 
     public Lease? Lease { get; private set; }
+    public List<RentalCharge> Charges { get; private set; } = new();
+    public List<GeneratedDocument> GeneratedDocs { get; private set; } = new();
+
+    public decimal TotalBilled { get; private set; }
+    public decimal TotalPaid { get; private set; }
+    public decimal CurrentBalance { get; private set; }
+    public int UnpaidCount { get; private set; }
 
     public async Task<IActionResult> OnGetAsync(int id)
     {
@@ -92,8 +99,22 @@ public class DetailsModel : PageModel
         Lease = await _db.Leases
             .Include(l => l.Property)
             .Include(l => l.Tenants)
-            .Include(l => l.Payments)
+            .Include(l => l.Payments).ThenInclude(p => p.Allocations)
             .Include(l => l.Documents)
+            .Include(l => l.Charges).ThenInclude(c => c.Allocations)
             .FirstOrDefaultAsync(l => l.Id == id);
+        if (Lease is null) return;
+
+        Charges = Lease.Charges.OrderByDescending(c => c.BillingPeriodStart).ToList();
+        TotalBilled = Charges.Sum(c => c.AmountDue);
+        TotalPaid = Charges.Sum(c => c.AmountPaid);
+        CurrentBalance = Charges.Sum(c => c.Balance);
+        UnpaidCount = Charges.Count(c => c.Balance > 0);
+
+        GeneratedDocs = await _db.GeneratedDocuments
+            .Where(d => d.LeaseId == id)
+            .OrderByDescending(d => d.CreatedUtc)
+            .Take(20)
+            .ToListAsync();
     }
 }

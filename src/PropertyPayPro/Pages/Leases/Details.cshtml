@@ -1,100 +1,254 @@
 @page "{id:int}"
 @model PropertyPayPro.Pages.Leases.DetailsModel
+@using PropertyPayPro.Pages.Shared
 @{
     ViewData["Title"] = "Lease";
+    var today = DateOnly.FromDateTime(DateTime.UtcNow);
+    var isActive = Model.Lease!.StartDate <= today && (Model.Lease.IsMonthToMonth || Model.Lease.EndDate >= today);
+    var badges = new List<DetailHeaderBadge>();
+    badges.Add(isActive
+        ? new DetailHeaderBadge { Text = "Active", Color = "success" }
+        : new DetailHeaderBadge { Text = "Ended", Color = "secondary" });
+    if (Model.Lease.IsMonthToMonth)
+        badges.Add(new() { Text = "Month-to-month", Color = "info" });
+    if (Model.CurrentBalance > 0)
+        badges.Add(new() { Text = $"Balance: {Model.CurrentBalance:C}", Color = "danger" });
+    var subtitle = $"{Model.Lease.Property!.Name} • {Model.Lease.TenantNames}";
 }
 
-<h1>Lease</h1>
-
-<dl class="row">
-    <dt class="col-sm-3">Property</dt><dd class="col-sm-9">@Model.Lease!.Property!.Name</dd>
-    <dt class="col-sm-3">Tenants</dt>
-    <dd class="col-sm-9">
-        @if (Model.Lease.Tenants.Any())
-        {
-            foreach (var t in Model.Lease.Tenants)
-            {
-                <span class="badge bg-secondary me-1">@t.DisplayName</span>
-            }
-        }
-        else { <span class="text-muted">(none)</span> }
-    </dd>
-    <dt class="col-sm-3">Term</dt>
-    <dd class="col-sm-9">
-        @Model.Lease.StartDate.ToString("yyyy-MM-dd") &mdash; @Model.Lease.EndDate.ToString("yyyy-MM-dd")
-        @if (Model.Lease.IsMonthToMonth) { <span class="badge bg-info ms-2">Month-to-month</span> }
-    </dd>
-    <dt class="col-sm-3">Monthly rent</dt><dd class="col-sm-9">@Model.Lease.MonthlyRent.ToString("C")</dd>
-    <dt class="col-sm-3">Security deposit</dt><dd class="col-sm-9">@Model.Lease.SecurityDeposit.ToString("C")</dd>
-    <dt class="col-sm-3">Rent due day</dt><dd class="col-sm-9">@Model.Lease.RentDueDay</dd>
-    <dt class="col-sm-3">Late fee</dt>
-    <dd class="col-sm-9">
-        @Model.Lease.LateFeeAmount.ToString("C") after @Model.Lease.LateFeeGraceDays day(s) past due
-    </dd>
-    <dt class="col-sm-3">Notes</dt><dd class="col-sm-9">@Model.Lease.Notes</dd>
-</dl>
-
-<h3>Documents</h3>
-<form method="post" enctype="multipart/form-data" asp-page-handler="Upload" class="row g-2 mb-3">
-    <input type="hidden" name="leaseId" value="@Model.Lease.Id" />
-    <div class="col-auto">
-        <input type="file" name="file" class="form-control" required />
+<div class="card mb-3">
+    <div class="card-body d-flex flex-wrap align-items-center gap-3">
+        <div class="flex-grow-1">
+            <partial name="_DetailHeader" model="@(new DetailHeaderModel {
+                Title = $"Lease #{Model.Lease.Id}",
+                Subtitle = subtitle,
+                IconClass = "flaticon-381-notepad",
+                IconColor = "primary",
+                Badges = badges
+            })" />
+        </div>
+        <div class="flex-shrink-0">
+            <a asp-page="/Reports/Statement" asp-route-leaseId="@Model.Lease.Id" class="btn btn-outline-info">View Statement</a>
+            <a asp-page="/Payments/Create" asp-route-leaseId="@Model.Lease.Id" class="btn btn-success">Record Payment</a>
+            <a asp-page="Edit" asp-route-id="@Model.Lease.Id" class="btn btn-primary">Edit</a>
+            <a asp-page="Index" class="btn btn-outline-secondary">Back</a>
+        </div>
     </div>
-    <div class="col-auto">
-        <input type="text" name="description" class="form-control" placeholder="Description (optional)" maxlength="255" />
+</div>
+
+<div class="row">
+    <partial name="_KpiCard" model="@(new KpiCardModel {
+        Label = "Monthly Rent", Value = Model.Lease.MonthlyRent.ToString("C"),
+        Color = "primary", Icon = "las la-dollar-sign" })" />
+    <partial name="_KpiCard" model="@(new KpiCardModel {
+        Label = "Total Billed", Value = Model.TotalBilled.ToString("C"),
+        SubText = $"{Model.Charges.Count} charge(s)",
+        Color = "info", Icon = "flaticon-381-list" })" />
+    <partial name="_KpiCard" model="@(new KpiCardModel {
+        Label = "Total Paid", Value = Model.TotalPaid.ToString("C"),
+        Color = "success", Icon = "flaticon-381-notepad" })" />
+    <partial name="_KpiCard" model="@(new KpiCardModel {
+        Label = "Balance", Value = Model.CurrentBalance.ToString("C"),
+        SubText = $"{Model.UnpaidCount} unpaid",
+        Color = Model.CurrentBalance > 0 ? "danger" : "success",
+        Icon = "flaticon-381-warning" })" />
+</div>
+
+<div class="row g-3">
+    <div class="col-lg-8">
+        <div class="card mb-3">
+            <div class="card-header"><h4 class="card-title mb-0">Lease Terms</h4></div>
+            <div class="card-body">
+                <dl class="row mb-0">
+                    <dt class="col-sm-4">Property</dt>
+                    <dd class="col-sm-8">
+                        <a asp-page="/Properties/Details" asp-route-id="@Model.Lease.PropertyId">@Model.Lease.Property!.Name</a>
+                    </dd>
+                    <dt class="col-sm-4">Tenants</dt>
+                    <dd class="col-sm-8">
+                        @if (Model.Lease.Tenants.Any())
+                        {
+                            foreach (var t in Model.Lease.Tenants)
+                            {
+                                <a asp-page="/Tenants/Details" asp-route-id="@t.Id" class="badge bg-secondary me-1 text-decoration-none">@t.DisplayName</a>
+                            }
+                        }
+                        else { <span class="text-muted">(none)</span> }
+                    </dd>
+                    <dt class="col-sm-4">Term</dt>
+                    <dd class="col-sm-8">
+                        @Model.Lease.StartDate.ToString("yyyy-MM-dd") &mdash;
+                        @(Model.Lease.IsMonthToMonth ? "month-to-month" : Model.Lease.EndDate.ToString("yyyy-MM-dd"))
+                    </dd>
+                    <dt class="col-sm-4">Security deposit</dt>
+                    <dd class="col-sm-8">@Model.Lease.SecurityDeposit.ToString("C")</dd>
+                    <dt class="col-sm-4">Rent due day</dt>
+                    <dd class="col-sm-8">@Model.Lease.RentDueDay of each month</dd>
+                    <dt class="col-sm-4">Late fee</dt>
+                    <dd class="col-sm-8">
+                        @if (Model.Lease.LateFeeAmount > 0)
+                        {
+                            @Model.Lease.LateFeeAmount.ToString("C")
+                            @:after @Model.Lease.LateFeeGraceDays day(s)
+                        }
+                        else { <span class="text-muted">None</span> }
+                    </dd>
+                    @if (!string.IsNullOrWhiteSpace(Model.Lease.Notes))
+                    {
+                        <dt class="col-sm-4">Notes</dt>
+                        <dd class="col-sm-8">@Model.Lease.Notes</dd>
+                    }
+                </dl>
+            </div>
+        </div>
+
+        <div class="card mb-3">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h4 class="card-title mb-0">Bill History</h4>
+                <a asp-page="/Bills/Index" class="btn btn-sm btn-outline-primary">All bills</a>
+            </div>
+            <div class="card-body p-0">
+                <table class="table mb-0">
+                    <thead class="table-light">
+                        <tr><th>Period</th><th>Due</th><th class="text-end">Due</th><th class="text-end">Paid</th><th class="text-end">Balance</th><th>Status</th></tr>
+                    </thead>
+                    <tbody>
+                    @foreach (var c in Model.Charges)
+                    {
+                        <tr>
+                            <td>@c.PeriodLabel</td>
+                            <td>@c.DueDate.ToString("yyyy-MM-dd")</td>
+                            <td class="text-end">@c.AmountDue.ToString("C")</td>
+                            <td class="text-end">@c.AmountPaid.ToString("C")</td>
+                            <td class="text-end @(c.Balance > 0 ? "fw-bold" : "")">@c.Balance.ToString("C")</td>
+                            <td>
+                                @switch (c.Status)
+                                {
+                                    case PropertyPayPro.Models.ChargeStatus.Paid:
+                                        <span class="badge bg-success">Paid</span>
+                                        break;
+                                    case PropertyPayPro.Models.ChargeStatus.PartiallyPaid:
+                                        <span class="badge bg-warning text-dark">Partial</span>
+                                        break;
+                                    case PropertyPayPro.Models.ChargeStatus.Overdue:
+                                        <span class="badge bg-danger">Overdue</span>
+                                        break;
+                                    default:
+                                        <span class="badge bg-secondary">Unpaid</span>
+                                        break;
+                                }
+                            </td>
+                        </tr>
+                    }
+                    @if (!Model.Charges.Any())
+                    {
+                        <tr><td colspan="6" class="text-center text-muted py-3">No bills yet.</td></tr>
+                    }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <div class="card mb-3">
+            <div class="card-header"><h4 class="card-title mb-0">Payment History</h4></div>
+            <div class="card-body p-0">
+                <table class="table mb-0">
+                    <thead class="table-light">
+                        <tr><th>Date</th><th>Method</th><th>Reference</th><th class="text-end">Amount</th><th></th></tr>
+                    </thead>
+                    <tbody>
+                    @foreach (var p in Model.Lease.Payments.OrderByDescending(x => x.PaidOn))
+                    {
+                        <tr>
+                            <td>@p.PaidOn.ToString("yyyy-MM-dd")</td>
+                            <td><span class="badge badge-outline-primary">@p.Method</span></td>
+                            <td>@p.Reference</td>
+                            <td class="text-end fw-bold">@p.Amount.ToString("C")</td>
+                            <td class="text-end">
+                                <a asp-page="/Receipts/Show" asp-route-id="@p.Id" class="btn btn-sm btn-outline-success">Receipt</a>
+                            </td>
+                        </tr>
+                    }
+                    @if (!Model.Lease.Payments.Any())
+                    {
+                        <tr><td colspan="5" class="text-center text-muted py-3">No payments recorded yet.</td></tr>
+                    }
+                    </tbody>
+                </table>
+            </div>
+        </div>
     </div>
-    <div class="col-auto">
-        <button type="submit" class="btn btn-primary">Upload</button>
+
+    <div class="col-lg-4">
+        <div class="card mb-3">
+            <div class="card-header"><h4 class="card-title mb-0">Lease Documents</h4></div>
+            <div class="card-body">
+                <form method="post" enctype="multipart/form-data" asp-page-handler="Upload" class="mb-3">
+                    <input type="hidden" name="leaseId" value="@Model.Lease.Id" />
+                    <input type="file" name="file" class="form-control mb-2" required />
+                    <input type="text" name="description" class="form-control mb-2" placeholder="Description (optional)" maxlength="255" />
+                    <button type="submit" class="btn btn-primary w-100">Upload</button>
+                </form>
+                @if (Model.Lease.Documents.Any())
+                {
+                    <table class="table table-sm mb-0">
+                        <thead><tr><th>File</th><th></th></tr></thead>
+                        <tbody>
+                        @foreach (var d in Model.Lease.Documents.OrderByDescending(x => x.UploadedOn))
+                        {
+                            <tr>
+                                <td>
+                                    @d.FileName
+                                    @if (!string.IsNullOrWhiteSpace(d.Description))
+                                    { <br /><small class="text-muted">@d.Description</small> }
+                                </td>
+                                <td class="text-end">
+                                    <a asp-page-handler="Download" asp-route-documentId="@d.Id" class="btn btn-sm btn-outline-secondary">Download</a>
+                                    <form method="post" asp-page-handler="DeleteDocument" class="d-inline">
+                                        <input type="hidden" name="documentId" value="@d.Id" />
+                                        <button type="submit" class="btn btn-sm btn-outline-danger"
+                                                onclick="return confirm('Delete this document?')">Delete</button>
+                                    </form>
+                                </td>
+                            </tr>
+                        }
+                        </tbody>
+                    </table>
+                }
+                else
+                {
+                    <p class="text-muted mb-0">No documents uploaded.</p>
+                }
+            </div>
+        </div>
+
+        <div class="card mb-3">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h4 class="card-title mb-0">Generated PDFs</h4>
+                <a asp-page="/Documents/Index" asp-route-LeaseFilter="@Model.Lease.Id" class="btn btn-sm btn-outline-primary">All</a>
+            </div>
+            <div class="card-body p-0" style="max-height: 360px; overflow-y: auto;">
+                <table class="table table-sm mb-0">
+                    <thead class="table-light"><tr><th>Date</th><th>Kind</th><th></th></tr></thead>
+                    <tbody>
+                    @foreach (var d in Model.GeneratedDocs)
+                    {
+                        <tr>
+                            <td>@d.CreatedUtc.ToLocalTime().ToString("yyyy-MM-dd")</td>
+                            <td>@d.Kind</td>
+                            <td class="text-end">
+                                <a asp-page="/Documents/Index" asp-page-handler="Download" asp-route-id="@d.Id"
+                                   class="btn btn-sm btn-outline-primary">PDF</a>
+                            </td>
+                        </tr>
+                    }
+                    @if (!Model.GeneratedDocs.Any())
+                    {
+                        <tr><td colspan="3" class="text-center text-muted py-3">None yet.</td></tr>
+                    }
+                    </tbody>
+                </table>
+            </div>
+        </div>
     </div>
-</form>
-
-@if (Model.Lease.Documents.Any())
-{
-    <table class="table table-sm">
-        <thead><tr><th>File</th><th>Description</th><th>Size</th><th>Uploaded</th><th></th></tr></thead>
-        <tbody>
-        @foreach (var d in Model.Lease.Documents.OrderByDescending(x => x.UploadedOn))
-        {
-            <tr>
-                <td>@d.FileName</td>
-                <td>@d.Description</td>
-                <td>@($"{d.SizeBytes / 1024.0:N1} KB")</td>
-                <td>@d.UploadedOn.ToString("yyyy-MM-dd HH:mm")</td>
-                <td class="text-end">
-                    <a asp-page-handler="Download" asp-route-documentId="@d.Id" class="btn btn-sm btn-outline-secondary">Download</a>
-                    <form method="post" asp-page-handler="DeleteDocument" class="d-inline">
-                        <input type="hidden" name="documentId" value="@d.Id" />
-                        <button type="submit" class="btn btn-sm btn-outline-danger"
-                                onclick="return confirm('Delete this document?')">Delete</button>
-                    </form>
-                </td>
-            </tr>
-        }
-        </tbody>
-    </table>
-}
-else
-{
-    <p class="text-muted">No documents uploaded yet.</p>
-}
-
-<h3>Payments</h3>
-<table class="table table-sm">
-    <thead><tr><th>Date</th><th>Method</th><th class="text-end">Amount</th><th>Reference</th></tr></thead>
-    <tbody>
-    @foreach (var p in Model.Lease.Payments.OrderByDescending(x => x.PaidOn))
-    {
-        <tr>
-            <td>@p.PaidOn.ToString("yyyy-MM-dd")</td>
-            <td>@p.Method</td>
-            <td class="text-end">@p.Amount.ToString("C")</td>
-            <td>@p.Reference</td>
-        </tr>
-    }
-    </tbody>
-</table>
-
-<a asp-page="Edit" asp-route-id="@Model.Lease.Id" class="btn btn-primary">Edit</a>
-<a asp-page="/Payments/Create" asp-route-leaseId="@Model.Lease.Id" class="btn btn-success">Record Payment</a>
-<a asp-page="/Reports/Statement" asp-route-leaseId="@Model.Lease.Id" class="btn btn-outline-info">View Statement</a>
-<a asp-page="Index" class="btn btn-outline-secondary">Back</a>
+</div>
