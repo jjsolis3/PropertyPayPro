@@ -51,6 +51,8 @@ builder.Services
         options.Conventions.AllowAnonymousToPage("/Error");
     });
 
+builder.Services.AddMemoryCache();
+builder.Services.AddScoped<PropertyPayPro.Services.AppSettingsService>();
 builder.Services.AddScoped<PropertyPayPro.Services.BillingService>();
 builder.Services.AddSingleton<PropertyPayPro.Services.IDocumentStorage, PropertyPayPro.Services.LocalFileSystemDocumentStorage>();
 builder.Services.AddHealthChecks();
@@ -102,6 +104,20 @@ app.UseAuthorization();
 app.MapRazorPages();
 app.MapHealthChecks("/health")
    .AllowAnonymous();
+
+// Public branded-logo endpoint (used by login page + nav). Allows anonymous so the
+// login page can render before the user is authenticated.
+app.MapGet("/branding/logo/{which}", async (
+    string which,
+    PropertyPayPro.Services.AppSettingsService settings,
+    PropertyPayPro.Services.IDocumentStorage storage) =>
+{
+    var s = await settings.GetAsync();
+    var key = which == "small" ? s.LogoSmallStorageKey : s.LogoStorageKey;
+    if (string.IsNullOrEmpty(key)) return Results.NotFound();
+    var stream = await storage.OpenReadAsync(key);
+    return Results.File(stream, "image/png");
+}).AllowAnonymous();
 
 app.MapGet("/api/leases/{leaseId:int}/outstanding-charges", async (
     int leaseId,

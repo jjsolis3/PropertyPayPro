@@ -1,7 +1,17 @@
+@inject PropertyPayPro.Services.AppSettingsService AppSettings
+@{
+    var s = await AppSettings.GetAsync();
+    var smallLogoSrc = string.IsNullOrEmpty(s.LogoSmallStorageKey)
+        ? "/img/brand/PPS_Logo_SM.png"
+        : "/branding/logo/small";
+    var mainLogoSrc = string.IsNullOrEmpty(s.LogoStorageKey)
+        ? "/img/brand/PPS_Logo_Main.png"
+        : "/branding/logo/main";
+}
 <div class="nav-header">
     <a asp-page="/Index" class="brand-logo">
-        <img class="logo-abbr" src="/img/brand/PPS_Logo_SM.png" alt="PropertyPayPro" />
-        <img class="brand-title" src="/img/brand/PPS_Logo_Main.png" alt="PropertyPayPro" />
+        <img class="logo-abbr" src="@smallLogoSrc" alt="@s.AppName" />
+        <img class="brand-title" src="@mainLogoSrc" alt="@s.AppName" />
     </a>
     <div class="nav-control">
         <div class="hamburger">

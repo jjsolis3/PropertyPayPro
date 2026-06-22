@@ -2,6 +2,7 @@
 @using PropertyPayPro.Models
 @inject SignInManager<ApplicationUser> SignInManager
 @inject UserManager<ApplicationUser> UserManager
+@inject PropertyPayPro.Services.AppSettingsService AppSettings
 @{
     var isAdmin = false;
     if (SignInManager.IsSignedIn(User))
@@ -12,6 +13,7 @@
             isAdmin = await UserManager.IsInRoleAsync(current, PropertyPayPro.Data.IdentitySeed.AdminRole);
         }
     }
+    var appSettings = await AppSettings.GetAsync();
 }
 <div class="deznav">
     <div class="deznav-scroll">
@@ -80,15 +82,21 @@
             @if (isAdmin)
             {
                 <li>
-                    <a class="ai-icon" asp-page="/Users/Index">
-                        <i class="flaticon-381-user-7"></i>
-                        <span class="nav-text">Users</span>
+                    <a class="has-arrow ai-icon" href="javascript:void(0)" aria-expanded="false">
+                        <i class="flaticon-381-settings"></i>
+                        <span class="nav-text">Settings</span>
                     </a>
+                    <ul aria-expanded="false">
+                        <li><a asp-page="/Settings/Branding">Branding</a></li>
+                        <li><a asp-page="/Settings/Email">Email</a></li>
+                        <li><a asp-page="/Settings/Billing">Billing Defaults</a></li>
+                        <li><a asp-page="/Users/Index">Users</a></li>
+                    </ul>
                 </li>
             }
         </ul>
         <div class="copyright">
-            <p><strong>PropertyPayPro</strong> © @DateTime.UtcNow.Year</p>
+            <p><strong>@appSettings.AppName</strong> © @DateTime.UtcNow.Year</p>
         </div>
     </div>
 </div>

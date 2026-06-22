@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.EntityFrameworkCore;
 using PropertyPayPro.Data;
 using PropertyPayPro.Models;
+using PropertyPayPro.Services;
 
 namespace PropertyPayPro.Pages.Leases;
 
@@ -12,7 +13,13 @@ namespace PropertyPayPro.Pages.Leases;
 public class CreateModel : PageModel
 {
     private readonly ApplicationDbContext _db;
-    public CreateModel(ApplicationDbContext db) => _db = db;
+    private readonly AppSettingsService _settings;
+
+    public CreateModel(ApplicationDbContext db, AppSettingsService settings)
+    {
+        _db = db;
+        _settings = settings;
+    }
 
     [BindProperty]
     public Lease Lease { get; set; } = new()
@@ -29,6 +36,10 @@ public class CreateModel : PageModel
 
     public async Task<IActionResult> OnGetAsync()
     {
+        var defaults = await _settings.GetAsync();
+        Lease.RentDueDay = defaults.DefaultRentDueDay;
+        Lease.LateFeeGraceDays = defaults.DefaultLateFeeGraceDays;
+        Lease.LateFeeAmount = defaults.DefaultLateFeeAmount;
         await LoadSelectListsAsync();
         return Page();
     }
