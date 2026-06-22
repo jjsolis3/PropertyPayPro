@@ -1,0 +1,122 @@
+@page
+@model PropertyPayPro.Pages.Settings.EmailModel
+@{
+    ViewData["Title"] = "Settings — Email";
+    ViewData["SettingsTab"] = "email";
+
+    string Mask(string? v) =>
+        string.IsNullOrEmpty(v) ? "(not set)"
+        : v.Length <= 4 ? new string('•', v.Length)
+        : new string('•', v.Length - 4) + v[^4..];
+}
+
+<h1 class="h3 mb-3">Settings</h1>
+<partial name="_SettingsNav" />
+
+@if (TempData["Message"] is string msg)
+{
+    <div class="alert alert-success alert-dismissible fade show">@msg
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+}
+@if (TempData["Error"] is string err)
+{
+    <div class="alert alert-danger alert-dismissible fade show">@err
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+}
+
+<div class="row g-3">
+    <div class="col-lg-6">
+        <div class="card mb-3">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h4 class="card-title mb-0">SMTP Configuration</h4>
+                @if (Model.Options.IsConfigured)
+                {
+                    <span class="badge bg-success">Configured</span>
+                }
+                else
+                {
+                    <span class="badge bg-warning text-dark">Not configured</span>
+                }
+            </div>
+            <div class="card-body">
+                <p class="text-muted small">
+                    These are read from environment variables on the host (Coolify env vars).
+                    Editing them requires a redeploy. Sensitive values are masked.
+                </p>
+                <dl class="row mb-0">
+                    <dt class="col-sm-4">SMTP_HOST</dt>
+                    <dd class="col-sm-8"><code>@(string.IsNullOrEmpty(Model.Options.Host) ? "(not set)" : Model.Options.Host)</code></dd>
+                    <dt class="col-sm-4">SMTP_PORT</dt>
+                    <dd class="col-sm-8"><code>@Model.Options.Port</code></dd>
+                    <dt class="col-sm-4">SMTP_USER</dt>
+                    <dd class="col-sm-8"><code>@(string.IsNullOrEmpty(Model.Options.User) ? "(not set)" : Model.Options.User)</code></dd>
+                    <dt class="col-sm-4">SMTP_PASSWORD</dt>
+                    <dd class="col-sm-8"><code>@Mask(Model.Options.Password)</code></dd>
+                    <dt class="col-sm-4">SMTP_FROM</dt>
+                    <dd class="col-sm-8"><code>@(string.IsNullOrEmpty(Model.Options.FromAddress) ? "(not set)" : Model.Options.FromAddress)</code></dd>
+                    <dt class="col-sm-4">SMTP_FROM_NAME</dt>
+                    <dd class="col-sm-8"><code>@Model.Options.FromName</code></dd>
+                    <dt class="col-sm-4">STARTTLS</dt>
+                    <dd class="col-sm-8"><code>@Model.Options.UseStartTls</code></dd>
+                </dl>
+            </div>
+        </div>
+
+        <div class="card mb-3">
+            <div class="card-header"><h4 class="card-title mb-0">From Override (optional)</h4></div>
+            <div class="card-body">
+                <p class="text-muted small">
+                    Override the From name and/or email used for outgoing messages.
+                    Leaving blank uses the env-var defaults.
+                </p>
+                <form method="post" asp-page-handler="Save">
+                    <div class="mb-3">
+                        <label class="form-label">From name override</label>
+                        <input asp-for="FromNameOverride" class="form-control" placeholder="@Model.Options.FromName" />
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">From email override</label>
+                        <input asp-for="FromEmailOverride" class="form-control" placeholder="@Model.Options.FromAddress" type="email" />
+                    </div>
+                    <button type="submit" class="btn btn-primary">Save Overrides</button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-lg-6">
+        <div class="card mb-3">
+            <div class="card-header"><h4 class="card-title mb-0">Test Send</h4></div>
+            <div class="card-body">
+                <p class="text-muted small">Verify SMTP works end-to-end without recording a payment.</p>
+                <form method="post" asp-page-handler="Test">
+                    <div class="mb-3">
+                        <label class="form-label">Recipient</label>
+                        <input asp-for="TestRecipient" type="email" class="form-control" required />
+                    </div>
+                    <button type="submit" class="btn btn-success" @(Model.Options.IsConfigured ? "" : "disabled")>
+                        Send Test Email
+                    </button>
+                    @if (!Model.Options.IsConfigured)
+                    {
+                        <small class="text-muted d-block mt-2">SMTP must be configured first.</small>
+                    }
+                </form>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-header"><h4 class="card-title mb-0">Tips</h4></div>
+            <div class="card-body small">
+                <ul class="mb-0 ps-3">
+                    <li>For Gmail, use an <strong>App Password</strong> (not your account password) from
+                        <a href="https://myaccount.google.com/apppasswords" target="_blank" rel="noopener">myaccount.google.com/apppasswords</a>.</li>
+                    <li>Gmail free accounts have a <strong>~500 emails/day</strong> limit. Workspace ~2,000/day.</li>
+                    <li>If sends fail with "535 Authentication failed", regenerate the App Password.</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,69 @@
+@page
+@model PropertyPayPro.Pages.Settings.BillingModel
+@{
+    ViewData["Title"] = "Settings — Billing";
+    ViewData["SettingsTab"] = "billing";
+}
+
+<h1 class="h3 mb-3">Settings</h1>
+<partial name="_SettingsNav" />
+
+@if (TempData["Message"] is string msg)
+{
+    <div class="alert alert-success alert-dismissible fade show">@msg
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+}
+
+<form method="post">
+    <div class="row g-3">
+        <div class="col-lg-8">
+            <div class="card mb-3">
+                <div class="card-header"><h4 class="card-title mb-0">Default Lease Terms</h4></div>
+                <div class="card-body">
+                    <p class="text-muted small mb-3">
+                        These values prefill new leases. Each lease can still override them individually.
+                    </p>
+                    <div class="row">
+                        <div class="col-md-4 mb-3">
+                            <label asp-for="DefaultRentDueDay" class="form-label">Rent due day</label>
+                            <input asp-for="DefaultRentDueDay" type="number" min="1" max="31" class="form-control" />
+                            <small class="text-muted">Day of month rent is due (1–31).</small>
+                            <span asp-validation-for="DefaultRentDueDay" class="text-danger"></span>
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <label asp-for="DefaultLateFeeGraceDays" class="form-label">Late fee grace days</label>
+                            <input asp-for="DefaultLateFeeGraceDays" type="number" min="0" max="60" class="form-control" />
+                            <small class="text-muted">Days past due before a late fee applies.</small>
+                            <span asp-validation-for="DefaultLateFeeGraceDays" class="text-danger"></span>
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <label asp-for="DefaultLateFeeAmount" class="form-label">Late fee amount</label>
+                            <input asp-for="DefaultLateFeeAmount" type="number" step="0.01" min="0" max="10000" class="form-control" />
+                            <small class="text-muted">$0 disables late fees by default.</small>
+                            <span asp-validation-for="DefaultLateFeeAmount" class="text-danger"></span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-4">
+            <div class="card mb-3">
+                <div class="card-header"><h4 class="card-title mb-0">Notes</h4></div>
+                <div class="card-body small">
+                    <p>Bills are generated on the rent due day for each active lease.</p>
+                    <p>If a lease has a non-zero late fee and the bill remains unpaid past the grace days, the late-fee charge is added automatically.</p>
+                    <p class="mb-0 text-muted">Last saved: @Model.Current.UpdatedUtc.ToLocalTime().ToString("yyyy-MM-dd HH:mm")</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="d-flex gap-2">
+        <button type="submit" class="btn btn-primary">Save Defaults</button>
+        <a asp-page="Billing" class="btn btn-outline-secondary">Cancel</a>
+    </div>
+</form>
+
+@section Scripts { <partial name="_ValidationScriptsPartial" /> }

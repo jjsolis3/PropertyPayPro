@@ -1,0 +1,22 @@
+@*
+    Sub-navigation pills shared across all /Settings/* pages.
+*@
+@{
+    string? active = ViewData["SettingsTab"] as string;
+    bool Is(string id) => string.Equals(active, id, StringComparison.OrdinalIgnoreCase);
+}
+
+<ul class="nav nav-pills mb-3">
+    <li class="nav-item">
+        <a asp-page="/Settings/Branding" class="nav-link @(Is("branding") ? "active" : "")">Branding</a>
+    </li>
+    <li class="nav-item">
+        <a asp-page="/Settings/Email" class="nav-link @(Is("email") ? "active" : "")">Email</a>
+    </li>
+    <li class="nav-item">
+        <a asp-page="/Settings/Billing" class="nav-link @(Is("billing") ? "active" : "")">Billing Defaults</a>
+    </li>
+    <li class="nav-item">
+        <a asp-page="/Users/Index" class="nav-link @(Is("users") ? "active" : "")">Users</a>
+    </li>
+</ul>
