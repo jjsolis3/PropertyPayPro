@@ -44,6 +44,10 @@
             <div class="text-end">
                 <div><strong>Receipt #</strong> @Model.Payment.Id</div>
                 <div><strong>Date received:</strong> @Model.Payment.PaidOn.ToString("yyyy-MM-dd")</div>
+                @if (Model.Payment.PaidByTenant is not null)
+                {
+                    <div><strong>Paid by:</strong> @Model.Payment.PaidByTenant.DisplayName</div>
+                }
             </div>
         </div>
 

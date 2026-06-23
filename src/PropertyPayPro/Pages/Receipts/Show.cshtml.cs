@@ -31,6 +31,7 @@ public class ShowModel : PageModel
         Payment = await _db.RentPayments
             .Include(p => p.Lease).ThenInclude(l => l!.Property)
             .Include(p => p.Lease).ThenInclude(l => l!.Tenants)
+            .Include(p => p.PaidByTenant)
             .Include(p => p.Allocations).ThenInclude(a => a.RentalCharge)
             .FirstOrDefaultAsync(p => p.Id == id);
         if (Payment is null) return NotFound();

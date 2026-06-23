@@ -40,6 +40,9 @@ public class CreateModel : PageModel
     public SelectList Leases { get; private set; } = default!;
     public List<RentalCharge> OutstandingCharges { get; private set; } = new();
     public List<decimal> SuggestedAmounts { get; private set; } = new();
+    public Dictionary<int, List<TenantOption>> LeaseTenants { get; private set; } = new();
+
+    public record TenantOption(int Id, string DisplayName);
 
     public async Task<IActionResult> OnGetAsync(int? leaseId)
     {
@@ -128,6 +131,11 @@ public class CreateModel : PageModel
         Leases = new SelectList(
             leases.Select(l => new { l.Id, Label = $"{l.TenantNames} — {l.Property!.Name}" }),
             "Id", "Label");
+
+        LeaseTenants = leases.ToDictionary(
+            l => l.Id,
+            l => l.Tenants.OrderBy(t => t.LastName).ThenBy(t => t.FirstName)
+                          .Select(t => new TenantOption(t.Id, t.DisplayName)).ToList());
     }
 
     private async Task LoadOutstandingAsync()

@@ -26,6 +26,9 @@ public class EditModel : PageModel
     public SelectList Leases { get; private set; } = default!;
     public List<RentalCharge> OutstandingCharges { get; private set; } = new();
     public Dictionary<int, decimal> CurrentAllocations { get; private set; } = new();
+    public Dictionary<int, List<TenantOption>> LeaseTenants { get; private set; } = new();
+
+    public record TenantOption(int Id, string DisplayName);
 
     public async Task<IActionResult> OnGetAsync(int id)
     {
@@ -69,6 +72,7 @@ public class EditModel : PageModel
         if (existing is null) return NotFound();
 
         existing.LeaseId = Payment.LeaseId;
+        existing.PaidByTenantId = Payment.PaidByTenantId;
         existing.PaidOn = Payment.PaidOn;
         existing.Amount = Payment.Amount;
         existing.Method = Payment.Method;
@@ -103,6 +107,11 @@ public class EditModel : PageModel
         Leases = new SelectList(
             leases.Select(l => new { l.Id, Label = $"{l.TenantNames} — {l.Property!.Name}" }),
             "Id", "Label");
+
+        LeaseTenants = leases.ToDictionary(
+            l => l.Id,
+            l => l.Tenants.OrderBy(t => t.LastName).ThenBy(t => t.FirstName)
+                          .Select(t => new TenantOption(t.Id, t.DisplayName)).ToList());
     }
 
     private async Task LoadOutstandingAsync()

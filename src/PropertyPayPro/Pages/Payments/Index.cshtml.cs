@@ -28,6 +28,7 @@ public class IndexModel : PageModel
         Payments = await _db.RentPayments
             .Include(p => p.Lease).ThenInclude(l => l!.Property)
             .Include(p => p.Lease).ThenInclude(l => l!.Tenants)
+            .Include(p => p.PaidByTenant)
             .Include(p => p.Allocations)
             .OrderByDescending(p => p.PaidOn)
             .ThenByDescending(p => p.Id)

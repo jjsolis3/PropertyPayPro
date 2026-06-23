@@ -14,10 +14,19 @@
                     <div asp-validation-summary="ModelOnly" class="text-danger"></div>
 
                     <div class="row">
-                        <div class="col mb-3">
+                        <div class="col-md-6 mb-3">
                             <label asp-for="Payment.LeaseId" class="form-label">Lease</label>
                             <select asp-for="Payment.LeaseId" class="form-select" asp-items="Model.Leases" id="leaseSelect"></select>
                         </div>
+                        <div class="col-md-6 mb-3">
+                            <label asp-for="Payment.PaidByTenantId" class="form-label">Paid by tenant</label>
+                            <select asp-for="Payment.PaidByTenantId" class="form-select" id="paidByTenantSelect">
+                                <option value="">(unspecified)</option>
+                            </select>
+                            <small class="text-muted">Filters automatically based on lease's tenants.</small>
+                        </div>
+                    </div>
+                    <div class="row">
                         <div class="col mb-3">
                             <label asp-for="Payment.PaidOn" class="form-label"></label>
                             <input asp-for="Payment.PaidOn" class="form-control" />
@@ -96,8 +105,14 @@
 @section Scripts {
     <partial name="_ValidationScriptsPartial" />
     <script>
+        // Lease → tenants map (server-rendered)
+        const LEASE_TENANTS = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Model.LeaseTenants));
+        const SELECTED_TENANT_ID = '@(Model.Payment.PaidByTenantId?.ToString() ?? "")';
+    </script>
+    <script>
         (function () {
             const leaseSelect = document.getElementById('leaseSelect');
+            const paidBySelect = document.getElementById('paidByTenantSelect');
             const amountInput = document.getElementById('amountInput');
             const tbody = document.getElementById('allocationTbody');
             const totalEl = document.getElementById('allocationTotal');
@@ -106,6 +121,17 @@
             const selectAllBtn = document.getElementById('selectAllBtn');
             const clearAllBtn = document.getElementById('clearAllBtn');
             const form = document.getElementById('paymentForm');
+
+            function refreshPaidByOptions(preserveSelection) {
+                const leaseId = leaseSelect.value;
+                const tenants = (LEASE_TENANTS[leaseId] || []);
+                const current = preserveSelection ? paidBySelect.value : SELECTED_TENANT_ID;
+                paidBySelect.innerHTML =
+                    '<option value="">(unspecified)</option>' +
+                    tenants.map(t => `<option value="${t.Id}" ${String(t.Id) === current ? 'selected' : ''}>${t.DisplayName}</option>`).join('');
+            }
+            leaseSelect.addEventListener('change', () => refreshPaidByOptions(false));
+            refreshPaidByOptions(true);
 
             let charges = [];
 
@@ -128,7 +154,7 @@
                         <td>
                             <input type="hidden" name="AllocationChargeIds[${i}]" value="${c.id}" />
                             <input type="number" step="0.01" min="0" max="${c.balance}" value="0"
-                                   name="AllocationAmounts[${i}]" data-row="${i}" disabled
+                                   name="AllocationAmounts[${i}]" data-row="${i}" readonly
                                    class="form-control form-control-sm alloc-amount text-end" />
                         </td>
                     </tr>
@@ -142,7 +168,7 @@
                 const i = Number(e.target.dataset.row);
                 const amt = tbody.querySelector(`.alloc-amount[data-row="${i}"]`);
                 if (e.target.checked) {
-                    amt.disabled = false;
+                    amt.removeAttribute('readonly');
                     const remaining = remainingAvailable();
                     const apply = Math.min(charges[i].balance, Math.max(0, remaining + Number(amt.value || 0)));
                     amt.value = apply > 0 ? apply.toFixed(2) : charges[i].balance.toFixed(2);
@@ -150,7 +176,7 @@
                     amt.select();
                 } else {
                     amt.value = '0';
-                    amt.disabled = true;
+                    amt.setAttribute('readonly', '');
                 }
                 recalcTotal();
             }
@@ -190,12 +216,12 @@
                     const apply = Math.min(charges[i].balance, Math.max(0, remaining));
                     if (apply > 0) {
                         check.checked = true;
-                        amt.disabled = false;
+                        amt.removeAttribute('readonly');
                         amt.value = apply.toFixed(2);
                         remaining -= apply;
                     } else {
                         check.checked = false;
-                        amt.disabled = true;
+                        amt.setAttribute('readonly', '');
                         amt.value = '0';
                     }
                 });

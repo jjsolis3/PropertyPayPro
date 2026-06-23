@@ -19,6 +19,9 @@ public class RentPayment
     public int LeaseId { get; set; }
     public Lease? Lease { get; set; }
 
+    public int? PaidByTenantId { get; set; }
+    public Tenant? PaidByTenant { get; set; }
+
     [DataType(DataType.Date)]
     public DateOnly PaidOn { get; set; }
 
