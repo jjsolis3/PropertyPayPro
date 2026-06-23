@@ -44,6 +44,12 @@ public class ApplicationDbContext : IdentityDbContext<ApplicationUser>
             .HasForeignKey(p => p.LeaseId)
             .OnDelete(DeleteBehavior.Cascade);
 
+        builder.Entity<RentPayment>()
+            .HasOne(p => p.PaidByTenant)
+            .WithMany()
+            .HasForeignKey(p => p.PaidByTenantId)
+            .OnDelete(DeleteBehavior.SetNull);
+
         builder.Entity<RentalCharge>()
             .HasOne(c => c.Lease)
             .WithMany(l => l.Charges)

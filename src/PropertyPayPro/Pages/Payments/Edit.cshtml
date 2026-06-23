@@ -16,10 +16,18 @@
                     <div asp-validation-summary="ModelOnly" class="text-danger"></div>
 
                     <div class="row">
-                        <div class="col mb-3">
+                        <div class="col-md-6 mb-3">
                             <label asp-for="Payment.LeaseId" class="form-label">Lease</label>
-                            <select asp-for="Payment.LeaseId" class="form-select" asp-items="Model.Leases"></select>
+                            <select asp-for="Payment.LeaseId" class="form-select" asp-items="Model.Leases" id="leaseSelect"></select>
                         </div>
+                        <div class="col-md-6 mb-3">
+                            <label asp-for="Payment.PaidByTenantId" class="form-label">Paid by tenant</label>
+                            <select asp-for="Payment.PaidByTenantId" class="form-select" id="paidByTenantSelect">
+                                <option value="">(unspecified)</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="row">
                         <div class="col mb-3">
                             <label asp-for="Payment.PaidOn" class="form-label"></label>
                             <input asp-for="Payment.PaidOn" class="form-control" />
@@ -89,7 +97,7 @@
                                             <input type="hidden" name="AllocationChargeIds[@i]" value="@c.Id" />
                                             <input type="number" step="0.01" min="0" max="@maxAllowed"
                                                    name="AllocationAmounts[@i]" value="@current.ToString("0.00")"
-                                                   data-row="@i" @(isChecked ? "" : "disabled")
+                                                   data-row="@i" @(isChecked ? "" : "readonly")
                                                    class="form-control form-control-sm alloc-amount text-end" />
                                         </td>
                                     </tr>
@@ -116,11 +124,30 @@
 @section Scripts {
     <partial name="_ValidationScriptsPartial" />
     <script>
+        const LEASE_TENANTS = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Model.LeaseTenants));
+        const SELECTED_TENANT_ID = '@(Model.Payment.PaidByTenantId?.ToString() ?? "")';
+    </script>
+    <script>
         (function () {
+            const leaseSelect = document.getElementById('leaseSelect');
+            const paidBySelect = document.getElementById('paidByTenantSelect');
             const amountInput = document.getElementById('amountInput');
             const tbody = document.getElementById('allocationTbody');
             const totalEl = document.getElementById('allocationTotal');
             const form = document.getElementById('paymentForm');
+
+            function refreshPaidByOptions(preserveSelection) {
+                if (!paidBySelect || !leaseSelect) return;
+                const leaseId = leaseSelect.value;
+                const tenants = (LEASE_TENANTS[leaseId] || []);
+                const current = preserveSelection ? (paidBySelect.value || SELECTED_TENANT_ID) : '';
+                paidBySelect.innerHTML =
+                    '<option value="">(unspecified)</option>' +
+                    tenants.map(t => `<option value="${t.Id}" ${String(t.Id) === current ? 'selected' : ''}>${t.DisplayName}</option>`).join('');
+            }
+            if (leaseSelect) leaseSelect.addEventListener('change', () => refreshPaidByOptions(false));
+            refreshPaidByOptions(true);
+
             if (!tbody) return;
 
             const fmt = n => '$' + (Number(n) || 0).toFixed(2);
@@ -137,12 +164,12 @@
                 const i = e.target.dataset.row;
                 const amt = tbody.querySelector(`.alloc-amount[data-row="${i}"]`);
                 if (e.target.checked) {
-                    amt.disabled = false;
+                    amt.removeAttribute('readonly');
                     if (Number(amt.value) === 0) amt.value = amt.max;
                     amt.focus(); amt.select();
                 } else {
                     amt.value = '0';
-                    amt.disabled = true;
+                    amt.setAttribute('readonly', '');
                 }
                 recalc();
             }));
