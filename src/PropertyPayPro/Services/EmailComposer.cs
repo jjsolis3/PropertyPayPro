@@ -164,6 +164,60 @@ public static class EmailComposer
             <p style=""margin-top:24px;color:#555;"">Thank you for your payment.</p>");
     }
 
+    public static string ComposeReimbursementReminder(
+        string baseUrl,
+        Lease lease,
+        IEnumerable<PropertyExpense> unreimbursedExpenses)
+    {
+        var rows = new StringBuilder();
+        decimal totalDue = 0, totalReimb = 0, totalOutstanding = 0;
+        foreach (var e in unreimbursedExpenses.OrderBy(x => x.DueDate))
+        {
+            rows.Append($@"
+                <tr>
+                    <td style=""padding:8px;border:1px solid #dee2e6;"">{Esc(e.Description)}</td>
+                    <td style=""padding:8px;border:1px solid #dee2e6;"">{Esc(e.Vendor ?? "")}</td>
+                    <td style=""padding:8px;border:1px solid #dee2e6;"">{(e.DueDate?.ToString("yyyy-MM-dd") ?? "-")}</td>
+                    <td style=""padding:8px;border:1px solid #dee2e6;text-align:right;"">{e.AmountDue:C}</td>
+                    <td style=""padding:8px;border:1px solid #dee2e6;text-align:right;"">{(e.ReimbursedAmount ?? 0):C}</td>
+                    <td style=""padding:8px;border:1px solid #dee2e6;text-align:right;font-weight:bold;color:#b91c1c;"">{e.OutstandingReimbursement:C}</td>
+                </tr>");
+            totalDue += e.AmountDue;
+            totalReimb += e.ReimbursedAmount ?? 0;
+            totalOutstanding += e.OutstandingReimbursement;
+        }
+
+        var property = lease.Property!;
+        var logoUrl = $"{baseUrl}/img/brand/PPS_Logo_Main.png";
+
+        return BaseTemplate("Pass-through Expense Reimbursement", logoUrl, $@"
+            <h1 style=""text-align:center;margin:8px 0 4px;color:#333;"">{Esc(property.Name)}</h1>
+            <p style=""text-align:center;color:#666;margin:0 0 24px;"">Pass-through Expense Reimbursement Notice</p>
+
+            <p>Hello {Esc(lease.TenantNames)},</p>
+            <p>The following pass-through expenses are awaiting reimbursement per your lease terms:</p>
+
+            <table style=""width:100%;border-collapse:collapse;font-size:14px;margin-top:12px;"">
+                <thead style=""background:#f8f9fa;""><tr>
+                    <th style=""padding:8px;border:1px solid #dee2e6;text-align:left;"">Expense</th>
+                    <th style=""padding:8px;border:1px solid #dee2e6;text-align:left;"">Vendor</th>
+                    <th style=""padding:8px;border:1px solid #dee2e6;text-align:left;"">Due date</th>
+                    <th style=""padding:8px;border:1px solid #dee2e6;text-align:right;"">Amount</th>
+                    <th style=""padding:8px;border:1px solid #dee2e6;text-align:right;"">Reimbursed</th>
+                    <th style=""padding:8px;border:1px solid #dee2e6;text-align:right;"">Outstanding</th>
+                </tr></thead>
+                <tbody>{rows}</tbody>
+                <tfoot style=""background:#f8f9fa;font-weight:bold;""><tr>
+                    <td colspan=""3"" style=""padding:8px;border:1px solid #dee2e6;text-align:right;"">TOTAL</td>
+                    <td style=""padding:8px;border:1px solid #dee2e6;text-align:right;"">{totalDue:C}</td>
+                    <td style=""padding:8px;border:1px solid #dee2e6;text-align:right;"">{totalReimb:C}</td>
+                    <td style=""padding:8px;border:1px solid #dee2e6;text-align:right;color:#b91c1c;"">{totalOutstanding:C}</td>
+                </tr></tfoot>
+            </table>
+
+            <p style=""margin-top:20px;"">Please remit the outstanding amount with your next rent payment.</p>");
+    }
+
     private static string BaseTemplate(string title, string logoUrl, string innerHtml) => $@"<!doctype html>
 <html><head><meta charset=""utf-8""><title>{title}</title></head>
 <body style=""font-family:-apple-system,BlinkMacSystemFont,Segoe UI,Roboto,Helvetica,Arial,sans-serif;background:#f5f5f5;margin:0;padding:24px;color:#333;"">

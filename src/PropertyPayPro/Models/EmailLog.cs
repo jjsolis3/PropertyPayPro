@@ -7,6 +7,7 @@ public enum EmailKind
     Statement,
     Receipt,
     Reminder,
+    ReimbursementReminder,
     Other
 }
 

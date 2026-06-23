@@ -20,6 +20,8 @@ public class IndexModel : PageModel
     public decimal OpenTotal { get; private set; }
     public string TopCategoryLabel { get; private set; } = "—";
     public decimal TopCategoryAmount { get; private set; }
+    public decimal UnreimbursedTotal { get; private set; }
+    public int UnreimbursedCount { get; private set; }
 
     public async Task OnGetAsync()
     {
@@ -56,5 +58,9 @@ public class IndexModel : PageModel
             TopCategoryLabel = ytd.Category.ToString();
             TopCategoryAmount = ytd.Total;
         }
+
+        var unreimbursed = Expenses.Where(e => e.PassThroughToTenant && e.OutstandingReimbursement > 0).ToList();
+        UnreimbursedCount = unreimbursed.Count;
+        UnreimbursedTotal = unreimbursed.Sum(e => e.OutstandingReimbursement);
     }
 }

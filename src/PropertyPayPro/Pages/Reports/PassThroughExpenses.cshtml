@@ -1,0 +1,189 @@
+@page
+@model PropertyPayPro.Pages.Reports.PassThroughExpensesModel
+@using PropertyPayPro.Pages.Shared
+@{
+    ViewData["Title"] = "Pass-through Expenses";
+}
+
+<div class="d-flex justify-content-between align-items-center mb-3 d-print-none">
+    <div>
+        <h1 class="h3 mb-0">Pass-through Expenses</h1>
+        <p class="text-muted mb-0">Expenses you paid that should be reimbursed by tenants.</p>
+    </div>
+    <div>
+        <button type="button" class="btn btn-outline-secondary" onclick="window.print()">Print</button>
+        <a asp-page="PassThroughExpenses"
+           asp-route-FromDate="@Model.FromDate"
+           asp-route-ToDate="@Model.ToDate"
+           asp-route-PropertyId="@Model.PropertyId"
+           asp-route-Status="@Model.Status"
+           asp-route-Category="@Model.Category"
+           asp-route-export="csv"
+           class="btn btn-outline-success">Export CSV</a>
+        @if (Model.MailConfigured && Model.TotalOutstanding > 0)
+        {
+            <form method="post" asp-page-handler="SendReminders" class="d-inline">
+                <input type="hidden" name="FromDate" value="@Model.FromDate" />
+                <input type="hidden" name="ToDate" value="@Model.ToDate" />
+                <input type="hidden" name="PropertyId" value="@Model.PropertyId" />
+                <input type="hidden" name="Status" value="@Model.Status" />
+                <input type="hidden" name="Category" value="@Model.Category" />
+                <button type="submit" class="btn btn-primary"
+                        onclick="return confirm('Email a reimbursement notice to every tenant with outstanding pass-through expenses?');">
+                    Email Reminders to All
+                </button>
+            </form>
+        }
+    </div>
+</div>
+
+@if (TempData["Message"] is string msg)
+{
+    <div class="alert alert-success alert-dismissible fade show">@msg
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+}
+@if (TempData["Error"] is string err)
+{
+    <div class="alert alert-danger alert-dismissible fade show">@err
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+}
+
+<div class="card mb-3 d-print-none">
+    <div class="card-body">
+        <form method="get" class="row g-2 align-items-end">
+            <div class="col-md-2">
+                <label class="form-label">From due</label>
+                <input type="date" name="FromDate" value="@Model.FromDate?.ToString("yyyy-MM-dd")" class="form-control" />
+            </div>
+            <div class="col-md-2">
+                <label class="form-label">To due</label>
+                <input type="date" name="ToDate" value="@Model.ToDate?.ToString("yyyy-MM-dd")" class="form-control" />
+            </div>
+            <div class="col-md-2">
+                <label class="form-label">Property</label>
+                <select name="PropertyId" class="form-select">
+                    <option value="">All</option>
+                    @foreach (var p in Model.PropertyOptions)
+                    {
+                        <option value="@p.Id" selected="@(Model.PropertyId == p.Id)">@p.Name</option>
+                    }
+                </select>
+            </div>
+            <div class="col-md-2">
+                <label class="form-label">Category</label>
+                <select name="Category" class="form-select">
+                    <option value="">All</option>
+                    @foreach (var c in Enum.GetValues<PropertyPayPro.Models.ExpenseCategory>())
+                    {
+                        <option value="@c" selected="@(Model.Category == c)">@c</option>
+                    }
+                </select>
+            </div>
+            <div class="col-md-2">
+                <label class="form-label">Status</label>
+                <select name="Status" class="form-select">
+                    @foreach (var s in Enum.GetValues<PropertyPayPro.Pages.Reports.PassThroughExpensesModel.FilterStatus>())
+                    {
+                        <option value="@s" selected="@(Model.Status == s)">@s</option>
+                    }
+                </select>
+            </div>
+            <div class="col-md-2">
+                <button type="submit" class="btn btn-primary w-100">Apply</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<div class="row">
+    <partial name="_KpiCard" model="@(new KpiCardModel {
+        Label = "Total Expense", Value = Model.TotalExpense.ToString("C"),
+        Color = "primary", Icon = "flaticon-381-list" })" />
+    <partial name="_KpiCard" model="@(new KpiCardModel {
+        Label = "Reimbursed", Value = Model.TotalReimbursed.ToString("C"),
+        Color = "success", Icon = "las la-dollar-sign" })" />
+    <partial name="_KpiCard" model="@(new KpiCardModel {
+        Label = "Outstanding", Value = Model.TotalOutstanding.ToString("C"),
+        SubText = "Tenant owes",
+        Color = Model.TotalOutstanding > 0 ? "danger" : "success",
+        Icon = "flaticon-381-warning" })" />
+    <partial name="_KpiCard" model="@(new KpiCardModel {
+        Label = "Expenses Shown", Value = Model.Expenses.Count.ToString(),
+        SubText = Model.Status.ToString(),
+        Color = "info", Icon = "flaticon-381-notepad" })" />
+</div>
+
+<div class="card">
+    <div class="card-body p-0">
+        <table class="table table-striped mb-0">
+            <thead class="table-light">
+                <tr>
+                    <th>Property</th>
+                    <th>Category</th>
+                    <th>Vendor</th>
+                    <th>Description</th>
+                    <th>Due</th>
+                    <th class="text-end">Amount</th>
+                    <th class="text-end">Reimbursed</th>
+                    <th class="text-end">Outstanding</th>
+                    <th>Status</th>
+                </tr>
+            </thead>
+            <tbody>
+            @foreach (var e in Model.Expenses)
+            {
+                <tr>
+                    <td>@e.Property?.Name</td>
+                    <td>@e.Category</td>
+                    <td>@e.Vendor</td>
+                    <td>@e.Description</td>
+                    <td>@(e.DueDate?.ToString("yyyy-MM-dd") ?? "—")</td>
+                    <td class="text-end">@e.AmountDue.ToString("C")</td>
+                    <td class="text-end">
+                        @if (e.IsReimbursed)
+                        {
+                            @(e.ReimbursedAmount?.ToString("C") ?? "—")
+                            <br /><small class="text-muted">@e.ReimbursedOn?.ToString("yyyy-MM-dd")</small>
+                        }
+                        else { <span class="text-muted">—</span> }
+                    </td>
+                    <td class="text-end @(e.OutstandingReimbursement > 0 ? "fw-bold text-danger" : "")">
+                        @e.OutstandingReimbursement.ToString("C")
+                    </td>
+                    <td>
+                        @if (e.IsReimbursed && e.OutstandingReimbursement == 0)
+                        { <span class="badge bg-success">Reimbursed</span> }
+                        else if (e.IsReimbursed)
+                        { <span class="badge bg-warning text-dark">Partial</span> }
+                        else
+                        { <span class="badge bg-danger">Owed</span> }
+                    </td>
+                </tr>
+            }
+            @if (!Model.Expenses.Any())
+            {
+                <tr><td colspan="9" class="text-center text-muted py-3">No expenses match the filters.</td></tr>
+            }
+            </tbody>
+            <tfoot class="table-light fw-bold">
+                <tr>
+                    <td colspan="5" class="text-end">Totals</td>
+                    <td class="text-end">@Model.TotalExpense.ToString("C")</td>
+                    <td class="text-end">@Model.TotalReimbursed.ToString("C")</td>
+                    <td class="text-end text-danger">@Model.TotalOutstanding.ToString("C")</td>
+                    <td></td>
+                </tr>
+            </tfoot>
+        </table>
+    </div>
+</div>
+
+<style>
+    @@media print {
+        nav, footer, .d-print-none, .deznav, .header { display: none !important; }
+        .content-body { margin-left: 0 !important; }
+        .card { border: 1px solid #dee2e6 !important; }
+    }
+</style>
