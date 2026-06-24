@@ -4,18 +4,85 @@
     ViewData["Title"] = "Expense";
 }
 
-<h1>@Model.Expense!.Description</h1>
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <h1 class="h3 mb-0">@Model.Expense!.Description</h1>
+    <div>
+        @if (Model.Expense.PassThroughToTenant && !Model.Expense.IsReimbursed)
+        {
+            <form method="post" asp-page-handler="MarkReimbursed" asp-route-id="@Model.Expense.Id" class="d-inline">
+                <button type="submit" class="btn btn-outline-success"
+                        onclick="return confirm('Mark this expense as fully reimbursed today?');">
+                    Mark Reimbursed
+                </button>
+            </form>
+        }
+        @if (Model.Expense.IsReimbursed)
+        {
+            <form method="post" asp-page-handler="ClearReimbursed" asp-route-id="@Model.Expense.Id" class="d-inline">
+                <button type="submit" class="btn btn-outline-warning"
+                        onclick="return confirm('Clear the reimbursement record?');">
+                    Clear Reimbursement
+                </button>
+            </form>
+        }
+        <a asp-page="Edit" asp-route-id="@Model.Expense.Id" class="btn btn-primary">Edit</a>
+        <a asp-page="Index" class="btn btn-outline-secondary">Back</a>
+    </div>
+</div>
 
-<dl class="row">
-    <dt class="col-sm-3">Property</dt><dd class="col-sm-9">@Model.Expense.Property!.Name</dd>
-    <dt class="col-sm-3">Category</dt><dd class="col-sm-9">@Model.Expense.Category</dd>
-    <dt class="col-sm-3">Vendor</dt><dd class="col-sm-9">@Model.Expense.Vendor</dd>
-    <dt class="col-sm-3">Amount</dt><dd class="col-sm-9">@Model.Expense.AmountDue.ToString("C")</dd>
-    <dt class="col-sm-3">Due</dt><dd class="col-sm-9">@(Model.Expense.DueDate?.ToString("yyyy-MM-dd") ?? "—")</dd>
-    <dt class="col-sm-3">Paid</dt><dd class="col-sm-9">@(Model.Expense.PaidOn?.ToString("yyyy-MM-dd") ?? "Unpaid")</dd>
-    <dt class="col-sm-3">Pass through</dt><dd class="col-sm-9">@(Model.Expense.PassThroughToTenant ? "Yes" : "No")</dd>
-    <dt class="col-sm-3">Notes</dt><dd class="col-sm-9">@Model.Expense.Notes</dd>
-</dl>
+@if (TempData["Message"] is string msg)
+{
+    <div class="alert alert-success alert-dismissible fade show">@msg
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+}
 
-<a asp-page="Edit" asp-route-id="@Model.Expense.Id" class="btn btn-primary">Edit</a>
-<a asp-page="Index" class="btn btn-outline-secondary">Back</a>
+<div class="card">
+    <div class="card-body">
+        <dl class="row mb-0">
+            <dt class="col-sm-3">Property</dt><dd class="col-sm-9">@Model.Expense.Property!.Name</dd>
+            <dt class="col-sm-3">Category</dt><dd class="col-sm-9">@Model.Expense.Category</dd>
+            <dt class="col-sm-3">Vendor</dt><dd class="col-sm-9">@Model.Expense.Vendor</dd>
+            <dt class="col-sm-3">Amount</dt><dd class="col-sm-9">@Model.Expense.AmountDue.ToString("C")</dd>
+            <dt class="col-sm-3">Due date</dt><dd class="col-sm-9">@(Model.Expense.DueDate?.ToString("yyyy-MM-dd") ?? "—")</dd>
+            <dt class="col-sm-3">Paid on</dt><dd class="col-sm-9">@(Model.Expense.PaidOn?.ToString("yyyy-MM-dd") ?? "Unpaid")</dd>
+            <dt class="col-sm-3">Pass through?</dt>
+            <dd class="col-sm-9">
+                @if (Model.Expense.PassThroughToTenant)
+                {
+                    <span class="badge bg-info">Yes — tenant should reimburse</span>
+                }
+                else
+                {
+                    <span class="badge bg-secondary">No</span>
+                }
+            </dd>
+            @if (Model.Expense.PassThroughToTenant)
+            {
+                <dt class="col-sm-3">Reimbursement</dt>
+                <dd class="col-sm-9">
+                    @if (Model.Expense.IsReimbursed)
+                    {
+                        <span class="badge bg-success">Reimbursed</span>
+                        <span class="ms-2">@Model.Expense.ReimbursedAmount?.ToString("C") on @Model.Expense.ReimbursedOn?.ToString("yyyy-MM-dd")</span>
+                        @if (Model.Expense.ReimbursedAmount < Model.Expense.AmountDue)
+                        {
+                            <div class="text-danger small mt-1">
+                                Outstanding: @Model.Expense.OutstandingReimbursement.ToString("C")
+                            </div>
+                        }
+                    }
+                    else
+                    {
+                        <span class="badge bg-danger">Not reimbursed</span>
+                        <span class="ms-2 text-danger">Outstanding: @Model.Expense.AmountDue.ToString("C")</span>
+                    }
+                </dd>
+            }
+            @if (!string.IsNullOrWhiteSpace(Model.Expense.Notes))
+            {
+                <dt class="col-sm-3">Notes</dt><dd class="col-sm-9">@Model.Expense.Notes</dd>
+            }
+        </dl>
+    </div>
+</div>

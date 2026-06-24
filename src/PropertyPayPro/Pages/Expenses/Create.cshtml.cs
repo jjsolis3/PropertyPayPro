@@ -32,6 +32,15 @@ public class CreateModel : PageModel
             await LoadAsync();
             return Page();
         }
+        // If reimbursed date is set but amount isn't, default to full expense amount.
+        if (Expense.ReimbursedOn.HasValue && !Expense.ReimbursedAmount.HasValue)
+            Expense.ReimbursedAmount = Expense.AmountDue;
+        // Clear reimbursement fields if not pass-through (avoids leftover data).
+        if (!Expense.PassThroughToTenant)
+        {
+            Expense.ReimbursedOn = null;
+            Expense.ReimbursedAmount = null;
+        }
         _db.PropertyExpenses.Add(Expense);
         await _db.SaveChangesAsync();
         return RedirectToPage("Index");

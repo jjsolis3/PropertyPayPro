@@ -1,0 +1,190 @@
+@page
+@model PropertyPayPro.Pages.Reports.PaymentsReportModel
+@using PropertyPayPro.Pages.Shared
+@{
+    ViewData["Title"] = "Payments Report";
+}
+
+<div class="d-flex justify-content-between align-items-center mb-3 d-print-none">
+    <h1 class="h3 mb-0">Payments Report</h1>
+    <div>
+        <button type="button" class="btn btn-outline-secondary" onclick="window.print()">Print</button>
+        <a asp-page="Payments"
+           asp-route-FromDate="@Model.FromDate"
+           asp-route-ToDate="@Model.ToDate"
+           asp-route-LeaseId="@Model.LeaseId"
+           asp-route-PropertyId="@Model.PropertyId"
+           asp-route-Method="@Model.Method"
+           asp-route-TenantSearch="@Model.TenantSearch"
+           asp-route-export="csv"
+           class="btn btn-outline-success">Export CSV</a>
+    </div>
+</div>
+
+<div class="card mb-3 d-print-none">
+    <div class="card-body">
+        <form method="get" class="row g-2 align-items-end">
+            <div class="col-md-2">
+                <label class="form-label">From</label>
+                <input type="date" name="FromDate" value="@Model.FromDate?.ToString("yyyy-MM-dd")" class="form-control" />
+            </div>
+            <div class="col-md-2">
+                <label class="form-label">To</label>
+                <input type="date" name="ToDate" value="@Model.ToDate?.ToString("yyyy-MM-dd")" class="form-control" />
+            </div>
+            <div class="col-md-2">
+                <label class="form-label">Property</label>
+                <select name="PropertyId" class="form-select">
+                    <option value="">All</option>
+                    @foreach (var p in Model.PropertyOptions)
+                    {
+                        <option value="@p.Id" selected="@(Model.PropertyId == p.Id)">@p.Name</option>
+                    }
+                </select>
+            </div>
+            <div class="col-md-2">
+                <label class="form-label">Lease</label>
+                <select name="LeaseId" class="form-select">
+                    <option value="">All</option>
+                    @foreach (var l in Model.LeaseOptions)
+                    {
+                        <option value="@l.Id" selected="@(Model.LeaseId == l.Id)">@l.TenantNames — @l.Property!.Name</option>
+                    }
+                </select>
+            </div>
+            <div class="col-md-1">
+                <label class="form-label">Method</label>
+                <select name="Method" class="form-select">
+                    <option value="">All</option>
+                    @foreach (var m in Enum.GetValues<PropertyPayPro.Models.PaymentMethod>())
+                    {
+                        <option value="@m" selected="@(Model.Method == m)">@m</option>
+                    }
+                </select>
+            </div>
+            <div class="col-md-2">
+                <label class="form-label">Paid by (search)</label>
+                <input name="TenantSearch" value="@Model.TenantSearch" class="form-control" placeholder="e.g. Cruz" />
+            </div>
+            <div class="col-md-1">
+                <button type="submit" class="btn btn-primary w-100">Apply</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<div class="row">
+    <partial name="_KpiCard" model="@(new KpiCardModel {
+        Label = "Total Collected", Value = Model.TotalCollected.ToString("C"),
+        Color = "success", Icon = "las la-dollar-sign" })" />
+    <partial name="_KpiCard" model="@(new KpiCardModel {
+        Label = "Payments", Value = Model.PaymentCount.ToString(),
+        Color = "primary", Icon = "flaticon-381-notepad" })" />
+    <partial name="_KpiCard" model="@(new KpiCardModel {
+        Label = "Average Payment", Value = Model.AveragePayment.ToString("C"),
+        Color = "info", Icon = "flaticon-381-list" })" />
+    <partial name="_KpiCard" model="@(new KpiCardModel {
+        Label = "Top Tenant",
+        Value = Model.ByTenant.FirstOrDefault()?.TenantName ?? "—",
+        SubText = Model.ByTenant.FirstOrDefault()?.Total.ToString("C") ?? "",
+        Color = "warning", Icon = "flaticon-381-user-7" })" />
+</div>
+
+<div class="row g-3">
+    <div class="col-lg-4">
+        <div class="card mb-3">
+            <div class="card-header"><h4 class="card-title mb-0">By Paying Tenant</h4></div>
+            <div class="card-body p-0">
+                <table class="table mb-0">
+                    <thead class="table-light"><tr><th>Tenant</th><th class="text-end">#</th><th class="text-end">Total</th></tr></thead>
+                    <tbody>
+                    @foreach (var r in Model.ByTenant)
+                    {
+                        <tr>
+                            <td>@r.TenantName</td>
+                            <td class="text-end">@r.Count</td>
+                            <td class="text-end fw-bold">@r.Total.ToString("C")</td>
+                        </tr>
+                    }
+                    @if (!Model.ByTenant.Any())
+                    {
+                        <tr><td colspan="3" class="text-center text-muted py-3">No payments match.</td></tr>
+                    }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <div class="card mb-3">
+            <div class="card-header"><h4 class="card-title mb-0">By Month</h4></div>
+            <div class="card-body p-0">
+                <table class="table mb-0">
+                    <thead class="table-light"><tr><th>Month</th><th class="text-end">#</th><th class="text-end">Total</th></tr></thead>
+                    <tbody>
+                    @foreach (var r in Model.ByMonth)
+                    {
+                        <tr>
+                            <td>@r.Month.ToString("MMM yyyy")</td>
+                            <td class="text-end">@r.Count</td>
+                            <td class="text-end fw-bold">@r.Total.ToString("C")</td>
+                        </tr>
+                    }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-lg-8">
+        <div class="card">
+            <div class="card-header"><h4 class="card-title mb-0">Detail (@Model.PaymentCount payments)</h4></div>
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table table-striped mb-0">
+                        <thead class="table-light">
+                            <tr>
+                                <th>Date</th>
+                                <th>Property</th>
+                                <th>Paid by</th>
+                                <th>Method</th>
+                                <th>Reference</th>
+                                <th class="text-end">Amount</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                        @foreach (var p in Model.Payments)
+                        {
+                            <tr>
+                                <td>@p.PaidOn.ToString("yyyy-MM-dd")</td>
+                                <td>@p.Lease?.Property?.Name</td>
+                                <td>
+                                    @{ var paidBy = (p.Reference ?? "").Split(" from ").LastOrDefault() ?? ""; }
+                                    @(string.IsNullOrWhiteSpace(paidBy) ? p.Lease?.TenantNames : paidBy)
+                                </td>
+                                <td><span class="badge badge-outline-primary">@p.Method</span></td>
+                                <td><small>@p.Reference</small></td>
+                                <td class="text-end fw-bold">@p.Amount.ToString("C")</td>
+                            </tr>
+                        }
+                        @if (!Model.Payments.Any())
+                        {
+                            <tr><td colspan="6" class="text-center text-muted py-3">No payments match the filters.</td></tr>
+                        }
+                        </tbody>
+                        <tfoot class="table-light fw-bold">
+                            <tr><td colspan="5" class="text-end">Total</td><td class="text-end">@Model.TotalCollected.ToString("C")</td></tr>
+                        </tfoot>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    @@media print {
+        nav, footer, .d-print-none, .deznav, .header { display: none !important; }
+        .content-body { margin-left: 0 !important; }
+        .card { border: 1px solid #dee2e6 !important; }
+    }
+</style>

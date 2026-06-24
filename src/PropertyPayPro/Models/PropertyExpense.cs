@@ -41,9 +41,23 @@ public class PropertyExpense
 
     public bool PassThroughToTenant { get; set; }
 
+    [DataType(DataType.Date)]
+    public DateOnly? ReimbursedOn { get; set; }
+
+    [Range(0, 1_000_000)]
+    [Column(TypeName = "numeric(10,2)")]
+    public decimal? ReimbursedAmount { get; set; }
+
     [StringLength(500)]
     public string? Notes { get; set; }
 
     [NotMapped]
     public bool IsPaid => PaidOn.HasValue;
+
+    [NotMapped]
+    public bool IsReimbursed => ReimbursedOn.HasValue;
+
+    [NotMapped]
+    public decimal OutstandingReimbursement =>
+        PassThroughToTenant ? Math.Max(0, AmountDue - (ReimbursedAmount ?? 0m)) : 0m;
 }

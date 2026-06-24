@@ -35,6 +35,13 @@ public class EditModel : PageModel
             await LoadAsync();
             return Page();
         }
+        if (Expense.ReimbursedOn.HasValue && !Expense.ReimbursedAmount.HasValue)
+            Expense.ReimbursedAmount = Expense.AmountDue;
+        if (!Expense.PassThroughToTenant)
+        {
+            Expense.ReimbursedOn = null;
+            Expense.ReimbursedAmount = null;
+        }
         _db.Attach(Expense).State = EntityState.Modified;
         await _db.SaveChangesAsync();
         return RedirectToPage("Index");

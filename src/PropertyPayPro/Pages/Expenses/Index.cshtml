@@ -22,10 +22,12 @@
         SubText = Model.OpenTotal.ToString("C"),
         Color = "warning", Icon = "flaticon-381-warning" })" />
     <partial name="_KpiCard" model="@(new KpiCardModel {
-        Label = $"Top Category ({Model.TopCategoryLabel})",
-        Value = Model.TopCategoryAmount.ToString("C"),
-        SubText = "Year to date",
-        Color = "success", Icon = "flaticon-381-notepad" })" />
+        Label = "Unreimbursed Pass-through",
+        Value = Model.UnreimbursedTotal.ToString("C"),
+        SubText = $"{Model.UnreimbursedCount} expense(s) owed by tenants",
+        Color = Model.UnreimbursedTotal > 0 ? "danger" : "success",
+        Icon = "flaticon-381-warning",
+        LinkPage = "/Reports/PassThroughExpenses", LinkText = "View report" })" />
 </div>
 
 <div class="card">
@@ -58,7 +60,15 @@
                     <td>
                         @if (e.IsPaid) { <span class="badge bg-success">Paid</span> }
                         else { <span class="badge bg-secondary">Open</span> }
-                        @if (e.PassThroughToTenant) { <span class="badge bg-info ms-1">Pass-through</span> }
+                        @if (e.PassThroughToTenant)
+                        {
+                            if (e.IsReimbursed && e.OutstandingReimbursement == 0)
+                            { <span class="badge bg-success ms-1" title="Reimbursed in full">Reimbursed</span> }
+                            else if (e.IsReimbursed)
+                            { <span class="badge bg-warning text-dark ms-1" title="Partially reimbursed">Partial reimb.</span> }
+                            else
+                            { <span class="badge bg-danger ms-1" title="Tenant owes reimbursement">Owed</span> }
+                        }
                     </td>
                     <td class="text-end">
                         <a asp-page="Details" asp-route-id="@e.Id" class="btn btn-sm btn-outline-secondary">Details</a>

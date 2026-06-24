@@ -83,6 +83,43 @@ public class MailService
             leaseId: payment.LeaseId, paymentId: payment.Id, ct: ct);
     }
 
+    public async Task<EmailLog> SendReimbursementReminderAsync(string baseUrl, int leaseId, CancellationToken ct = default)
+    {
+        var lease = await _db.Leases
+            .Include(l => l.Property)
+            .Include(l => l.Tenants)
+            .FirstOrDefaultAsync(l => l.Id == leaseId, ct)
+            ?? throw new InvalidOperationException($"Lease {leaseId} not found.");
+
+        var tenant = lease.Tenants.FirstOrDefault(t => t.ReceiveReminders && !string.IsNullOrWhiteSpace(t.Email));
+        if (tenant is null || string.IsNullOrWhiteSpace(tenant.Email))
+        {
+            return await LogAsync(EmailKind.ReimbursementReminder, EmailStatus.Failed,
+                "(no eligible tenant email)",
+                $"Reimbursement reminder for {lease.Property!.Name}",
+                "No tenant on this lease has reminders enabled or an email on file.",
+                leaseId: leaseId, ct: ct);
+        }
+
+        var expenses = await _db.PropertyExpenses
+            .Where(e => e.PropertyId == lease.PropertyId && e.PassThroughToTenant)
+            .ToListAsync(ct);
+        var unreimbursed = expenses.Where(e => e.OutstandingReimbursement > 0).ToList();
+
+        if (unreimbursed.Count == 0)
+        {
+            return await LogAsync(EmailKind.ReimbursementReminder, EmailStatus.Failed, tenant.Email!,
+                $"Reimbursement reminder for {lease.Property!.Name}",
+                "No unreimbursed pass-through expenses for this lease.",
+                leaseId: leaseId, ct: ct);
+        }
+
+        var subject = $"Reimbursement Notice — {lease.Property!.Name}";
+        var body = EmailComposer.ComposeReimbursementReminder(baseUrl, lease, unreimbursed);
+        return await TrySendAsync(EmailKind.ReimbursementReminder, tenant.Email!, subject, body,
+            attachments: null, leaseId: leaseId, ct: ct);
+    }
+
     private async Task<List<EmailAttachment>> LoadAttachmentsAsync(GeneratedDocument doc, CancellationToken ct)
     {
         await using var stream = await _storage.OpenReadAsync(doc.StorageKey, ct);
