@@ -58,7 +58,8 @@
         <div class="card mb-3">
             <div class="card-header"><h4 class="card-title mb-0">Leases</h4></div>
             <div class="card-body p-0">
-                <table class="table mb-0">
+                <div class="table-responsive">
+                <table class="table mb-0 js-datatable" data-order='[[1,"desc"]]' data-page-length="10">
                     <thead class="table-light">
                         <tr><th>Tenant(s)</th><th>Term</th><th class="text-end">Monthly</th><th>Status</th><th></th></tr>
                     </thead>
@@ -89,6 +90,7 @@
                     }
                     </tbody>
                 </table>
+                </div>
             </div>
         </div>
 
@@ -98,7 +100,8 @@
                 <a asp-page="/Expenses/Index" class="btn btn-sm btn-outline-primary">All expenses</a>
             </div>
             <div class="card-body p-0">
-                <table class="table mb-0">
+                <div class="table-responsive">
+                <table class="table mb-0 js-datatable" data-order='[[3,"desc"]]' data-page-length="10">
                     <thead class="table-light">
                         <tr><th>Category</th><th>Description</th><th>Vendor</th><th>Due</th><th>Paid</th><th class="text-end">Amount</th></tr>
                     </thead>
@@ -120,6 +123,7 @@
                     }
                     </tbody>
                 </table>
+                </div>
             </div>
         </div>
     </div>
@@ -128,7 +132,8 @@
         <div class="card mb-3">
             <div class="card-header"><h4 class="card-title mb-0">Outstanding Bills</h4></div>
             <div class="card-body p-0">
-                <table class="table table-sm mb-0">
+                <div class="table-responsive">
+                <table class="table table-sm mb-0 js-datatable" data-order='[[1,"asc"]]' data-page-length="10">
                     <thead class="table-light"><tr><th>Tenant</th><th>Period</th><th class="text-end">Balance</th></tr></thead>
                     <tbody>
                     @foreach (var c in Model.UnpaidBills)
@@ -145,6 +150,7 @@
                     }
                     </tbody>
                 </table>
+                </div>
             </div>
         </div>
 
@@ -153,8 +159,9 @@
                 <h4 class="card-title mb-0">Open Service Tickets</h4>
                 <a asp-page="/ServiceTickets/Create" class="btn btn-sm btn-outline-success">New</a>
             </div>
-            <div class="card-body p-0" style="max-height: 320px; overflow-y: auto;">
-                <table class="table table-sm mb-0">
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                <table class="table table-sm mb-0 js-datatable" data-order='[[2,"asc"]]' data-page-length="10">
                     <thead class="table-light"><tr><th>Title</th><th>Category</th><th>Status</th></tr></thead>
                     <tbody>
                     @foreach (var t in Model.OpenTickets)
@@ -178,6 +185,7 @@
                     }
                     </tbody>
                 </table>
+                </div>
             </div>
         </div>
 

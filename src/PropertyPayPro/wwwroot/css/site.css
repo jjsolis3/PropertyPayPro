@@ -1,6 +1,9 @@
-html { position: relative; min-height: 100%; }
-body { margin-bottom: 60px; }
-.footer { padding: 12px 0; }
+/* Layout fix: Mophy's body height:100% + main-wrapper overflow:hidden was
+   clipping pages taller than the viewport. Let body grow with content. */
+html, body { height: auto; min-height: 100%; }
+body { margin: 0; }
+#main-wrapper { overflow: visible !important; min-height: 100vh; }
+.content-body { min-height: calc(100vh - var(--dz-header-height) - 70px); }
 
 /* PropertyPayPro brand logos: show only ONE at a time based on sidebar state.
    Default (sidebar expanded): wordmark only.
@@ -16,3 +19,28 @@ body { margin-bottom: 60px; }
     .nav-header .logo-abbr { display: inline-block; }
     .nav-header .brand-title { display: none; }
 }
+
+/* DataTables polish to fit Mophy card style */
+table.dataTable { width: 100% !important; }
+.dataTables_wrapper { padding: 0.75rem 1rem; }
+.dataTables_wrapper .dataTables_filter input,
+.dataTables_wrapper .dataTables_length select {
+    border: 1px solid var(--bs-border-color, #e6e6e6);
+    border-radius: 0.5rem;
+    padding: 0.25rem 0.5rem;
+    margin-left: 0.5rem;
+}
+.dataTables_wrapper .dataTables_paginate .paginate_button {
+    padding: 0.25rem 0.6rem;
+    margin-left: 0.15rem;
+    border-radius: 0.4rem;
+}
+.dataTables_wrapper .dataTables_paginate .paginate_button.current,
+.dataTables_wrapper .dataTables_paginate .paginate_button.current:hover {
+    background: var(--pps-primary, var(--primary, #6418c3)) !important;
+    color: #fff !important;
+    border: 1px solid var(--pps-primary, var(--primary, #6418c3)) !important;
+}
+.dataTables_wrapper .dataTables_info { padding-top: 0.5rem; }
+table.dataTable thead th { border-bottom: 2px solid rgba(0,0,0,0.06); }
+table.dataTable thead th.no-sort { background-image: none !important; cursor: default; }
