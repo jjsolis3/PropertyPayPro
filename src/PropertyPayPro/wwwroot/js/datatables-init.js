@@ -26,6 +26,17 @@
             var $t = $(this);
             if ($.fn.dataTable.isDataTable($t)) return;
 
+            // Empty-state rows use <td colspan="N"> which would trip DataTables'
+            // "incorrect column count" check. Strip them so DataTables shows its
+            // own zeroRecords message via language.zeroRecords below.
+            $t.find('tbody > tr').each(function () {
+                var $row = $(this);
+                var tds = $row.children('td');
+                if (tds.length === 1 && tds.attr('colspan')) {
+                    $row.remove();
+                }
+            });
+
             var columnDefs = [];
             $t.find('thead th').each(function (i, th) {
                 var $th = $(th);

@@ -32,16 +32,22 @@
 <h3>Payments applied</h3>
 @if (Model.Charge.Allocations.Any())
 {
-    <table class="table table-sm">
-        <thead><tr><th>Date</th><th>Method</th><th>Reference</th><th class="text-end">Amount applied</th><th></th></tr></thead>
+    <table class="table table-sm js-datatable" data-order='[[0,"desc"]]' data-page-length="10">
+        <thead><tr><th>Date</th><th>Paid by</th><th>Method</th><th>Reference</th><th class="text-end">Amount applied</th><th></th></tr></thead>
         <tbody>
         @foreach (var a in Model.Charge.Allocations.OrderByDescending(x => x.Payment!.PaidOn))
         {
             <tr>
                 <td>@a.Payment!.PaidOn.ToString("yyyy-MM-dd")</td>
-                <td>@a.Payment.Method</td>
+                <td>
+                    @if (a.Payment.PaidByTenant is not null)
+                    { <span class="fw-semibold">@a.Payment.PaidByTenant.DisplayName</span> }
+                    else
+                    { <span class="text-muted">(unspecified)</span> }
+                </td>
+                <td><span class="badge badge-outline-primary">@a.Payment.Method</span></td>
                 <td>@a.Payment.Reference</td>
-                <td class="text-end">@a.Amount.ToString("C")</td>
+                <td class="text-end fw-bold">@a.Amount.ToString("C")</td>
                 <td class="text-end">
                     <a asp-page="/Receipts/Show" asp-route-id="@a.RentPaymentId" class="btn btn-sm btn-outline-secondary">Receipt</a>
                 </td>
