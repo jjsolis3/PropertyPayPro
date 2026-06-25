@@ -18,6 +18,8 @@
         headerBadges.Add(new() { Text = "Reminders", Color = "info", Title = "Receives statements and reminders" });
     if (Model.CurrentBalance > 0)
         headerBadges.Add(new() { Text = $"Balance: {Model.CurrentBalance:C}", Color = "danger" });
+    else
+        headerBadges.Add(new() { Text = "Paid up", Color = "success" });
 
     var subtitleParts = new List<string>();
     if (!string.IsNullOrWhiteSpace(Model.Tenant.Email)) subtitleParts.Add(Model.Tenant.Email);
@@ -49,169 +51,203 @@
         Color = "primary", Icon = "flaticon-381-notepad" })" />
     <partial name="_KpiCard" model="@(new KpiCardModel {
         Label = "Lifetime Paid", Value = Model.LifetimePaid.ToString("C"),
+        SubText = $"{Model.PaymentCount} payment(s)",
         Color = "success", Icon = "las la-dollar-sign" })" />
     <partial name="_KpiCard" model="@(new KpiCardModel {
-        Label = "Current Balance", Value = Model.CurrentBalance.ToString("C"),
+        Label = "Tenant Balance", Value = Model.CurrentBalance.ToString("C"),
+        SubText = "Your share owed",
         Color = Model.CurrentBalance > 0 ? "danger" : "success",
         Icon = "flaticon-381-list" })" />
     <partial name="_KpiCard" model="@(new KpiCardModel {
         Label = "On-time %", Value = $"{Model.OnTimePercent}%",
-        SubText = "Across all paid bills",
+        SubText = "Of fully paid shares",
         Color = "info", Icon = "flaticon-381-time" })" />
 </div>
 
-<div class="row g-3">
-    <div class="col-lg-8">
-        <div class="card mb-3">
-            <div class="card-header"><h4 class="card-title mb-0">Leases</h4></div>
-            <div class="card-body p-0">
-                <table class="table mb-0">
-                    <thead class="table-light">
-                        <tr><th>Property</th><th>Term</th><th class="text-end">Monthly</th><th>Status</th><th></th></tr>
-                    </thead>
-                    <tbody>
-                    @foreach (var l in Model.Leases)
-                    {
-                        var today = DateOnly.FromDateTime(DateTime.UtcNow);
-                        var isActive = l.StartDate <= today && (l.IsMonthToMonth || l.EndDate >= today);
-                        <tr>
-                            <td>@l.Property?.Name</td>
-                            <td>
-                                @l.StartDate.ToString("yyyy-MM-dd") →
-                                @(l.IsMonthToMonth ? "M2M" : l.EndDate.ToString("yyyy-MM-dd"))
-                            </td>
-                            <td class="text-end">@l.MonthlyRent.ToString("C")</td>
-                            <td>
-                                @if (isActive) { <span class="badge bg-success">Active</span> }
-                                else { <span class="badge bg-secondary">Ended</span> }
-                            </td>
-                            <td class="text-end">
-                                <a asp-page="/Leases/Details" asp-route-id="@l.Id" class="btn btn-sm btn-outline-secondary">View</a>
-                            </td>
-                        </tr>
-                    }
-                    @if (!Model.Leases.Any())
-                    {
-                        <tr><td colspan="5" class="text-center text-muted py-3">No leases yet for this tenant.</td></tr>
-                    }
-                    </tbody>
-                </table>
+@if (Model.PrimaryLease is not null)
+{
+    var l = Model.PrimaryLease;
+    var today = DateOnly.FromDateTime(DateTime.UtcNow);
+    var isActive = l.StartDate <= today && (l.IsMonthToMonth || l.EndDate >= today);
+    var term = l.IsMonthToMonth ? "M2M" : $"{l.StartDate:yyyy-MM-dd} → {l.EndDate:yyyy-MM-dd}";
+    <div class="card mb-3">
+        <div class="card-body d-flex flex-wrap align-items-center gap-3">
+            <div class="flex-grow-1">
+                <i class="flaticon-381-home-2 me-2 text-primary"></i>
+                <strong>@l.Property?.Name</strong>
+                <span class="text-muted mx-2">•</span>
+                <span>Lease #@l.Id</span>
+                <span class="text-muted mx-2">•</span>
+                <span>@term</span>
+                <span class="text-muted mx-2">•</span>
+                <span>@l.MonthlyRent.ToString("C")/mo</span>
+                @if (isActive)
+                {
+                    <span class="badge bg-success ms-2">Active</span>
+                }
+                else
+                {
+                    <span class="badge bg-secondary ms-2">Ended</span>
+                }
+                @if (l.Tenants.Count > 1)
+                {
+                    <span class="badge bg-info ms-1" title="Tenants on this lease">@l.Tenants.Count tenants</span>
+                }
             </div>
-        </div>
-
-        <div class="card mb-3">
-            <div class="card-header d-flex justify-content-between align-items-center">
-                <h4 class="card-title mb-0">Recent Payments</h4>
-                <a asp-page="/Payments/Index" class="btn btn-sm btn-outline-primary">All payments</a>
-            </div>
-            <div class="card-body p-0">
-                <table class="table mb-0">
-                    <thead class="table-light">
-                        <tr><th>Date</th><th>Property</th><th>Method</th><th class="text-end">Amount</th><th></th></tr>
-                    </thead>
-                    <tbody>
-                    @foreach (var p in Model.RecentPayments)
-                    {
-                        <tr>
-                            <td>@p.PaidOn.ToString("yyyy-MM-dd")</td>
-                            <td>@p.Lease?.Property?.Name</td>
-                            <td><span class="badge badge-outline-primary">@p.Method</span></td>
-                            <td class="text-end fw-bold">@p.Amount.ToString("C")</td>
-                            <td class="text-end">
-                                <a asp-page="/Receipts/Show" asp-route-id="@p.Id" class="btn btn-sm btn-outline-success">Receipt</a>
-                            </td>
-                        </tr>
-                    }
-                    @if (!Model.RecentPayments.Any())
-                    {
-                        <tr><td colspan="5" class="text-center text-muted py-3">No payments yet.</td></tr>
-                    }
-                    </tbody>
-                </table>
+            <div class="flex-shrink-0">
+                <a asp-page="/Leases/Details" asp-route-id="@l.Id" class="btn btn-sm btn-outline-secondary">View Lease</a>
+                <a asp-page="/Payments/Create" asp-route-leaseId="@l.Id" class="btn btn-sm btn-success">Record Payment</a>
             </div>
         </div>
     </div>
 
-    <div class="col-lg-4">
+    @if (Model.Leases.Count > 1)
+    {
+        <div class="text-muted small mb-3">
+            Other leases:
+            @foreach (var ol in Model.Leases.Where(x => x.Id != l.Id))
+            {
+                <a asp-page="/Leases/Details" asp-route-id="@ol.Id" class="me-2">#@ol.Id @ol.Property?.Name</a>
+            }
+        </div>
+    }
+}
+
+<div class="row g-3">
+    <div class="col-lg-7">
         <div class="card mb-3">
-            <div class="card-header"><h4 class="card-title mb-0">Unpaid Bills</h4></div>
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h4 class="card-title mb-0">Recent Payments by @Model.Tenant.FirstName</h4>
+                <a asp-page="/Payments/Index" class="btn btn-sm btn-outline-primary">All payments</a>
+            </div>
             <div class="card-body p-0">
-                <table class="table mb-0">
-                    <thead class="table-light">
-                        <tr><th>Period</th><th>Due</th><th class="text-end">Balance</th></tr>
-                    </thead>
-                    <tbody>
-                    @foreach (var c in Model.UnpaidBills)
-                    {
-                        <tr>
-                            <td>@c.PeriodLabel</td>
-                            <td>@c.DueDate.ToString("MMM d")</td>
-                            <td class="text-end fw-bold">@c.Balance.ToString("C")</td>
-                        </tr>
-                    }
-                    @if (!Model.UnpaidBills.Any())
-                    {
-                        <tr><td colspan="3" class="text-center text-success py-3">All caught up.</td></tr>
-                    }
-                    </tbody>
-                </table>
+                <div class="table-responsive">
+                    <table class="table mb-0">
+                        <thead class="table-light">
+                            <tr><th>Date</th><th>Property</th><th>Method</th><th>Reference</th><th class="text-end">Amount</th><th></th></tr>
+                        </thead>
+                        <tbody>
+                        @foreach (var p in Model.RecentPayments)
+                        {
+                            <tr>
+                                <td>@p.PaidOn.ToString("yyyy-MM-dd")</td>
+                                <td>@p.Lease?.Property?.Name</td>
+                                <td><span class="badge badge-outline-primary">@p.Method</span></td>
+                                <td class="text-muted small">@p.Reference</td>
+                                <td class="text-end fw-bold">@p.Amount.ToString("C")</td>
+                                <td class="text-end">
+                                    <a asp-page="/Receipts/Show" asp-route-id="@p.Id" class="btn btn-sm btn-outline-success">Receipt</a>
+                                </td>
+                            </tr>
+                        }
+                        @if (!Model.RecentPayments.Any())
+                        {
+                            <tr><td colspan="6" class="text-center text-muted py-3">No payments recorded for this tenant.</td></tr>
+                        }
+                        </tbody>
+                    </table>
+                </div>
             </div>
         </div>
+    </div>
 
+    <div class="col-lg-5">
+        <div class="card mb-3">
+            <div class="card-header">
+                <h4 class="card-title mb-0">Unpaid Bills — @Model.Tenant.FirstName's share</h4>
+            </div>
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table mb-0">
+                        <thead class="table-light">
+                            <tr><th>Period</th><th>Due</th><th class="text-end">Share</th><th class="text-end">Owed</th></tr>
+                        </thead>
+                        <tbody>
+                        @foreach (var s in Model.UnpaidShares)
+                        {
+                            <tr>
+                                <td>@s.Charge.PeriodLabel</td>
+                                <td>@s.Charge.DueDate.ToString("MMM d")</td>
+                                <td class="text-end text-muted">@s.TenantShare.ToString("C")</td>
+                                <td class="text-end fw-bold">@s.Balance.ToString("C")</td>
+                            </tr>
+                        }
+                        @if (!Model.UnpaidShares.Any())
+                        {
+                            <tr><td colspan="4" class="text-center text-success py-3">All caught up.</td></tr>
+                        }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row g-3">
+    <div class="col-lg-7">
         <div class="card mb-3">
             <div class="card-header"><h4 class="card-title mb-0">Communication Log</h4></div>
-            <div class="card-body p-0" style="max-height: 320px; overflow-y: auto;">
-                <table class="table table-sm mb-0">
-                    <thead class="table-light"><tr><th>Date</th><th>Kind</th><th>Status</th></tr></thead>
-                    <tbody>
-                    @foreach (var e in Model.CommunicationLog)
-                    {
-                        <tr title="@e.Subject">
-                            <td>@e.CreatedUtc.ToLocalTime().ToString("yyyy-MM-dd")</td>
-                            <td>@e.Kind</td>
-                            <td>
-                                @if (e.Status == PropertyPayPro.Models.EmailStatus.Sent)
-                                { <span class="badge bg-success">Sent</span> }
-                                else
-                                { <span class="badge bg-danger" title="@e.Error">Failed</span> }
-                            </td>
-                        </tr>
-                    }
-                    @if (!Model.CommunicationLog.Any())
-                    {
-                        <tr><td colspan="3" class="text-center text-muted py-3">No emails sent yet.</td></tr>
-                    }
-                    </tbody>
-                </table>
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table table-sm mb-0">
+                        <thead class="table-light"><tr><th>Date</th><th>Kind</th><th>Subject</th><th>To</th><th>Status</th></tr></thead>
+                        <tbody>
+                        @foreach (var e in Model.CommunicationLog)
+                        {
+                            <tr>
+                                <td class="text-nowrap">@e.CreatedUtc.ToLocalTime().ToString("yyyy-MM-dd")</td>
+                                <td>@e.Kind</td>
+                                <td class="text-truncate" style="max-width: 280px;" title="@e.Subject">@e.Subject</td>
+                                <td class="text-muted small">@e.ToAddress</td>
+                                <td>
+                                    @if (e.Status == PropertyPayPro.Models.EmailStatus.Sent)
+                                    { <span class="badge bg-success">Sent</span> }
+                                    else
+                                    { <span class="badge bg-danger" title="@e.Error">Failed</span> }
+                                </td>
+                            </tr>
+                        }
+                        @if (!Model.CommunicationLog.Any())
+                        {
+                            <tr><td colspan="5" class="text-center text-muted py-3">No emails sent yet.</td></tr>
+                        }
+                        </tbody>
+                    </table>
+                </div>
             </div>
         </div>
+    </div>
 
+    <div class="col-lg-5">
         <div class="card mb-3">
             <div class="card-header d-flex justify-content-between align-items-center">
                 <h4 class="card-title mb-0">Documents</h4>
                 <a asp-page="/Documents/Index" class="btn btn-sm btn-outline-primary">All</a>
             </div>
-            <div class="card-body p-0" style="max-height: 320px; overflow-y: auto;">
-                <table class="table table-sm mb-0">
-                    <thead class="table-light"><tr><th>Date</th><th>Kind</th><th></th></tr></thead>
-                    <tbody>
-                    @foreach (var d in Model.Documents)
-                    {
-                        <tr>
-                            <td>@d.CreatedUtc.ToLocalTime().ToString("yyyy-MM-dd")</td>
-                            <td>@d.Kind</td>
-                            <td class="text-end">
-                                <a asp-page="/Documents/Index" asp-page-handler="Download" asp-route-id="@d.Id"
-                                   class="btn btn-sm btn-outline-primary">PDF</a>
-                            </td>
-                        </tr>
-                    }
-                    @if (!Model.Documents.Any())
-                    {
-                        <tr><td colspan="3" class="text-center text-muted py-3">No PDFs generated yet.</td></tr>
-                    }
-                    </tbody>
-                </table>
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table table-sm mb-0">
+                        <thead class="table-light"><tr><th>Date</th><th>Kind</th><th></th></tr></thead>
+                        <tbody>
+                        @foreach (var d in Model.Documents)
+                        {
+                            <tr>
+                                <td>@d.CreatedUtc.ToLocalTime().ToString("yyyy-MM-dd")</td>
+                                <td>@d.Kind</td>
+                                <td class="text-end">
+                                    <a asp-page="/Documents/Index" asp-page-handler="Download" asp-route-id="@d.Id"
+                                       class="btn btn-sm btn-outline-primary">PDF</a>
+                                </td>
+                            </tr>
+                        }
+                        @if (!Model.Documents.Any())
+                        {
+                            <tr><td colspan="3" class="text-center text-muted py-3">No PDFs generated yet.</td></tr>
+                        }
+                        </tbody>
+                    </table>
+                </div>
             </div>
         </div>
     </div>

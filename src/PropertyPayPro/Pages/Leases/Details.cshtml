@@ -104,6 +104,59 @@
 
         <div class="card mb-3">
             <div class="card-header d-flex justify-content-between align-items-center">
+                <h4 class="card-title mb-0">Unpaid Bills</h4>
+                @if (Model.UnpaidCount > 0)
+                {
+                    <span class="badge bg-danger">@Model.UnpaidCount unpaid • @Model.CurrentBalance.ToString("C")</span>
+                }
+                else
+                {
+                    <span class="badge bg-success">All paid</span>
+                }
+            </div>
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table mb-0">
+                        <thead class="table-light">
+                            <tr><th>Period</th><th>Due</th><th class="text-end">Due</th><th class="text-end">Paid</th><th class="text-end">Balance</th><th>Status</th></tr>
+                        </thead>
+                        <tbody>
+                        @foreach (var c in Model.Charges.Where(x => x.Balance > 0).OrderBy(x => x.DueDate))
+                        {
+                            <tr>
+                                <td>@c.PeriodLabel</td>
+                                <td>@c.DueDate.ToString("yyyy-MM-dd")</td>
+                                <td class="text-end">@c.AmountDue.ToString("C")</td>
+                                <td class="text-end">@c.AmountPaid.ToString("C")</td>
+                                <td class="text-end fw-bold">@c.Balance.ToString("C")</td>
+                                <td>
+                                    @switch (c.Status)
+                                    {
+                                        case PropertyPayPro.Models.ChargeStatus.PartiallyPaid:
+                                            <span class="badge bg-warning text-dark">Partial</span>
+                                            break;
+                                        case PropertyPayPro.Models.ChargeStatus.Overdue:
+                                            <span class="badge bg-danger">Overdue</span>
+                                            break;
+                                        default:
+                                            <span class="badge bg-secondary">Unpaid</span>
+                                            break;
+                                    }
+                                </td>
+                            </tr>
+                        }
+                        @if (Model.UnpaidCount == 0)
+                        {
+                            <tr><td colspan="6" class="text-center text-success py-3">No unpaid bills.</td></tr>
+                        }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <div class="card mb-3">
+            <div class="card-header d-flex justify-content-between align-items-center">
                 <h4 class="card-title mb-0">Bill History</h4>
                 <a asp-page="/Bills/Index" class="btn btn-sm btn-outline-primary">All bills</a>
             </div>
