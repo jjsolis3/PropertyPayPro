@@ -1,0 +1,55 @@
+@model PropertyPayPro.Pages.Reports.AnnualPnLModel.PeriodData
+
+<div class="row g-3">
+    <div class="col-md-6">
+        <div class="card mb-3">
+            <div class="card-header"><h4 class="card-title mb-0">Income — @Model.Year</h4></div>
+            <div class="card-body p-0">
+                <table class="table mb-0">
+                    <tbody>
+                        <tr><td>Rent collected</td><td class="text-end">@Model.RentIncome.ToString("C")</td></tr>
+                        <tr><td>Late fees collected</td><td class="text-end">@Model.LateFeeIncome.ToString("C")</td></tr>
+                        <tr><td>Reimbursements (pass-through)</td><td class="text-end">@Model.ReimbursementIncome.ToString("C")</td></tr>
+                    </tbody>
+                    <tfoot class="table-light fw-bold">
+                        <tr><td>Total income</td><td class="text-end">@Model.TotalIncome.ToString("C")</td></tr>
+                    </tfoot>
+                </table>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div class="card mb-3">
+            <div class="card-header"><h4 class="card-title mb-0">Expenses — @Model.Year</h4></div>
+            <div class="card-body p-0">
+                <table class="table mb-0">
+                    <tbody>
+                    @foreach (var c in Model.ExpensesByCategory)
+                    {
+                        <tr><td>@c.Label</td><td class="text-end">@c.Amount.ToString("C")</td></tr>
+                    }
+                    @if (Model.RepairsExpense > 0)
+                    {
+                        <tr><td>Repairs / Service tickets</td><td class="text-end">@Model.RepairsExpense.ToString("C")</td></tr>
+                    }
+                    @if (!Model.ExpensesByCategory.Any() && Model.RepairsExpense == 0)
+                    {
+                        <tr><td colspan="2" class="text-center text-muted">No expenses recorded.</td></tr>
+                    }
+                    </tbody>
+                    <tfoot class="table-light fw-bold">
+                        <tr><td>Total expenses</td><td class="text-end">@Model.TotalExpenses.ToString("C")</td></tr>
+                    </tfoot>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="card mb-3">
+    <div class="card-body">
+        <div class="d-flex justify-content-between">
+            <h4 class="mb-0">Net @Model.Year</h4>
+            <h4 class="mb-0 @(Model.Net >= 0 ? "text-success" : "text-danger")">@Model.Net.ToString("C")</h4>
+        </div>
+    </div>
+</div>
