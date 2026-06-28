@@ -90,57 +90,31 @@
         Color = "warning", Icon = "flaticon-381-user-7" })" />
 </div>
 
-<div class="row g-3">
-    <div class="col-lg-4">
-        <div class="card mb-3">
-            <div class="card-header"><h4 class="card-title mb-0">By Paying Tenant</h4></div>
-            <div class="card-body p-0">
-                <table class="table mb-0">
-                    <thead class="table-light"><tr><th>Tenant</th><th class="text-end">#</th><th class="text-end">Total</th></tr></thead>
-                    <tbody>
-                    @foreach (var r in Model.ByTenant)
-                    {
-                        <tr>
-                            <td>@r.TenantName</td>
-                            <td class="text-end">@r.Count</td>
-                            <td class="text-end fw-bold">@r.Total.ToString("C")</td>
-                        </tr>
-                    }
-                    @if (!Model.ByTenant.Any())
-                    {
-                        <tr><td colspan="3" class="text-center text-muted py-3">No payments match.</td></tr>
-                    }
-                    </tbody>
-                </table>
-            </div>
-        </div>
+<div class="card">
+    <div class="card-body p-0">
+        <ul class="nav nav-tabs nav-fill d-print-none" id="paymentsTabs" role="tablist">
+            <li class="nav-item" role="presentation">
+                <button class="nav-link active" data-bs-toggle="tab" data-bs-target="#tab-detail" type="button" role="tab">
+                    Detail <span class="badge bg-primary ms-1">@Model.PaymentCount</span>
+                </button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" data-bs-toggle="tab" data-bs-target="#tab-by-tenant" type="button" role="tab">
+                    By Paying Tenant
+                </button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" data-bs-toggle="tab" data-bs-target="#tab-by-month" type="button" role="tab">
+                    By Month
+                </button>
+            </li>
+        </ul>
 
-        <div class="card mb-3">
-            <div class="card-header"><h4 class="card-title mb-0">By Month</h4></div>
-            <div class="card-body p-0">
-                <table class="table mb-0">
-                    <thead class="table-light"><tr><th>Month</th><th class="text-end">#</th><th class="text-end">Total</th></tr></thead>
-                    <tbody>
-                    @foreach (var r in Model.ByMonth)
-                    {
-                        <tr>
-                            <td>@r.Month.ToString("MMM yyyy")</td>
-                            <td class="text-end">@r.Count</td>
-                            <td class="text-end fw-bold">@r.Total.ToString("C")</td>
-                        </tr>
-                    }
-                    </tbody>
-                </table>
-            </div>
-        </div>
-    </div>
-
-    <div class="col-lg-8">
-        <div class="card">
-            <div class="card-header"><h4 class="card-title mb-0">Detail (@Model.PaymentCount payments)</h4></div>
-            <div class="card-body p-0">
+        <div class="tab-content p-3">
+            <div class="tab-pane fade show active" id="tab-detail" role="tabpanel">
+                <h5 class="mb-2">Detail (@Model.PaymentCount payments)</h5>
                 <div class="table-responsive">
-                    <table class="table table-striped mb-0 js-datatable" data-order='[[0,"desc"]]'>
+                    <table class="table table-striped mb-0 js-datatable" data-order='[[0,"desc"]]' data-page-length="25">
                         <thead class="table-light">
                             <tr>
                                 <th>Date</th>
@@ -166,14 +140,46 @@
                                 <td class="text-end fw-bold">@p.Amount.ToString("C")</td>
                             </tr>
                         }
-                        @if (!Model.Payments.Any())
+                        </tbody>
+                    </table>
+                </div>
+                <div class="mt-2 text-end fw-bold">Total: @Model.TotalCollected.ToString("C")</div>
+            </div>
+
+            <div class="tab-pane fade" id="tab-by-tenant" role="tabpanel">
+                <h5 class="mb-2">By Paying Tenant</h5>
+                <div class="table-responsive">
+                    <table class="table mb-0 js-datatable" data-order='[[2,"desc"]]' data-page-length="25">
+                        <thead class="table-light"><tr><th>Tenant</th><th class="text-end">#</th><th class="text-end">Total</th></tr></thead>
+                        <tbody>
+                        @foreach (var r in Model.ByTenant)
                         {
-                            <tr><td colspan="6" class="text-center text-muted py-3">No payments match the filters.</td></tr>
+                            <tr>
+                                <td>@r.TenantName</td>
+                                <td class="text-end">@r.Count</td>
+                                <td class="text-end fw-bold">@r.Total.ToString("C")</td>
+                            </tr>
                         }
                         </tbody>
-                        <tfoot class="table-light fw-bold">
-                            <tr><td colspan="5" class="text-end">Total</td><td class="text-end">@Model.TotalCollected.ToString("C")</td></tr>
-                        </tfoot>
+                    </table>
+                </div>
+            </div>
+
+            <div class="tab-pane fade" id="tab-by-month" role="tabpanel">
+                <h5 class="mb-2">By Month</h5>
+                <div class="table-responsive">
+                    <table class="table mb-0 js-datatable" data-order='[[0,"desc"]]' data-page-length="25">
+                        <thead class="table-light"><tr><th>Month</th><th class="text-end">#</th><th class="text-end">Total</th></tr></thead>
+                        <tbody>
+                        @foreach (var r in Model.ByMonth)
+                        {
+                            <tr>
+                                <td>@r.Month.ToString("yyyy-MM")</td>
+                                <td class="text-end">@r.Count</td>
+                                <td class="text-end fw-bold">@r.Total.ToString("C")</td>
+                            </tr>
+                        }
+                        </tbody>
                     </table>
                 </div>
             </div>
@@ -186,5 +192,6 @@
         nav, footer, .d-print-none, .deznav, .header { display: none !important; }
         .content-body { margin-left: 0 !important; }
         .card { border: 1px solid #dee2e6 !important; }
+        .tab-pane { display: block !important; opacity: 1 !important; }
     }
 </style>

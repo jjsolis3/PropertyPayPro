@@ -113,14 +113,37 @@
     }
 }
 
-<div class="row g-3">
-    <div class="col-lg-7">
-        <div class="card mb-3">
-            <div class="card-header d-flex justify-content-between align-items-center">
-                <h4 class="card-title mb-0">Recent Payments by @Model.Tenant.FirstName</h4>
-                <a asp-page="/Payments/Index" class="btn btn-sm btn-outline-primary">All payments</a>
-            </div>
-            <div class="card-body p-0">
+<div class="card">
+    <div class="card-body p-0">
+        <ul class="nav nav-tabs nav-fill" id="tenantTabs" role="tablist">
+            <li class="nav-item" role="presentation">
+                <button class="nav-link active" id="tab-payments-btn" data-bs-toggle="tab" data-bs-target="#tab-payments" type="button" role="tab">
+                    Payments <span class="badge bg-primary ms-1">@Model.PaymentCount</span>
+                </button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="tab-unpaid-btn" data-bs-toggle="tab" data-bs-target="#tab-unpaid" type="button" role="tab">
+                    Unpaid Bills <span class="badge @(Model.UnpaidShares.Count > 0 ? "bg-danger" : "bg-success") ms-1">@Model.UnpaidShares.Count</span>
+                </button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="tab-comms-btn" data-bs-toggle="tab" data-bs-target="#tab-comms" type="button" role="tab">
+                    Communication <span class="badge bg-secondary ms-1">@Model.CommunicationLog.Count</span>
+                </button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="tab-docs-btn" data-bs-toggle="tab" data-bs-target="#tab-docs" type="button" role="tab">
+                    Documents <span class="badge bg-secondary ms-1">@Model.Documents.Count</span>
+                </button>
+            </li>
+        </ul>
+
+        <div class="tab-content p-3">
+            <div class="tab-pane fade show active" id="tab-payments" role="tabpanel">
+                <div class="d-flex justify-content-between align-items-center mb-2">
+                    <h5 class="mb-0">Recent Payments by @Model.Tenant.FirstName</h5>
+                    <a asp-page="/Payments/Index" class="btn btn-sm btn-outline-primary">All payments</a>
+                </div>
                 <div class="table-responsive">
                     <table class="table mb-0 js-datatable" data-order='[[0,"desc"]]' data-page-length="10">
                         <thead class="table-light">
@@ -140,23 +163,13 @@
                                 </td>
                             </tr>
                         }
-                        @if (!Model.RecentPayments.Any())
-                        {
-                            <tr><td colspan="6" class="text-center text-muted py-3">No payments recorded for this tenant.</td></tr>
-                        }
                         </tbody>
                     </table>
                 </div>
             </div>
-        </div>
-    </div>
 
-    <div class="col-lg-5">
-        <div class="card mb-3">
-            <div class="card-header">
-                <h4 class="card-title mb-0">Unpaid Bills — @Model.Tenant.FirstName's share</h4>
-            </div>
-            <div class="card-body p-0">
+            <div class="tab-pane fade" id="tab-unpaid" role="tabpanel">
+                <h5 class="mb-2">Unpaid Bills — @Model.Tenant.FirstName's share</h5>
                 <div class="table-responsive">
                     <table class="table mb-0 js-datatable" data-order='[[1,"asc"]]' data-page-length="10">
                         <thead class="table-light">
@@ -167,28 +180,18 @@
                         {
                             <tr>
                                 <td>@s.Charge.PeriodLabel</td>
-                                <td>@s.Charge.DueDate.ToString("MMM d")</td>
+                                <td>@s.Charge.DueDate.ToString("yyyy-MM-dd")</td>
                                 <td class="text-end text-muted">@s.TenantShare.ToString("C")</td>
                                 <td class="text-end fw-bold">@s.Balance.ToString("C")</td>
                             </tr>
-                        }
-                        @if (!Model.UnpaidShares.Any())
-                        {
-                            <tr><td colspan="4" class="text-center text-success py-3">All caught up.</td></tr>
                         }
                         </tbody>
                     </table>
                 </div>
             </div>
-        </div>
-    </div>
-</div>
 
-<div class="row g-3">
-    <div class="col-lg-7">
-        <div class="card mb-3">
-            <div class="card-header"><h4 class="card-title mb-0">Communication Log</h4></div>
-            <div class="card-body p-0">
+            <div class="tab-pane fade" id="tab-comms" role="tabpanel">
+                <h5 class="mb-2">Communication Log</h5>
                 <div class="table-responsive">
                     <table class="table table-sm mb-0 js-datatable" data-order='[[0,"desc"]]' data-page-length="10">
                         <thead class="table-light"><tr><th>Date</th><th>Kind</th><th>Subject</th><th>To</th><th>Status</th></tr></thead>
@@ -208,24 +211,16 @@
                                 </td>
                             </tr>
                         }
-                        @if (!Model.CommunicationLog.Any())
-                        {
-                            <tr><td colspan="5" class="text-center text-muted py-3">No emails sent yet.</td></tr>
-                        }
                         </tbody>
                     </table>
                 </div>
             </div>
-        </div>
-    </div>
 
-    <div class="col-lg-5">
-        <div class="card mb-3">
-            <div class="card-header d-flex justify-content-between align-items-center">
-                <h4 class="card-title mb-0">Documents</h4>
-                <a asp-page="/Documents/Index" class="btn btn-sm btn-outline-primary">All</a>
-            </div>
-            <div class="card-body p-0">
+            <div class="tab-pane fade" id="tab-docs" role="tabpanel">
+                <div class="d-flex justify-content-between align-items-center mb-2">
+                    <h5 class="mb-0">Documents</h5>
+                    <a asp-page="/Documents/Index" class="btn btn-sm btn-outline-primary">All</a>
+                </div>
                 <div class="table-responsive">
                     <table class="table table-sm mb-0 js-datatable" data-order='[[0,"desc"]]' data-page-length="10">
                         <thead class="table-light"><tr><th>Date</th><th>Kind</th><th></th></tr></thead>
@@ -240,10 +235,6 @@
                                        class="btn btn-sm btn-outline-primary">PDF</a>
                                 </td>
                             </tr>
-                        }
-                        @if (!Model.Documents.Any())
-                        {
-                            <tr><td colspan="3" class="text-center text-muted py-3">No PDFs generated yet.</td></tr>
                         }
                         </tbody>
                     </table>

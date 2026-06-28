@@ -5,6 +5,65 @@
     ViewData["Title"] = $"P&L {Model.Year}";
 }
 
+@functions {
+    void RenderYear(PropertyPayPro.Pages.Reports.AnnualPnLModel.PeriodData y)
+    {
+        <div class="row g-3">
+            <div class="col-md-6">
+                <div class="card mb-3">
+                    <div class="card-header"><h4 class="card-title mb-0">Income — @y.Year</h4></div>
+                    <div class="card-body p-0">
+                        <table class="table mb-0">
+                            <tbody>
+                                <tr><td>Rent collected</td><td class="text-end">@y.RentIncome.ToString("C")</td></tr>
+                                <tr><td>Late fees collected</td><td class="text-end">@y.LateFeeIncome.ToString("C")</td></tr>
+                                <tr><td>Reimbursements (pass-through)</td><td class="text-end">@y.ReimbursementIncome.ToString("C")</td></tr>
+                            </tbody>
+                            <tfoot class="table-light fw-bold">
+                                <tr><td>Total income</td><td class="text-end">@y.TotalIncome.ToString("C")</td></tr>
+                            </tfoot>
+                        </table>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="card mb-3">
+                    <div class="card-header"><h4 class="card-title mb-0">Expenses — @y.Year</h4></div>
+                    <div class="card-body p-0">
+                        <table class="table mb-0">
+                            <tbody>
+                                @foreach (var c in y.ExpensesByCategory)
+                                {
+                                    <tr><td>@c.Label</td><td class="text-end">@c.Amount.ToString("C")</td></tr>
+                                }
+                                @if (y.RepairsExpense > 0)
+                                {
+                                    <tr><td>Repairs / Service tickets</td><td class="text-end">@y.RepairsExpense.ToString("C")</td></tr>
+                                }
+                                @if (!y.ExpensesByCategory.Any() && y.RepairsExpense == 0)
+                                {
+                                    <tr><td colspan="2" class="text-center text-muted">No expenses recorded.</td></tr>
+                                }
+                            </tbody>
+                            <tfoot class="table-light fw-bold">
+                                <tr><td>Total expenses</td><td class="text-end">@y.TotalExpenses.ToString("C")</td></tr>
+                            </tfoot>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="card mb-3">
+            <div class="card-body">
+                <div class="d-flex justify-content-between">
+                    <h4 class="mb-0">Net @y.Year</h4>
+                    <h4 class="mb-0 @(y.Net >= 0 ? "text-success" : "text-danger")">@y.Net.ToString("C")</h4>
+                </div>
+            </div>
+        </div>
+    }
+}
+
 <div class="d-flex justify-content-between align-items-center mb-3 d-print-none">
     <h1 class="h3 mb-0">Annual Profit &amp; Loss</h1>
     <div>
@@ -75,114 +134,13 @@
     }
 </div>
 
-<div class="row g-3">
-    <div class="col-lg-6">
-        <div class="card mb-3">
-            <div class="card-header"><h4 class="card-title mb-0">Income — @Model.Year</h4></div>
-            <div class="card-body p-0">
-                <table class="table mb-0">
-                    <tbody>
-                        <tr><td>Rent collected</td><td class="text-end">@Model.This.RentIncome.ToString("C")</td></tr>
-                        <tr><td>Late fees collected</td><td class="text-end">@Model.This.LateFeeIncome.ToString("C")</td></tr>
-                        <tr><td>Reimbursements (pass-through)</td><td class="text-end">@Model.This.ReimbursementIncome.ToString("C")</td></tr>
-                    </tbody>
-                    <tfoot class="table-light fw-bold">
-                        <tr><td>Total income</td><td class="text-end">@Model.This.TotalIncome.ToString("C")</td></tr>
-                    </tfoot>
-                </table>
-            </div>
-        </div>
+@{ RenderYear(Model.This); }
 
-        <div class="card mb-3">
-            <div class="card-header"><h4 class="card-title mb-0">Expenses — @Model.Year</h4></div>
-            <div class="card-body p-0">
-                <table class="table mb-0">
-                    <tbody>
-                    @foreach (var c in Model.This.ExpensesByCategory)
-                    {
-                        <tr><td>@c.Label</td><td class="text-end">@c.Amount.ToString("C")</td></tr>
-                    }
-                    @if (Model.This.RepairsExpense > 0)
-                    {
-                        <tr><td>Repairs / Service tickets</td><td class="text-end">@Model.This.RepairsExpense.ToString("C")</td></tr>
-                    }
-                    @if (!Model.This.ExpensesByCategory.Any() && Model.This.RepairsExpense == 0)
-                    {
-                        <tr><td colspan="2" class="text-center text-muted">No expenses recorded.</td></tr>
-                    }
-                    </tbody>
-                    <tfoot class="table-light fw-bold">
-                        <tr><td>Total expenses</td><td class="text-end">@Model.This.TotalExpenses.ToString("C")</td></tr>
-                    </tfoot>
-                </table>
-            </div>
-        </div>
-
-        <div class="card">
-            <div class="card-body">
-                <div class="d-flex justify-content-between">
-                    <h4 class="mb-0">Net @Model.Year</h4>
-                    <h4 class="mb-0 @(Model.This.Net >= 0 ? "text-success" : "text-danger")">
-                        @Model.This.Net.ToString("C")
-                    </h4>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    @if (Model.Prev is not null)
-    {
-        <div class="col-lg-6">
-            <div class="card mb-3">
-                <div class="card-header"><h4 class="card-title mb-0">Income — @Model.Prev.Year</h4></div>
-                <div class="card-body p-0">
-                    <table class="table mb-0">
-                        <tbody>
-                            <tr><td>Rent collected</td><td class="text-end">@Model.Prev.RentIncome.ToString("C")</td></tr>
-                            <tr><td>Late fees collected</td><td class="text-end">@Model.Prev.LateFeeIncome.ToString("C")</td></tr>
-                            <tr><td>Reimbursements</td><td class="text-end">@Model.Prev.ReimbursementIncome.ToString("C")</td></tr>
-                        </tbody>
-                        <tfoot class="table-light fw-bold">
-                            <tr><td>Total</td><td class="text-end">@Model.Prev.TotalIncome.ToString("C")</td></tr>
-                        </tfoot>
-                    </table>
-                </div>
-            </div>
-
-            <div class="card mb-3">
-                <div class="card-header"><h4 class="card-title mb-0">Expenses — @Model.Prev.Year</h4></div>
-                <div class="card-body p-0">
-                    <table class="table mb-0">
-                        <tbody>
-                        @foreach (var c in Model.Prev.ExpensesByCategory)
-                        {
-                            <tr><td>@c.Label</td><td class="text-end">@c.Amount.ToString("C")</td></tr>
-                        }
-                        @if (Model.Prev.RepairsExpense > 0)
-                        {
-                            <tr><td>Repairs</td><td class="text-end">@Model.Prev.RepairsExpense.ToString("C")</td></tr>
-                        }
-                        </tbody>
-                        <tfoot class="table-light fw-bold">
-                            <tr><td>Total</td><td class="text-end">@Model.Prev.TotalExpenses.ToString("C")</td></tr>
-                        </tfoot>
-                    </table>
-                </div>
-            </div>
-
-            <div class="card">
-                <div class="card-body">
-                    <div class="d-flex justify-content-between">
-                        <h4 class="mb-0">Net @Model.Prev.Year</h4>
-                        <h4 class="mb-0 @(Model.Prev.Net >= 0 ? "text-success" : "text-danger")">
-                            @Model.Prev.Net.ToString("C")
-                        </h4>
-                    </div>
-                </div>
-            </div>
-        </div>
-    }
-</div>
+@if (Model.Prev is not null)
+{
+    <h4 class="mt-4 mb-2 d-print-none">@Model.Prev.Year (comparison)</h4>
+    @{ RenderYear(Model.Prev); }
+}
 
 <style>
     @@media print {
