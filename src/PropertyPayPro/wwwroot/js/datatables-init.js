@@ -69,5 +69,16 @@
                 }
             });
         });
+
+        // Tables initialized inside a hidden Bootstrap tab compute zero column
+        // widths. When the tab becomes visible, recompute layout for any
+        // DataTables inside it.
+        $(document).on('shown.bs.tab', function (e) {
+            var target = $(e.target).attr('data-bs-target') || $(e.target).attr('href');
+            if (!target) return;
+            $(target).find('table.dataTable').each(function () {
+                $(this).DataTable().columns.adjust();
+            });
+        });
     });
 })();

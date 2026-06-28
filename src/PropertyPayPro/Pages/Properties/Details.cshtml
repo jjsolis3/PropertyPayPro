@@ -53,148 +53,159 @@
         Color = "info", Icon = "flaticon-381-briefcase" })" />
 </div>
 
-<div class="row g-3">
-    <div class="col-lg-8">
-        <div class="card mb-3">
-            <div class="card-header"><h4 class="card-title mb-0">Leases</h4></div>
-            <div class="card-body p-0">
+<div class="card">
+    <div class="card-body p-0">
+        <ul class="nav nav-tabs nav-fill" id="propertyTabs" role="tablist">
+            <li class="nav-item" role="presentation">
+                <button class="nav-link active" data-bs-toggle="tab" data-bs-target="#tab-overview" type="button" role="tab">Overview</button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" data-bs-toggle="tab" data-bs-target="#tab-leases" type="button" role="tab">
+                    Leases <span class="badge bg-secondary ms-1">@Model.Leases.Count</span>
+                </button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" data-bs-toggle="tab" data-bs-target="#tab-bills" type="button" role="tab">
+                    Outstanding Bills <span class="badge @(Model.UnpaidBills.Count > 0 ? "bg-danger" : "bg-success") ms-1">@Model.UnpaidBills.Count</span>
+                </button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" data-bs-toggle="tab" data-bs-target="#tab-expenses" type="button" role="tab">
+                    Expenses <span class="badge bg-secondary ms-1">@Model.RecentExpenses.Count</span>
+                </button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" data-bs-toggle="tab" data-bs-target="#tab-tickets" type="button" role="tab">
+                    Service Tickets <span class="badge @(Model.OpenTickets.Count > 0 ? "bg-warning" : "bg-secondary") ms-1">@Model.OpenTickets.Count</span>
+                </button>
+            </li>
+        </ul>
+
+        <div class="tab-content p-3">
+            <div class="tab-pane fade show active" id="tab-overview" role="tabpanel">
+                <h5 class="mb-3">Property Details</h5>
+                <dl class="row mb-0">
+                    <dt class="col-sm-3">Address</dt>
+                    <dd class="col-sm-9">@address</dd>
+                    <dt class="col-sm-3">Active leases</dt>
+                    <dd class="col-sm-9">@Model.ActiveLeases.Count of @Model.Leases.Count total</dd>
+                    <dt class="col-sm-3">Monthly rent roll</dt>
+                    <dd class="col-sm-9">@Model.MonthlyRentRoll.ToString("C")</dd>
+                    @if (!string.IsNullOrWhiteSpace(Model.Property.Notes))
+                    {
+                        <dt class="col-sm-3">Notes</dt>
+                        <dd class="col-sm-9">@Model.Property.Notes</dd>
+                    }
+                </dl>
+            </div>
+
+            <div class="tab-pane fade" id="tab-leases" role="tabpanel">
+                <h5 class="mb-2">Leases</h5>
                 <div class="table-responsive">
-                <table class="table mb-0 js-datatable" data-order='[[1,"desc"]]' data-page-length="10">
-                    <thead class="table-light">
-                        <tr><th>Tenant(s)</th><th>Term</th><th class="text-end">Monthly</th><th>Status</th><th></th></tr>
-                    </thead>
-                    <tbody>
-                    @foreach (var l in Model.Leases)
-                    {
-                        var today = DateOnly.FromDateTime(DateTime.UtcNow);
-                        var isActive = l.StartDate <= today && (l.IsMonthToMonth || l.EndDate >= today);
-                        <tr>
-                            <td>@l.TenantNames</td>
-                            <td>
-                                @l.StartDate.ToString("yyyy-MM-dd") →
-                                @(l.IsMonthToMonth ? "M2M" : l.EndDate.ToString("yyyy-MM-dd"))
-                            </td>
-                            <td class="text-end">@l.MonthlyRent.ToString("C")</td>
-                            <td>
-                                @if (isActive) { <span class="badge bg-success">Active</span> }
-                                else { <span class="badge bg-secondary">Ended</span> }
-                            </td>
-                            <td class="text-end">
-                                <a asp-page="/Leases/Details" asp-route-id="@l.Id" class="btn btn-sm btn-outline-secondary">View</a>
-                            </td>
-                        </tr>
-                    }
-                    @if (!Model.Leases.Any())
-                    {
-                        <tr><td colspan="5" class="text-center text-muted py-3">No leases yet for this property.</td></tr>
-                    }
-                    </tbody>
-                </table>
+                    <table class="table mb-0 js-datatable" data-order='[[1,"desc"]]' data-page-length="10">
+                        <thead class="table-light">
+                            <tr><th>Tenant(s)</th><th>Term</th><th class="text-end">Monthly</th><th>Status</th><th></th></tr>
+                        </thead>
+                        <tbody>
+                        @foreach (var l in Model.Leases)
+                        {
+                            var today = DateOnly.FromDateTime(DateTime.UtcNow);
+                            var isActive = l.StartDate <= today && (l.IsMonthToMonth || l.EndDate >= today);
+                            <tr>
+                                <td>@l.TenantNames</td>
+                                <td>
+                                    @l.StartDate.ToString("yyyy-MM-dd") →
+                                    @(l.IsMonthToMonth ? "M2M" : l.EndDate.ToString("yyyy-MM-dd"))
+                                </td>
+                                <td class="text-end">@l.MonthlyRent.ToString("C")</td>
+                                <td>
+                                    @if (isActive) { <span class="badge bg-success">Active</span> }
+                                    else { <span class="badge bg-secondary">Ended</span> }
+                                </td>
+                                <td class="text-end">
+                                    <a asp-page="/Leases/Details" asp-route-id="@l.Id" class="btn btn-sm btn-outline-secondary">View</a>
+                                </td>
+                            </tr>
+                        }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div class="tab-pane fade" id="tab-bills" role="tabpanel">
+                <h5 class="mb-2">Outstanding Bills</h5>
+                <div class="table-responsive">
+                    <table class="table mb-0 js-datatable" data-order='[[1,"asc"]]' data-page-length="10">
+                        <thead class="table-light"><tr><th>Tenant</th><th>Period</th><th class="text-end">Balance</th></tr></thead>
+                        <tbody>
+                        @foreach (var c in Model.UnpaidBills)
+                        {
+                            <tr>
+                                <td>@c.Lease?.TenantNames</td>
+                                <td>@c.BillingPeriodStart.ToString("MMM yyyy")</td>
+                                <td class="text-end fw-bold">@c.Balance.ToString("C")</td>
+                            </tr>
+                        }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div class="tab-pane fade" id="tab-expenses" role="tabpanel">
+                <div class="d-flex justify-content-between align-items-center mb-2">
+                    <h5 class="mb-0">Recent Expenses</h5>
+                    <a asp-page="/Expenses/Index" class="btn btn-sm btn-outline-primary">All expenses</a>
+                </div>
+                <div class="table-responsive">
+                    <table class="table mb-0 js-datatable" data-order='[[3,"desc"]]' data-page-length="10">
+                        <thead class="table-light">
+                            <tr><th>Category</th><th>Description</th><th>Vendor</th><th>Due</th><th>Paid</th><th class="text-end">Amount</th></tr>
+                        </thead>
+                        <tbody>
+                        @foreach (var e in Model.RecentExpenses)
+                        {
+                            <tr>
+                                <td>@e.Category</td>
+                                <td>@e.Description</td>
+                                <td>@e.Vendor</td>
+                                <td>@(e.DueDate?.ToString("yyyy-MM-dd") ?? "—")</td>
+                                <td>@(e.PaidOn?.ToString("yyyy-MM-dd") ?? "—")</td>
+                                <td class="text-end">@e.AmountDue.ToString("C")</td>
+                            </tr>
+                        }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div class="tab-pane fade" id="tab-tickets" role="tabpanel">
+                <div class="d-flex justify-content-between align-items-center mb-2">
+                    <h5 class="mb-0">Open Service Tickets</h5>
+                    <a asp-page="/ServiceTickets/Create" class="btn btn-sm btn-outline-success">New</a>
+                </div>
+                <div class="table-responsive">
+                    <table class="table mb-0 js-datatable" data-order='[[2,"asc"]]' data-page-length="10">
+                        <thead class="table-light"><tr><th>Title</th><th>Category</th><th>Status</th></tr></thead>
+                        <tbody>
+                        @foreach (var t in Model.OpenTickets)
+                        {
+                            <tr>
+                                <td>
+                                    <a asp-page="/ServiceTickets/Details" asp-route-id="@t.Id">@t.Title</a>
+                                </td>
+                                <td>@t.Category</td>
+                                <td>
+                                    @if (t.Status == PropertyPayPro.Models.ServiceTicketStatus.InProgress)
+                                    { <span class="badge bg-info">In progress</span> }
+                                    else
+                                    { <span class="badge bg-warning text-dark">Open</span> }
+                                </td>
+                            </tr>
+                        }
+                        </tbody>
+                    </table>
                 </div>
             </div>
         </div>
-
-        <div class="card mb-3">
-            <div class="card-header d-flex justify-content-between align-items-center">
-                <h4 class="card-title mb-0">Recent Expenses</h4>
-                <a asp-page="/Expenses/Index" class="btn btn-sm btn-outline-primary">All expenses</a>
-            </div>
-            <div class="card-body p-0">
-                <div class="table-responsive">
-                <table class="table mb-0 js-datatable" data-order='[[3,"desc"]]' data-page-length="10">
-                    <thead class="table-light">
-                        <tr><th>Category</th><th>Description</th><th>Vendor</th><th>Due</th><th>Paid</th><th class="text-end">Amount</th></tr>
-                    </thead>
-                    <tbody>
-                    @foreach (var e in Model.RecentExpenses)
-                    {
-                        <tr>
-                            <td>@e.Category</td>
-                            <td>@e.Description</td>
-                            <td>@e.Vendor</td>
-                            <td>@(e.DueDate?.ToString("yyyy-MM-dd") ?? "—")</td>
-                            <td>@(e.PaidOn?.ToString("yyyy-MM-dd") ?? "—")</td>
-                            <td class="text-end">@e.AmountDue.ToString("C")</td>
-                        </tr>
-                    }
-                    @if (!Model.RecentExpenses.Any())
-                    {
-                        <tr><td colspan="6" class="text-center text-muted py-3">No expenses recorded yet.</td></tr>
-                    }
-                    </tbody>
-                </table>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <div class="col-lg-4">
-        <div class="card mb-3">
-            <div class="card-header"><h4 class="card-title mb-0">Outstanding Bills</h4></div>
-            <div class="card-body p-0">
-                <div class="table-responsive">
-                <table class="table table-sm mb-0 js-datatable" data-order='[[1,"asc"]]' data-page-length="10">
-                    <thead class="table-light"><tr><th>Tenant</th><th>Period</th><th class="text-end">Balance</th></tr></thead>
-                    <tbody>
-                    @foreach (var c in Model.UnpaidBills)
-                    {
-                        <tr>
-                            <td>@c.Lease?.TenantNames</td>
-                            <td>@c.BillingPeriodStart.ToString("MMM yyyy")</td>
-                            <td class="text-end fw-bold">@c.Balance.ToString("C")</td>
-                        </tr>
-                    }
-                    @if (!Model.UnpaidBills.Any())
-                    {
-                        <tr><td colspan="3" class="text-center text-success py-3">All bills current.</td></tr>
-                    }
-                    </tbody>
-                </table>
-                </div>
-            </div>
-        </div>
-
-        <div class="card mb-3">
-            <div class="card-header d-flex justify-content-between align-items-center">
-                <h4 class="card-title mb-0">Open Service Tickets</h4>
-                <a asp-page="/ServiceTickets/Create" class="btn btn-sm btn-outline-success">New</a>
-            </div>
-            <div class="card-body p-0">
-                <div class="table-responsive">
-                <table class="table table-sm mb-0 js-datatable" data-order='[[2,"asc"]]' data-page-length="10">
-                    <thead class="table-light"><tr><th>Title</th><th>Category</th><th>Status</th></tr></thead>
-                    <tbody>
-                    @foreach (var t in Model.OpenTickets)
-                    {
-                        <tr>
-                            <td>
-                                <a asp-page="/ServiceTickets/Details" asp-route-id="@t.Id">@t.Title</a>
-                            </td>
-                            <td>@t.Category</td>
-                            <td>
-                                @if (t.Status == PropertyPayPro.Models.ServiceTicketStatus.InProgress)
-                                { <span class="badge bg-info">In progress</span> }
-                                else
-                                { <span class="badge bg-warning text-dark">Open</span> }
-                            </td>
-                        </tr>
-                    }
-                    @if (!Model.OpenTickets.Any())
-                    {
-                        <tr><td colspan="3" class="text-center text-muted py-3">No open tickets.</td></tr>
-                    }
-                    </tbody>
-                </table>
-                </div>
-            </div>
-        </div>
-
-        @if (!string.IsNullOrWhiteSpace(Model.Property.Notes))
-        {
-            <div class="card mb-3">
-                <div class="card-header"><h4 class="card-title mb-0">Notes</h4></div>
-                <div class="card-body">@Model.Property.Notes</div>
-            </div>
-        }
     </div>
 </div>
