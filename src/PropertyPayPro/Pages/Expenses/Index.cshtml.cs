@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.EntityFrameworkCore;
 using PropertyPayPro.Data;
@@ -62,5 +63,16 @@ public class IndexModel : PageModel
         var unreimbursed = Expenses.Where(e => e.PassThroughToTenant && e.OutstandingReimbursement > 0).ToList();
         UnreimbursedCount = unreimbursed.Count;
         UnreimbursedTotal = unreimbursed.Sum(e => e.OutstandingReimbursement);
+    }
+
+    public async Task<IActionResult> OnPostMarkReimbursedAsync(int id)
+    {
+        var e = await _db.PropertyExpenses.FindAsync(id);
+        if (e is null) return NotFound();
+        e.ReimbursedOn = DateOnly.FromDateTime(DateTime.UtcNow);
+        e.ReimbursedAmount = e.AmountDue;
+        await _db.SaveChangesAsync();
+        TempData["Message"] = $"Marked reimbursed: {e.Category} — {e.Vendor}.";
+        return RedirectToPage();
     }
 }
