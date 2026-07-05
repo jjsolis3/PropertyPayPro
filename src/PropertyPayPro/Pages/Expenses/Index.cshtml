@@ -16,6 +16,12 @@
         <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
     </div>
 }
+@if (TempData["Error"] is string errMsg)
+{
+    <div class="alert alert-danger alert-dismissible fade show">@errMsg
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+}
 
 <div class="row">
     <partial name="_KpiCard" model="@(new KpiCardModel {
@@ -37,68 +43,145 @@
         LinkPage = "/Reports/PassThroughExpenses", LinkText = "View report" })" />
 </div>
 
-<div class="card">
-    <div class="card-body">
-        <table class="table table-striped mb-0 js-datatable" data-order='[[4,"desc"]]'>
-            <thead>
-                <tr>
-                    <th>Property</th>
-                    <th>Category</th>
-                    <th>Vendor</th>
-                    <th>Description</th>
-                    <th>Due</th>
-                    <th>Paid</th>
-                    <th class="text-end">Amount</th>
-                    <th>Status</th>
-                    <th></th>
-                </tr>
-            </thead>
-            <tbody>
-            @foreach (var e in Model.Expenses)
-            {
-                <tr>
-                    <td>@e.Property!.Name</td>
-                    <td>@e.Category</td>
-                    <td>@e.Vendor</td>
-                    <td>@e.Description</td>
-                    <td>@(e.DueDate?.ToString("yyyy-MM-dd") ?? "—")</td>
-                    <td>@(e.PaidOn?.ToString("yyyy-MM-dd") ?? "—")</td>
-                    <td class="text-end">@e.AmountDue.ToString("C")</td>
-                    <td>
-                        @if (e.IsPaid) { <span class="badge bg-success">Paid</span> }
-                        else { <span class="badge bg-secondary">Open</span> }
-                        @if (e.PassThroughToTenant)
-                        {
-                            if (e.IsReimbursed && e.OutstandingReimbursement == 0)
-                            { <span class="badge bg-success ms-1" title="Reimbursed in full">Reimbursed</span> }
+<form method="post" asp-page-handler="MarkSelectedReimbursed" id="expensesBulkForm">
+    <div class="card">
+        <div class="card-body">
+            <div class="d-flex justify-content-between align-items-center mb-2">
+                <div class="text-muted small">
+                    Tick pass-through expenses to reimburse in bulk.
+                </div>
+                <button type="submit" id="bulkReimburseBtn" class="btn btn-sm btn-success" disabled
+                        onclick="return confirm('Mark ' + document.querySelectorAll('.expense-check:checked').length + ' selected expense(s) reimbursed today, at their full amount?');">
+                    Mark Selected Reimbursed <span class="badge bg-light text-success ms-1" id="bulkReimburseCount">0</span>
+                </button>
+            </div>
+
+            <table class="table table-striped mb-0 js-datatable" data-order='[[5,"desc"]]'>
+                <thead>
+                    <tr>
+                        <th class="no-sort" style="width: 2.5rem;">
+                            <input type="checkbox" class="form-check-input" id="expenseSelectAll" title="Select all eligible on this page" />
+                        </th>
+                        <th>Property</th>
+                        <th>Category</th>
+                        <th>Vendor</th>
+                        <th>Description</th>
+                        <th>Due</th>
+                        <th>Paid</th>
+                        <th class="text-end">Amount</th>
+                        <th>Reimbursed?</th>
+                        <th>Status</th>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody>
+                @foreach (var e in Model.Expenses)
+                {
+                    var eligible = e.PassThroughToTenant && !e.IsReimbursed;
+                    <tr>
+                        <td>
+                            @if (eligible)
+                            {
+                                <input type="checkbox" class="form-check-input expense-check" name="selectedIds" value="@e.Id" />
+                            }
+                        </td>
+                        <td>@e.Property!.Name</td>
+                        <td>@e.Category</td>
+                        <td>@e.Vendor</td>
+                        <td>@e.Description</td>
+                        <td>@(e.DueDate?.ToString("yyyy-MM-dd") ?? "—")</td>
+                        <td>@(e.PaidOn?.ToString("yyyy-MM-dd") ?? "—")</td>
+                        <td class="text-end">@e.AmountDue.ToString("C")</td>
+                        <td>
+                            @if (!e.PassThroughToTenant)
+                            {
+                                <span class="text-muted small">n/a</span>
+                            }
+                            else if (e.IsReimbursed && e.OutstandingReimbursement == 0)
+                            {
+                                <span class="text-success">✓ @e.ReimbursedOn?.ToString("yyyy-MM-dd")</span>
+                            }
                             else if (e.IsReimbursed)
-                            { <span class="badge bg-warning text-dark ms-1" title="Partially reimbursed">Partial reimb.</span> }
+                            {
+                                <span class="text-warning">Partial<br /><small class="text-muted">@e.OutstandingReimbursement.ToString("C") owed</small></span>
+                            }
                             else
-                            { <span class="badge bg-danger ms-1" title="Tenant owes reimbursement">Owed</span> }
-                        }
-                    </td>
-                    <td class="text-end">
-                        @if (e.PassThroughToTenant && !e.IsReimbursed)
-                        {
-                            <form method="post" asp-page-handler="MarkReimbursed" asp-route-id="@e.Id" class="d-inline">
-                                <button type="submit" class="btn btn-sm btn-success"
-                                        title="Mark this pass-through expense as fully reimbursed"
+                            {
+                                <span class="text-danger">No</span>
+                            }
+                        </td>
+                        <td>
+                            @if (e.IsPaid) { <span class="badge bg-success">Paid</span> }
+                            else { <span class="badge bg-secondary">Open</span> }
+                            @if (e.PassThroughToTenant)
+                            {
+                                if (e.IsReimbursed && e.OutstandingReimbursement == 0)
+                                { <span class="badge bg-success ms-1" title="Reimbursed in full">Reimb.</span> }
+                                else if (e.IsReimbursed)
+                                { <span class="badge bg-warning text-dark ms-1" title="Partially reimbursed">Partial</span> }
+                                else
+                                { <span class="badge bg-danger ms-1" title="Tenant owes reimbursement">Owed</span> }
+                            }
+                        </td>
+                        <td class="text-end">
+                            @if (eligible)
+                            {
+                                <button type="submit" formaction="@Url.Page("Index", "MarkReimbursed", new { id = e.Id })"
+                                        class="btn btn-sm btn-outline-success"
+                                        title="Mark this expense fully reimbursed today"
                                         onclick="return confirm('Mark this expense reimbursed for @e.AmountDue.ToString("C")?')">
-                                    Reimbursed
+                                    ✓
                                 </button>
-                            </form>
-                        }
-                        <a asp-page="Details" asp-route-id="@e.Id" class="btn btn-sm btn-outline-secondary">Details</a>
-                        <a asp-page="Edit" asp-route-id="@e.Id" class="btn btn-sm btn-outline-primary">Edit</a>
-                        <a asp-page="Delete" asp-route-id="@e.Id" class="btn btn-sm btn-outline-danger">Delete</a>
-                    </td>
-                </tr>
-            }
-            @if (!Model.Expenses.Any())
-            {
-                <tr><td colspan="9" class="text-center text-muted py-3">No expenses recorded yet.</td></tr>
-            }
-            </tbody>
-        </table>
+                            }
+                            <a asp-page="Details" asp-route-id="@e.Id" class="btn btn-sm btn-outline-secondary">Details</a>
+                            <a asp-page="Edit" asp-route-id="@e.Id" class="btn btn-sm btn-outline-primary">Edit</a>
+                            <a asp-page="Delete" asp-route-id="@e.Id" class="btn btn-sm btn-outline-danger">Delete</a>
+                        </td>
+                    </tr>
+                }
+                @if (!Model.Expenses.Any())
+                {
+                    <tr><td colspan="11" class="text-center text-muted py-3">No expenses recorded yet.</td></tr>
+                }
+                </tbody>
+            </table>
+        </div>
     </div>
-</div>
+</form>
+
+@section Scripts {
+<script>
+    (function () {
+        var selectAll = document.getElementById('expenseSelectAll');
+        var bulkBtn = document.getElementById('bulkReimburseBtn');
+        var bulkCount = document.getElementById('bulkReimburseCount');
+
+        function refreshBulkState() {
+            var checked = document.querySelectorAll('.expense-check:checked').length;
+            bulkBtn.disabled = checked === 0;
+            bulkCount.textContent = checked;
+        }
+
+        if (selectAll) {
+            selectAll.addEventListener('change', function () {
+                // Only toggle visible (non-filtered, current-page) checkboxes.
+                document.querySelectorAll('.expense-check').forEach(function (cb) {
+                    var tr = cb.closest('tr');
+                    if (tr && tr.offsetParent !== null) {
+                        cb.checked = selectAll.checked;
+                    }
+                });
+                refreshBulkState();
+            });
+        }
+
+        document.addEventListener('change', function (ev) {
+            if (ev.target && ev.target.classList && ev.target.classList.contains('expense-check')) {
+                refreshBulkState();
+            }
+        });
+
+        refreshBulkState();
+    })();
+</script>
+}

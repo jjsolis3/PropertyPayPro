@@ -75,4 +75,33 @@ public class IndexModel : PageModel
         TempData["Message"] = $"Marked reimbursed: {e.Category} — {e.Vendor}.";
         return RedirectToPage();
     }
+
+    public async Task<IActionResult> OnPostMarkSelectedReimbursedAsync(int[] selectedIds)
+    {
+        if (selectedIds is null || selectedIds.Length == 0)
+        {
+            TempData["Error"] = "No expenses selected.";
+            return RedirectToPage();
+        }
+
+        var today = DateOnly.FromDateTime(DateTime.UtcNow);
+        var expenses = await _db.PropertyExpenses
+            .Where(e => selectedIds.Contains(e.Id) && e.PassThroughToTenant && e.ReimbursedOn == null)
+            .ToListAsync();
+
+        foreach (var e in expenses)
+        {
+            e.ReimbursedOn = today;
+            e.ReimbursedAmount = e.AmountDue;
+        }
+        await _db.SaveChangesAsync();
+
+        TempData["Message"] = expenses.Count switch
+        {
+            0 => "No eligible pass-through expenses were selected.",
+            1 => "1 expense marked reimbursed.",
+            _ => $"{expenses.Count} expenses marked reimbursed."
+        };
+        return RedirectToPage();
+    }
 }
