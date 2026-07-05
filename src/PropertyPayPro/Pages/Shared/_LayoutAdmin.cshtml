@@ -25,8 +25,30 @@
             --pps-accent: @appSettings.AccentColor;
         }
     </style>
+    <script>
+        // Restore sidebar collapsed state before the sidebar renders,
+        // otherwise it flashes open then snaps shut on every navigation.
+        (function () {
+            try {
+                if (localStorage.getItem('pps-sidebar-collapsed') === '1') {
+                    document.documentElement.classList.add('menu-toggle');
+                }
+            } catch (e) { /* localStorage unavailable — ignore */ }
+        })();
+    </script>
 </head>
 <body>
+    <script>
+        // Body exists now — mirror the class here too, because Mophy's
+        // theme JS toggles menu-toggle on <body>, not <html>.
+        (function () {
+            try {
+                if (localStorage.getItem('pps-sidebar-collapsed') === '1') {
+                    document.body.classList.add('menu-toggle');
+                }
+            } catch (e) { /* ignore */ }
+        })();
+    </script>
     <div id="preloader">
         <div class="sk-three-bounce">
             <div class="sk-child sk-bounce1"></div>
@@ -57,6 +79,7 @@
     <script src="~/mophy/admin/js/deznav-init.js"></script>
     <script src="~/js/toasts.js"></script>
     <script src="~/js/datatables-init.js"></script>
+    <script src="~/js/sidebar-persist.js"></script>
     @RenderSection("Scripts", false)
 </body>
 </html>
