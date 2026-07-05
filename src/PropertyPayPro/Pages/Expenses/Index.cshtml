@@ -10,6 +10,13 @@
     <a asp-page="Create" class="btn btn-success">New Expense</a>
 </div>
 
+@if (TempData["Message"] is string okMsg)
+{
+    <div class="alert alert-success alert-dismissible fade show">@okMsg
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+}
+
 <div class="row">
     <partial name="_KpiCard" model="@(new KpiCardModel {
         Label = "Spent This Month", Value = Model.SpentThisMonth.ToString("C"),
@@ -71,6 +78,16 @@
                         }
                     </td>
                     <td class="text-end">
+                        @if (e.PassThroughToTenant && !e.IsReimbursed)
+                        {
+                            <form method="post" asp-page-handler="MarkReimbursed" asp-route-id="@e.Id" class="d-inline">
+                                <button type="submit" class="btn btn-sm btn-success"
+                                        title="Mark this pass-through expense as fully reimbursed"
+                                        onclick="return confirm('Mark this expense reimbursed for @e.AmountDue.ToString("C")?')">
+                                    Reimbursed
+                                </button>
+                            </form>
+                        }
                         <a asp-page="Details" asp-route-id="@e.Id" class="btn btn-sm btn-outline-secondary">Details</a>
                         <a asp-page="Edit" asp-route-id="@e.Id" class="btn btn-sm btn-outline-primary">Edit</a>
                         <a asp-page="Delete" asp-route-id="@e.Id" class="btn btn-sm btn-outline-danger">Delete</a>
