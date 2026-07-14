@@ -22,66 +22,49 @@
     };
 }
 
-<div class="d-flex justify-content-between align-items-center mb-3">
-    <div>
-        <h1 class="h3 mb-1">@t.Title</h1>
-        <div>
-            <span class="badge @statusBadge(t.Status) me-1">@t.Status</span>
-            <span class="badge @priorityBadge(t.Priority) me-1">@t.Priority priority</span>
-            <span class="badge bg-light text-dark me-1">@t.Category</span>
-            @if (t.PassThroughToTenant) { <span class="badge bg-info">Pass-through</span> }
+<style>
+    .st-mini-card .card-body { padding: 1rem; }
+    .st-mini-card dt { font-weight: 600; color: var(--bs-secondary-color, #6c757d); font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.02em; margin-bottom: 0.15rem; }
+    .st-mini-card dd { margin-bottom: 0.5rem; }
+    .st-mini-card dd:last-child { margin-bottom: 0; }
+</style>
+
+<div class="card mb-3">
+    <div class="card-body d-flex flex-wrap align-items-center gap-3">
+        <div class="flex-grow-1">
+            <h1 class="h3 mb-1">@t.Title</h1>
+            <div class="text-muted">
+                <a asp-page="/Properties/Details" asp-route-id="@t.PropertyId">@t.Property!.Name</a>
+                <span class="mx-2">·</span>@t.Category
+            </div>
+            <div class="mt-2">
+                <span class="badge @statusBadge(t.Status) me-1">@t.Status</span>
+                <span class="badge @priorityBadge(t.Priority) me-1">@t.Priority priority</span>
+                @if (t.PassThroughToTenant) { <span class="badge bg-info me-1">Pass-through</span> }
+                @if (t.WarrantyExpiresOn.HasValue && t.WarrantyExpiresOn.Value >= today)
+                {
+                    <span class="badge bg-success">Under warranty</span>
+                }
+            </div>
         </div>
-    </div>
-    <div>
-        <a asp-page="Edit" asp-route-id="@t.Id" class="btn btn-primary">Edit</a>
-        <a asp-page="Index" class="btn btn-outline-secondary">Back</a>
+        <div class="flex-shrink-0">
+            <a asp-page="Edit" asp-route-id="@t.Id" class="btn btn-primary">Edit</a>
+            <a asp-page="Index" class="btn btn-outline-secondary">Back</a>
+        </div>
     </div>
 </div>
 
-<div class="row g-3">
-    <div class="col-md-6">
-        <div class="card mb-3">
-            <div class="card-header"><h5 class="card-title mb-0">Overview</h5></div>
+<div class="row g-3 align-items-start mb-1">
+    <div class="col-md-6 col-lg-3">
+        <div class="card st-mini-card h-100">
             <div class="card-body">
-                <dl class="row mb-0">
-                    <dt class="col-sm-4">Property</dt>
-                    <dd class="col-sm-8">
-                        <a asp-page="/Properties/Details" asp-route-id="@t.PropertyId">@t.Property!.Name</a>
-                    </dd>
-                    <dt class="col-sm-4">Description</dt>
-                    <dd class="col-sm-8">@(string.IsNullOrWhiteSpace(t.Description) ? "—" : t.Description)</dd>
-                    <dt class="col-sm-4">Notes</dt>
-                    <dd class="col-sm-8">@(string.IsNullOrWhiteSpace(t.Notes) ? "—" : t.Notes)</dd>
-                </dl>
-            </div>
-        </div>
-
-        <div class="card mb-3">
-            <div class="card-header"><h5 class="card-title mb-0">Vendor</h5></div>
-            <div class="card-body">
-                <dl class="row mb-0">
-                    <dt class="col-sm-4">Name</dt>
-                    <dd class="col-sm-8">@(string.IsNullOrWhiteSpace(t.Vendor) ? "—" : t.Vendor)</dd>
-                    <dt class="col-sm-4">Phone</dt>
-                    <dd class="col-sm-8">
-                        @if (string.IsNullOrWhiteSpace(t.VendorPhone)) { <span>—</span> }
-                        else { <a href="tel:@t.VendorPhone">@t.VendorPhone</a> }
-                    </dd>
-                </dl>
-            </div>
-        </div>
-    </div>
-
-    <div class="col-md-6">
-        <div class="card mb-3">
-            <div class="card-header"><h5 class="card-title mb-0">Timeline</h5></div>
-            <div class="card-body">
-                <dl class="row mb-0">
-                    <dt class="col-sm-4">Reported</dt>
-                    <dd class="col-sm-8">@t.ReportedOn.ToString("yyyy-MM-dd")</dd>
-                    <dt class="col-sm-4">Scheduled for</dt>
-                    <dd class="col-sm-8">
-                        @if (!t.ScheduledFor.HasValue) { <span class="text-muted">—</span> }
+                <h6 class="mb-3">Timeline</h6>
+                <dl class="mb-0">
+                    <dt>Reported</dt>
+                    <dd>@t.ReportedOn.ToString("yyyy-MM-dd")</dd>
+                    <dt>Scheduled for</dt>
+                    <dd>
+                        @if (!t.ScheduledFor.HasValue) { <span class="text-muted">Not scheduled</span> }
                         else
                         {
                             <span>@t.ScheduledFor.Value.ToString("yyyy-MM-dd")</span>
@@ -89,42 +72,70 @@
                                  && t.Status != PropertyPayPro.Models.ServiceTicketStatus.Cancelled)
                             {
                                 var days = t.ScheduledFor.Value.DayNumber - today.DayNumber;
-                                if (days < 0) { <span class="badge bg-danger ms-2">@Math.Abs(days) d overdue</span> }
-                                else if (days == 0) { <span class="badge bg-warning text-dark ms-2">Today</span> }
-                                else if (days <= 7) { <span class="badge bg-info ms-2">in @days d</span> }
+                                if (days < 0) { <span class="badge bg-danger ms-1">@Math.Abs(days) d overdue</span> }
+                                else if (days == 0) { <span class="badge bg-warning text-dark ms-1">Today</span> }
+                                else if (days <= 7) { <span class="badge bg-info ms-1">in @days d</span> }
                             }
                         }
                     </dd>
-                    <dt class="col-sm-4">Resolved</dt>
-                    <dd class="col-sm-8">@(t.ResolvedOn?.ToString("yyyy-MM-dd") ?? "—")</dd>
+                    <dt>Resolved</dt>
+                    <dd>
+                        @if (t.ResolvedOn.HasValue) { @t.ResolvedOn.Value.ToString("yyyy-MM-dd") }
+                        else { <span class="text-muted">Not yet</span> }
+                    </dd>
                 </dl>
             </div>
         </div>
+    </div>
 
-        <div class="card mb-3">
-            <div class="card-header"><h5 class="card-title mb-0">Cost &amp; Quote</h5></div>
+    <div class="col-md-6 col-lg-3">
+        <div class="card st-mini-card h-100">
             <div class="card-body">
-                <dl class="row mb-0">
-                    <dt class="col-sm-4">Quoted amount</dt>
-                    <dd class="col-sm-8">
+                <h6 class="mb-3">Vendor</h6>
+                <dl class="mb-0">
+                    <dt>Name</dt>
+                    <dd>
+                        @if (string.IsNullOrWhiteSpace(t.Vendor)) { <span class="text-muted">—</span> }
+                        else { @t.Vendor }
+                    </dd>
+                    <dt>Phone</dt>
+                    <dd>
+                        @if (string.IsNullOrWhiteSpace(t.VendorPhone)) { <span class="text-muted">—</span> }
+                        else { <a href="tel:@t.VendorPhone">@t.VendorPhone</a> }
+                    </dd>
+                </dl>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-6 col-lg-3">
+        <div class="card st-mini-card h-100">
+            <div class="card-body">
+                <h6 class="mb-3">Cost &amp; Quote</h6>
+                <dl class="mb-0">
+                    <dt>Quoted</dt>
+                    <dd>
                         @if (t.QuotedAmount.HasValue)
                         {
-                            @t.QuotedAmount.Value.ToString("C")
-                            @if (t.QuotedOn.HasValue) { <span class="text-muted small ms-2">quoted @t.QuotedOn.Value.ToString("yyyy-MM-dd")</span> }
+                            <div class="fw-semibold">@t.QuotedAmount.Value.ToString("C")</div>
+                            if (t.QuotedOn.HasValue)
+                            {
+                                <small class="text-muted">@t.QuotedOn.Value.ToString("yyyy-MM-dd")</small>
+                            }
                         }
                         else { <span class="text-muted">—</span> }
                     </dd>
-                    <dt class="col-sm-4">Final cost</dt>
-                    <dd class="col-sm-8">
+                    <dt>Final cost</dt>
+                    <dd>
                         @if (t.Cost.HasValue)
                         {
-                            @t.Cost.Value.ToString("C")
-                            @if (t.QuotedAmount.HasValue)
+                            <div class="fw-semibold">@t.Cost.Value.ToString("C")</div>
+                            if (t.QuotedAmount.HasValue)
                             {
                                 var delta = t.Cost.Value - t.QuotedAmount.Value;
-                                if (delta > 0) { <span class="badge bg-danger ms-2" title="Over quote">+@delta.ToString("C")</span> }
-                                else if (delta < 0) { <span class="badge bg-success ms-2" title="Under quote">@delta.ToString("C")</span> }
-                                else { <span class="badge bg-success ms-2">On quote</span> }
+                                if (delta > 0) { <span class="badge bg-danger" title="Over quote">+@delta.ToString("C")</span> }
+                                else if (delta < 0) { <span class="badge bg-success" title="Under quote">@delta.ToString("C")</span> }
+                                else { <span class="badge bg-success">On quote</span> }
                             }
                         }
                         else { <span class="text-muted">—</span> }
@@ -132,29 +143,53 @@
                 </dl>
             </div>
         </div>
+    </div>
 
-        <div class="card mb-3">
-            <div class="card-header"><h5 class="card-title mb-0">Warranty</h5></div>
+    <div class="col-md-6 col-lg-3">
+        <div class="card st-mini-card h-100">
             <div class="card-body">
+                <h6 class="mb-3">Warranty</h6>
                 @if (!t.WarrantyExpiresOn.HasValue)
                 {
-                    <span class="text-muted">No warranty on file.</span>
+                    <div class="text-muted">No warranty on file.</div>
                 }
                 else
                 {
                     var expiresOn = t.WarrantyExpiresOn.Value;
                     var days = expiresOn.DayNumber - today.DayNumber;
-                    <div class="d-flex justify-content-between align-items-center">
-                        <div>
-                            Expires <strong>@expiresOn.ToString("yyyy-MM-dd")</strong>
-                        </div>
-                        <div>
+                    <dl class="mb-0">
+                        <dt>Expires</dt>
+                        <dd class="fw-semibold">@expiresOn.ToString("yyyy-MM-dd")</dd>
+                        <dt>Status</dt>
+                        <dd>
                             @if (days < 0) { <span class="badge bg-secondary">Expired @Math.Abs(days) d ago</span> }
                             else if (days <= 30) { <span class="badge bg-warning text-dark">Expires in @days d</span> }
-                            else { <span class="badge bg-success">Under warranty (@days d left)</span> }
-                        </div>
-                    </div>
+                            else { <span class="badge bg-success">Active (@days d left)</span> }
+                        </dd>
+                    </dl>
                 }
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="card">
+    <div class="card-body">
+        <h5 class="mb-3">Overview</h5>
+        <div class="row">
+            <div class="col-md-6 mb-3">
+                <div class="text-muted small text-uppercase mb-1">Description</div>
+                <div>
+                    @if (string.IsNullOrWhiteSpace(t.Description)) { <span class="text-muted">No description.</span> }
+                    else { @t.Description }
+                </div>
+            </div>
+            <div class="col-md-6 mb-3">
+                <div class="text-muted small text-uppercase mb-1">Notes</div>
+                <div>
+                    @if (string.IsNullOrWhiteSpace(t.Notes)) { <span class="text-muted">No notes.</span> }
+                    else { @t.Notes }
+                </div>
             </div>
         </div>
     </div>
