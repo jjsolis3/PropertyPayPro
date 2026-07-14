@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
+using Microsoft.EntityFrameworkCore;
 using PropertyPayPro.Data;
 using PropertyPayPro.Models;
 
@@ -11,13 +12,19 @@ namespace PropertyPayPro.Pages.Users;
 public class IndexModel : PageModel
 {
     private readonly UserManager<ApplicationUser> _users;
-    public IndexModel(UserManager<ApplicationUser> users) => _users = users;
+    private readonly ApplicationDbContext _db;
+
+    public IndexModel(UserManager<ApplicationUser> users, ApplicationDbContext db)
+    {
+        _users = users;
+        _db = db;
+    }
 
     public List<UserRow> Users { get; private set; } = new();
 
     public async Task OnGetAsync()
     {
-        var all = _users.Users.OrderBy(u => u.Email).ToList();
+        var all = _users.Users.Include(u => u.Tenant).OrderBy(u => u.Email).ToList();
         foreach (var u in all)
         {
             var roles = await _users.GetRolesAsync(u);
@@ -27,6 +34,9 @@ public class IndexModel : PageModel
                 Email = u.Email ?? "",
                 DisplayName = u.DisplayName,
                 IsAdmin = roles.Contains(IdentitySeed.AdminRole),
+                IsTenant = roles.Contains(IdentitySeed.TenantRole),
+                TenantId = u.TenantId,
+                TenantName = u.Tenant is null ? null : $"{u.Tenant.FirstName} {u.Tenant.LastName}".Trim(),
                 LockedOut = u.LockoutEnd.HasValue && u.LockoutEnd.Value > DateTimeOffset.UtcNow
             });
         }
@@ -83,6 +93,9 @@ public class IndexModel : PageModel
         public string Email { get; set; } = "";
         public string DisplayName { get; set; } = "";
         public bool IsAdmin { get; set; }
+        public bool IsTenant { get; set; }
+        public int? TenantId { get; set; }
+        public string? TenantName { get; set; }
         public bool LockedOut { get; set; }
     }
 }

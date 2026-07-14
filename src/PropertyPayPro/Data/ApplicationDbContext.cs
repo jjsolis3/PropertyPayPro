@@ -99,5 +99,11 @@ public class ApplicationDbContext : IdentityDbContext<ApplicationUser>
         builder.Entity<GeneratedDocument>()
             .HasOne(d => d.RentPayment).WithMany().HasForeignKey(d => d.RentPaymentId)
             .OnDelete(DeleteBehavior.SetNull);
+
+        builder.Entity<ApplicationUser>()
+            .HasOne(u => u.Tenant)
+            .WithMany()
+            .HasForeignKey(u => u.TenantId)
+            .OnDelete(DeleteBehavior.SetNull);
     }
 }
