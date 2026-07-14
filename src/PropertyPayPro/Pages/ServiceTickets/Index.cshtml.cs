@@ -38,7 +38,8 @@ public class IndexModel : PageModel
         ScheduledThisWeek = Tickets.Count(t =>
             t.Status != ServiceTicketStatus.Completed &&
             t.Status != ServiceTicketStatus.Cancelled &&
-            t.ReportedOn >= today && t.ReportedOn <= weekEnd);
+            t.ScheduledFor.HasValue &&
+            t.ScheduledFor.Value >= today && t.ScheduledFor.Value <= weekEnd);
 
         SpentThisMonth = Tickets
             .Where(t => t.ResolvedOn.HasValue && t.ResolvedOn.Value >= firstOfMonth && t.Cost.HasValue)

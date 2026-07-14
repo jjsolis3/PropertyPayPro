@@ -3,6 +3,7 @@
 @using PropertyPayPro.Pages.Shared
 @{
     ViewData["Title"] = "Service Tickets";
+    var today = DateOnly.FromDateTime(DateTime.UtcNow);
 }
 
 <div class="d-flex justify-content-between align-items-center mb-3">
@@ -28,15 +29,18 @@
 
 <div class="card">
     <div class="card-body">
-        <table class="table table-striped mb-0 js-datatable" data-order='[[4,"desc"]]'>
+        <table class="table table-striped mb-0 js-datatable" data-order='[[5,"desc"]]'>
             <thead>
                 <tr>
                     <th>Property</th>
+                    <th>Priority</th>
                     <th>Category</th>
                     <th>Title</th>
                     <th>Vendor</th>
                     <th>Reported</th>
+                    <th>Scheduled</th>
                     <th>Resolved</th>
+                    <th class="text-end">Quote</th>
                     <th class="text-end">Cost</th>
                     <th>Status</th>
                     <th></th>
@@ -47,11 +51,57 @@
             {
                 <tr>
                     <td>@t.Property!.Name</td>
+                    <td>
+                        @switch (t.Priority)
+                        {
+                            case PropertyPayPro.Models.ServicePriority.Urgent:
+                                <span class="badge bg-danger">Urgent</span>
+                                break;
+                            case PropertyPayPro.Models.ServicePriority.High:
+                                <span class="badge bg-warning text-dark">High</span>
+                                break;
+                            case PropertyPayPro.Models.ServicePriority.Low:
+                                <span class="badge bg-secondary">Low</span>
+                                break;
+                            default:
+                                <span class="badge bg-info">Normal</span>
+                                break;
+                        }
+                    </td>
                     <td>@t.Category</td>
-                    <td>@t.Title</td>
-                    <td>@t.Vendor</td>
+                    <td>
+                        @t.Title
+                        @if (t.WarrantyExpiresOn.HasValue && t.WarrantyExpiresOn.Value >= today)
+                        {
+                            <span class="badge bg-success ms-1"
+                                  title="Under warranty until @t.WarrantyExpiresOn.Value.ToString("yyyy-MM-dd")">
+                                Warranty
+                            </span>
+                        }
+                    </td>
+                    <td>
+                        @t.Vendor
+                        @if (!string.IsNullOrWhiteSpace(t.VendorPhone))
+                        {
+                            <br /><small class="text-muted">@t.VendorPhone</small>
+                        }
+                    </td>
                     <td>@t.ReportedOn.ToString("yyyy-MM-dd")</td>
+                    <td>
+                        @if (!t.ScheduledFor.HasValue) { <span class="text-muted">—</span> }
+                        else
+                        {
+                            @t.ScheduledFor.Value.ToString("yyyy-MM-dd")
+                            @if (t.Status != PropertyPayPro.Models.ServiceTicketStatus.Completed
+                                 && t.Status != PropertyPayPro.Models.ServiceTicketStatus.Cancelled
+                                 && t.ScheduledFor.Value < today)
+                            {
+                                <span class="badge bg-danger ms-1">Overdue</span>
+                            }
+                        }
+                    </td>
                     <td>@(t.ResolvedOn?.ToString("yyyy-MM-dd") ?? "—")</td>
+                    <td class="text-end">@(t.QuotedAmount?.ToString("C") ?? "—")</td>
                     <td class="text-end">@(t.Cost?.ToString("C") ?? "—")</td>
                     <td>
                         @switch (t.Status)
@@ -80,7 +130,7 @@
             }
             @if (!Model.Tickets.Any())
             {
-                <tr><td colspan="9" class="text-center text-muted py-3">No service tickets yet.</td></tr>
+                <tr><td colspan="12" class="text-center text-muted py-3">No service tickets yet.</td></tr>
             }
             </tbody>
         </table>
