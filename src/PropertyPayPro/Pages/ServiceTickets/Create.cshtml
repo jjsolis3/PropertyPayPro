@@ -7,9 +7,11 @@
 <h1>New Service Ticket</h1>
 
 <div class="row">
-    <div class="col-md-7">
+    <div class="col-md-9">
         <form method="post">
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+            <h5 class="mt-2">Ticket</h5>
             <div class="row">
                 <div class="col mb-3">
                     <label asp-for="Ticket.PropertyId" class="form-label">Property</label>
@@ -25,6 +27,11 @@
                     <select asp-for="Ticket.Status" class="form-select"
                             asp-items="Html.GetEnumSelectList<PropertyPayPro.Models.ServiceTicketStatus>()"></select>
                 </div>
+                <div class="col mb-3">
+                    <label asp-for="Ticket.Priority" class="form-label"></label>
+                    <select asp-for="Ticket.Priority" class="form-select"
+                            asp-items="Html.GetEnumSelectList<PropertyPayPro.Models.ServicePriority>()"></select>
+                </div>
             </div>
             <div class="mb-3">
                 <label asp-for="Ticket.Title" class="form-label"></label>
@@ -34,26 +41,59 @@
                 <label asp-for="Ticket.Description" class="form-label"></label>
                 <textarea asp-for="Ticket.Description" class="form-control" rows="3"></textarea>
             </div>
+
+            <h5 class="mt-4">Vendor</h5>
             <div class="row">
                 <div class="col mb-3">
-                    <label asp-for="Ticket.Vendor" class="form-label"></label>
+                    <label asp-for="Ticket.Vendor" class="form-label">Vendor name</label>
                     <input asp-for="Ticket.Vendor" class="form-control" />
                 </div>
                 <div class="col mb-3">
-                    <label asp-for="Ticket.Cost" class="form-label"></label>
-                    <input asp-for="Ticket.Cost" class="form-control" />
+                    <label asp-for="Ticket.VendorPhone" class="form-label">Vendor phone</label>
+                    <input asp-for="Ticket.VendorPhone" class="form-control" placeholder="e.g. 555-123-4567" />
                 </div>
             </div>
+
+            <h5 class="mt-4">Dates</h5>
             <div class="row">
                 <div class="col mb-3">
-                    <label asp-for="Ticket.ReportedOn" class="form-label"></label>
+                    <label asp-for="Ticket.ReportedOn" class="form-label">Reported</label>
                     <input asp-for="Ticket.ReportedOn" class="form-control" />
                 </div>
                 <div class="col mb-3">
-                    <label asp-for="Ticket.ResolvedOn" class="form-label"></label>
+                    <label asp-for="Ticket.ScheduledFor" class="form-label">Scheduled for</label>
+                    <input asp-for="Ticket.ScheduledFor" class="form-control" />
+                </div>
+                <div class="col mb-3">
+                    <label asp-for="Ticket.ResolvedOn" class="form-label">Resolved</label>
                     <input asp-for="Ticket.ResolvedOn" class="form-control" />
                 </div>
             </div>
+
+            <h5 class="mt-4">Cost &amp; Quote</h5>
+            <div class="row">
+                <div class="col mb-3">
+                    <label asp-for="Ticket.QuotedAmount" class="form-label">Quoted amount</label>
+                    <input asp-for="Ticket.QuotedAmount" type="number" step="0.01" min="0" class="form-control" />
+                </div>
+                <div class="col mb-3">
+                    <label asp-for="Ticket.QuotedOn" class="form-label">Quoted on</label>
+                    <input asp-for="Ticket.QuotedOn" class="form-control" />
+                </div>
+                <div class="col mb-3">
+                    <label asp-for="Ticket.Cost" class="form-label">Final cost</label>
+                    <input asp-for="Ticket.Cost" type="number" step="0.01" min="0" class="form-control" />
+                </div>
+            </div>
+
+            <h5 class="mt-4">Warranty</h5>
+            <div class="row">
+                <div class="col-md-4 mb-3">
+                    <label asp-for="Ticket.WarrantyExpiresOn" class="form-label">Warranty expires</label>
+                    <input asp-for="Ticket.WarrantyExpiresOn" class="form-control" />
+                </div>
+            </div>
+
             <div class="mb-3 form-check">
                 <input asp-for="Ticket.PassThroughToTenant" class="form-check-input" />
                 <label asp-for="Ticket.PassThroughToTenant" class="form-check-label">Pass cost through to tenant</label>

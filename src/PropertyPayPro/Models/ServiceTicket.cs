@@ -23,6 +23,14 @@ public enum ServiceTicketStatus
     Cancelled
 }
 
+public enum ServicePriority
+{
+    Low,
+    Normal,
+    High,
+    Urgent
+}
+
 public class ServiceTicket
 {
     public int Id { get; set; }
@@ -32,6 +40,7 @@ public class ServiceTicket
 
     public ServiceCategory Category { get; set; } = ServiceCategory.General;
     public ServiceTicketStatus Status { get; set; } = ServiceTicketStatus.Open;
+    public ServicePriority Priority { get; set; } = ServicePriority.Normal;
 
     [Required, StringLength(200)]
     public string Title { get; set; } = string.Empty;
@@ -42,15 +51,31 @@ public class ServiceTicket
     [StringLength(120)]
     public string? Vendor { get; set; }
 
+    [StringLength(30)]
+    public string? VendorPhone { get; set; }
+
     [DataType(DataType.Date)]
     public DateOnly ReportedOn { get; set; } = DateOnly.FromDateTime(DateTime.UtcNow);
 
     [DataType(DataType.Date)]
+    public DateOnly? ScheduledFor { get; set; }
+
+    [DataType(DataType.Date)]
     public DateOnly? ResolvedOn { get; set; }
+
+    [DataType(DataType.Date)]
+    public DateOnly? QuotedOn { get; set; }
+
+    [Range(0, 1_000_000)]
+    [Column(TypeName = "numeric(10,2)")]
+    public decimal? QuotedAmount { get; set; }
 
     [Range(0, 1_000_000)]
     [Column(TypeName = "numeric(10,2)")]
     public decimal? Cost { get; set; }
+
+    [DataType(DataType.Date)]
+    public DateOnly? WarrantyExpiresOn { get; set; }
 
     public bool PassThroughToTenant { get; set; }
 
