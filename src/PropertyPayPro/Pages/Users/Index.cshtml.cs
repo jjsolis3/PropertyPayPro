@@ -1,7 +1,9 @@
+using System.Text;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
+using Microsoft.AspNetCore.WebUtilities;
 using Microsoft.EntityFrameworkCore;
 using PropertyPayPro.Data;
 using PropertyPayPro.Models;
@@ -47,8 +49,11 @@ public class IndexModel : PageModel
         var u = await _users.FindByIdAsync(id);
         if (u is null) return NotFound();
         var token = await _users.GeneratePasswordResetTokenAsync(u);
+        // Base64-URL-encode the raw token so the default Identity UI page
+        // (which calls WebEncoders.Base64UrlDecode) can decode it back.
+        var codeParam = WebEncoders.Base64UrlEncode(Encoding.UTF8.GetBytes(token));
         var link = Url.Page("/Account/ResetPassword", pageHandler: null,
-            values: new { area = "Identity", code = token, email = u.Email },
+            values: new { area = "Identity", code = codeParam, email = u.Email },
             protocol: Request.Scheme);
         TempData["ResetLink"] = link;
         TempData["ResetForEmail"] = u.Email;

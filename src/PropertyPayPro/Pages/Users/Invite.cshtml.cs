@@ -1,10 +1,12 @@
 using System.ComponentModel.DataAnnotations;
 using System.Security.Cryptography;
+using System.Text;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.Mvc.Rendering;
+using Microsoft.AspNetCore.WebUtilities;
 using Microsoft.EntityFrameworkCore;
 using PropertyPayPro.Data;
 using PropertyPayPro.Models;
@@ -126,8 +128,13 @@ public class InviteModel : PageModel
         }
 
         var token = await _users.GeneratePasswordResetTokenAsync(user);
+        // The default Identity UI ResetPassword page decodes `code` via
+        // WebEncoders.Base64UrlDecode, so we must URL-safe-base64 the raw
+        // token before putting it in the URL. Without this, the page sees
+        // "+" and "/" characters and fails with "Invalid token".
+        var codeParam = WebEncoders.Base64UrlEncode(Encoding.UTF8.GetBytes(token));
         InviteLink = Url.Page("/Account/ResetPassword", pageHandler: null,
-            values: new { area = "Identity", code = token, email = user.Email },
+            values: new { area = "Identity", code = codeParam, email = user.Email },
             protocol: Request.Scheme);
         InviteEmail = user.Email;
 
