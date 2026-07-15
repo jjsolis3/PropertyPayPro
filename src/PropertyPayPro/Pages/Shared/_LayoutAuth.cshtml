@@ -14,6 +14,18 @@
     <link rel="apple-touch-icon" sizes="180x180" href="/img/brand/favicon/apple-touch-icon.png">
     <link rel="manifest" href="/img/brand/favicon/site.webmanifest">
     <link class="main-css" href="/mophy/admin/css/style.css" rel="stylesheet">
+    <style>
+        /* The default Identity UI wraps its form in <div class="col-md-4">.
+           Inside our col-md-6 auth container that makes the inputs tiny.
+           Force any nested Bootstrap column inside .auth-form to fill its
+           row so the email/password fields stay usable. */
+        .auth-form .row > [class^="col-"],
+        .auth-form .row > [class*=" col-"] {
+            flex: 0 0 100%;
+            max-width: 100%;
+        }
+        .auth-form .form-control { width: 100%; }
+    </style>
 </head>
 <body class="vh-100">
     <div class="authincation h-100">
