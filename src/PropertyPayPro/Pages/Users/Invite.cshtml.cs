@@ -4,6 +4,8 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
+using Microsoft.AspNetCore.Mvc.Rendering;
+using Microsoft.EntityFrameworkCore;
 using PropertyPayPro.Data;
 using PropertyPayPro.Models;
 
@@ -13,12 +15,27 @@ namespace PropertyPayPro.Pages.Users;
 public class InviteModel : PageModel
 {
     private readonly UserManager<ApplicationUser> _users;
-    public InviteModel(UserManager<ApplicationUser> users) => _users = users;
+    private readonly ApplicationDbContext _db;
+
+    public InviteModel(UserManager<ApplicationUser> users, ApplicationDbContext db)
+    {
+        _users = users;
+        _db = db;
+    }
+
+    public enum InviteRole
+    {
+        Standard,
+        Admin,
+        Tenant
+    }
 
     [BindProperty] public InputModel Input { get; set; } = new();
 
     public string? InviteLink { get; private set; }
     public string? InviteEmail { get; private set; }
+
+    public SelectList TenantOptions { get; private set; } = default!;
 
     public class InputModel
     {
@@ -31,14 +48,28 @@ public class InviteModel : PageModel
         [Required, StringLength(80), Display(Name = "Last name")]
         public string LastName { get; set; } = string.Empty;
 
-        [Display(Name = "Make admin")]
-        public bool MakeAdmin { get; set; }
+        [Display(Name = "Invite as")]
+        public InviteRole Role { get; set; } = InviteRole.Standard;
+
+        [Display(Name = "Tenant record")]
+        public int? TenantId { get; set; }
     }
 
-    public void OnGet() { }
+    public async Task OnGetAsync()
+    {
+        await LoadTenantsAsync();
+    }
 
     public async Task<IActionResult> OnPostAsync()
     {
+        await LoadTenantsAsync();
+
+        if (Input.Role == InviteRole.Tenant && !Input.TenantId.HasValue)
+        {
+            ModelState.AddModelError(nameof(Input.TenantId),
+                "Pick which Tenant record this login represents.");
+        }
+
         if (!ModelState.IsValid) return Page();
 
         if (await _users.FindByEmailAsync(Input.Email) is not null)
@@ -47,13 +78,26 @@ public class InviteModel : PageModel
             return Page();
         }
 
+        if (Input.Role == InviteRole.Tenant && Input.TenantId.HasValue)
+        {
+            var alreadyLinked = await _db.Users
+                .AnyAsync(u => u.TenantId == Input.TenantId.Value);
+            if (alreadyLinked)
+            {
+                ModelState.AddModelError(nameof(Input.TenantId),
+                    "That tenant already has a portal login.");
+                return Page();
+            }
+        }
+
         var user = new ApplicationUser
         {
             UserName = Input.Email,
             Email = Input.Email,
             FirstName = Input.FirstName,
             LastName = Input.LastName,
-            EmailConfirmed = true
+            EmailConfirmed = true,
+            TenantId = Input.Role == InviteRole.Tenant ? Input.TenantId : null
         };
 
         // Random initial password so the user must use the reset link to set their own.
@@ -65,9 +109,13 @@ public class InviteModel : PageModel
             return Page();
         }
 
-        if (Input.MakeAdmin)
+        if (Input.Role == InviteRole.Admin)
         {
             await _users.AddToRoleAsync(user, IdentitySeed.AdminRole);
+        }
+        else if (Input.Role == InviteRole.Tenant)
+        {
+            await _users.AddToRoleAsync(user, IdentitySeed.TenantRole);
         }
 
         var token = await _users.GeneratePasswordResetTokenAsync(user);
@@ -76,5 +124,22 @@ public class InviteModel : PageModel
             protocol: Request.Scheme);
         InviteEmail = user.Email;
         return Page();
+    }
+
+    private async Task LoadTenantsAsync()
+    {
+        // Only tenants that don't already have a portal login are eligible.
+        var linkedTenantIds = await _db.Users
+            .Where(u => u.TenantId.HasValue)
+            .Select(u => u.TenantId!.Value)
+            .ToListAsync();
+
+        var tenants = await _db.Tenants
+            .Where(t => !linkedTenantIds.Contains(t.Id))
+            .OrderBy(t => t.LastName).ThenBy(t => t.FirstName)
+            .Select(t => new { t.Id, Label = t.FirstName + " " + t.LastName + (t.Email == null ? "" : " (" + t.Email + ")") })
+            .ToListAsync();
+
+        TenantOptions = new SelectList(tenants, "Id", "Label");
     }
 }

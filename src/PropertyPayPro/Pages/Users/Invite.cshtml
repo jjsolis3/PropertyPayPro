@@ -52,10 +52,44 @@
                             <input asp-for="Input.Email" class="form-control" type="email" />
                             <span asp-validation-for="Input.Email" class="text-danger"></span>
                         </div>
-                        <div class="form-check mb-3">
-                            <input asp-for="Input.MakeAdmin" class="form-check-input" />
-                            <label asp-for="Input.MakeAdmin" class="form-check-label"></label>
+
+                        <div class="mb-3">
+                            <label asp-for="Input.Role" class="form-label"></label>
+                            <div class="btn-group d-flex" role="group" aria-label="Role">
+                                <input type="radio" class="btn-check" name="Input.Role" id="role-standard"
+                                       value="@PropertyPayPro.Pages.Users.InviteModel.InviteRole.Standard"
+                                       @(Model.Input.Role == PropertyPayPro.Pages.Users.InviteModel.InviteRole.Standard ? "checked" : "") />
+                                <label class="btn btn-outline-secondary" for="role-standard">Standard user</label>
+
+                                <input type="radio" class="btn-check" name="Input.Role" id="role-admin"
+                                       value="@PropertyPayPro.Pages.Users.InviteModel.InviteRole.Admin"
+                                       @(Model.Input.Role == PropertyPayPro.Pages.Users.InviteModel.InviteRole.Admin ? "checked" : "") />
+                                <label class="btn btn-outline-primary" for="role-admin">Admin</label>
+
+                                <input type="radio" class="btn-check" name="Input.Role" id="role-tenant"
+                                       value="@PropertyPayPro.Pages.Users.InviteModel.InviteRole.Tenant"
+                                       @(Model.Input.Role == PropertyPayPro.Pages.Users.InviteModel.InviteRole.Tenant ? "checked" : "") />
+                                <label class="btn btn-outline-success" for="role-tenant">Tenant (portal)</label>
+                            </div>
+                            <small class="text-muted">
+                                Tenant portal logins can view their own bills, payments, expenses, service tickets and lease documents.
+                                They cannot see other tenants' data or any admin pages.
+                            </small>
                         </div>
+
+                        <div class="mb-3" id="tenant-picker"
+                             style="@(Model.Input.Role == PropertyPayPro.Pages.Users.InviteModel.InviteRole.Tenant ? "" : "display: none;")">
+                            <label asp-for="Input.TenantId" class="form-label"></label>
+                            <select asp-for="Input.TenantId" asp-items="Model.TenantOptions" class="form-select">
+                                <option value="">— Pick a tenant record —</option>
+                            </select>
+                            <span asp-validation-for="Input.TenantId" class="text-danger"></span>
+                            <small class="text-muted">
+                                Only tenants that don't already have a portal login are listed.
+                                Create the Tenant record first under Tenants → New Tenant if it's missing.
+                            </small>
+                        </div>
+
                         <button type="submit" class="btn btn-primary">Create Invitation</button>
                         <a asp-page="Index" class="btn btn-outline-secondary">Cancel</a>
                     </form>
@@ -65,4 +99,16 @@
     </div>
 </div>
 
-@section Scripts { <partial name="_ValidationScriptsPartial" /> }
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+    <script>
+        (function () {
+            var picker = document.getElementById('tenant-picker');
+            document.querySelectorAll('input[name="Input.Role"]').forEach(function (radio) {
+                radio.addEventListener('change', function () {
+                    picker.style.display = (radio.value === 'Tenant' && radio.checked) ? '' : 'none';
+                });
+            });
+        })();
+    </script>
+}

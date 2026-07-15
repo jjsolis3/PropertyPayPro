@@ -36,6 +36,15 @@ builder.Services.AddAuthorization(options =>
     options.FallbackPolicy = new AuthorizationPolicyBuilder()
         .RequireAuthenticatedUser()
         .Build();
+
+    // Admin surfaces require the Admin role. Applied via the AuthorizeFolder
+    // conventions below so we don't have to sprinkle [Authorize(Roles=…)] on
+    // every page. Tenants get a distinct policy and their own /Portal folder.
+    options.AddPolicy("AdminOnly", policy =>
+        policy.RequireAuthenticatedUser().RequireRole(IdentitySeed.AdminRole));
+
+    options.AddPolicy("TenantOnly", policy =>
+        policy.RequireAuthenticatedUser().RequireRole(IdentitySeed.TenantRole));
 });
 
 builder.Services
@@ -49,6 +58,27 @@ builder.Services
         options.Conventions.AllowAnonymousToAreaPage("Identity", "/Account/ResetPassword");
         options.Conventions.AllowAnonymousToAreaPage("Identity", "/Account/AccessDenied");
         options.Conventions.AllowAnonymousToPage("/Error");
+
+        // Admin-only folders. Each existing top-level Razor folder is gated on
+        // the Admin role so a tenant-portal login can't wander into them.
+        // Identity area pages (login/manage), the future /Portal folder, and
+        // the root pages "/Index", "/Privacy" fall through to the default
+        // authenticated-user policy.
+        var adminFolders = new[]
+        {
+            "/Properties", "/Tenants", "/Leases", "/Bills", "/Payments",
+            "/Receipts", "/Expenses", "/ServiceTickets", "/Documents",
+            "/Reports", "/Settings", "/Users"
+        };
+        foreach (var folder in adminFolders)
+        {
+            options.Conventions.AuthorizeFolder(folder, "AdminOnly");
+        }
+        // Root-level admin pages that aren't under a folder.
+        options.Conventions.AuthorizePage("/Index", "AdminOnly");
+        options.Conventions.AuthorizePage("/Privacy", "AdminOnly");
+
+        options.Conventions.AuthorizeFolder("/Portal", "TenantOnly");
     });
 
 builder.Services.AddMemoryCache();

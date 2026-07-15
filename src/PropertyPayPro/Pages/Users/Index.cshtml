@@ -54,6 +54,16 @@
                     <td>@u.DisplayName</td>
                     <td>
                         @if (u.IsAdmin) { <span class="badge bg-primary">Admin</span> }
+                        else if (u.IsTenant)
+                        {
+                            <span class="badge bg-success">Tenant</span>
+                            @if (!string.IsNullOrEmpty(u.TenantName))
+                            {
+                                <br /><small class="text-muted">
+                                    <a asp-page="/Tenants/Details" asp-route-id="@u.TenantId">@u.TenantName</a>
+                                </small>
+                            }
+                        }
                         else { <span class="badge bg-secondary">User</span> }
                     </td>
                     <td>

@@ -6,15 +6,21 @@ namespace PropertyPayPro.Data;
 public static class IdentitySeed
 {
     public const string AdminRole = "Admin";
+    public const string TenantRole = "Tenant";
+
+    private static readonly string[] AllRoles = { AdminRole, TenantRole };
 
     public static async Task EnsureAdminAsync(IServiceProvider services, IConfiguration config)
     {
         var roleManager = services.GetRequiredService<RoleManager<IdentityRole>>();
         var userManager = services.GetRequiredService<UserManager<ApplicationUser>>();
 
-        if (!await roleManager.RoleExistsAsync(AdminRole))
+        foreach (var role in AllRoles)
         {
-            await roleManager.CreateAsync(new IdentityRole(AdminRole));
+            if (!await roleManager.RoleExistsAsync(role))
+            {
+                await roleManager.CreateAsync(new IdentityRole(role));
+            }
         }
 
         var adminEmail = config["ADMIN_EMAIL"];

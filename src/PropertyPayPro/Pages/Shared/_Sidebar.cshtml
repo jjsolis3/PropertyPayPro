@@ -5,97 +5,114 @@
 @inject PropertyPayPro.Services.AppSettingsService AppSettings
 @{
     var isAdmin = false;
+    var isTenant = false;
     if (SignInManager.IsSignedIn(User))
     {
         var current = await UserManager.GetUserAsync(User);
         if (current is not null)
         {
             isAdmin = await UserManager.IsInRoleAsync(current, PropertyPayPro.Data.IdentitySeed.AdminRole);
+            isTenant = await UserManager.IsInRoleAsync(current, PropertyPayPro.Data.IdentitySeed.TenantRole);
         }
     }
+    // Tenant-only accounts see just the portal link. Admin (or anyone without a
+    // specific role) gets the full management nav.
+    var showAdminNav = !isTenant || isAdmin;
     var appSettings = await AppSettings.GetAsync();
 }
 <div class="deznav">
     <div class="deznav-scroll">
         <ul class="metismenu" id="menu">
-            <li>
-                <a class="ai-icon" asp-page="/Index">
-                    <i class="flaticon-381-networking"></i>
-                    <span class="nav-text">Dashboard</span>
-                </a>
-            </li>
-            <li>
-                <a class="ai-icon" asp-page="/Properties/Index">
-                    <i class="flaticon-381-home-2"></i>
-                    <span class="nav-text">Properties</span>
-                </a>
-            </li>
-            <li>
-                <a class="ai-icon" asp-page="/Tenants/Index">
-                    <i class="flaticon-381-user-9"></i>
-                    <span class="nav-text">Tenants</span>
-                </a>
-            </li>
-            <li>
-                <a class="ai-icon" asp-page="/Leases/Index">
-                    <i class="flaticon-381-notepad"></i>
-                    <span class="nav-text">Leases</span>
-                </a>
-            </li>
-            <li>
-                <a class="has-arrow ai-icon" href="javascript:void(0)" aria-expanded="false">
-                    <i class="flaticon-381-list"></i>
-                    <span class="nav-text">Billing</span>
-                </a>
-                <ul aria-expanded="false">
-                    <li><a asp-page="/Bills/Index">Rent Bills</a></li>
-                    <li><a asp-page="/Bills/LateFees">Late Fees</a></li>
-                    <li><a asp-page="/Payments/Index">Payments</a></li>
-                </ul>
-            </li>
-            <li>
-                <a class="has-arrow ai-icon" href="javascript:void(0)" aria-expanded="false">
-                    <i class="flaticon-381-briefcase"></i>
-                    <span class="nav-text">Property Operations</span>
-                </a>
-                <ul aria-expanded="false">
-                    <li><a asp-page="/Expenses/Index">Expenses</a></li>
-                    <li><a asp-page="/ServiceTickets/Index">Service Tickets</a></li>
-                </ul>
-            </li>
-            <li>
-                <a class="has-arrow ai-icon" href="javascript:void(0)" aria-expanded="false">
-                    <i class="flaticon-381-controls-3"></i>
-                    <span class="nav-text">Reports</span>
-                </a>
-                <ul aria-expanded="false">
-                    <li><a asp-page="/Reports/Receivables">Receivables Summary</a></li>
-                    <li><a asp-page="/Reports/UnpaidBills">Unpaid Bills</a></li>
-                    <li><a asp-page="/Reports/Payments">Payments</a></li>
-                    <li><a asp-page="/Reports/PassThroughExpenses">Pass-through Expenses</a></li>
-                    <li><a asp-page="/Reports/AnnualPnL">Annual P&amp;L</a></li>
-                </ul>
-            </li>
-            <li>
-                <a class="ai-icon" asp-page="/Documents/Index">
-                    <i class="flaticon-381-folder"></i>
-                    <span class="nav-text">Documents</span>
-                </a>
-            </li>
-            @if (isAdmin)
+            @if (isTenant)
             {
                 <li>
+                    <a class="ai-icon" href="/Portal">
+                        <i class="flaticon-381-user-9"></i>
+                        <span class="nav-text">My Portal</span>
+                    </a>
+                </li>
+            }
+            @if (showAdminNav)
+            {
+                <li>
+                    <a class="ai-icon" asp-page="/Index">
+                        <i class="flaticon-381-networking"></i>
+                        <span class="nav-text">Dashboard</span>
+                    </a>
+                </li>
+                <li>
+                    <a class="ai-icon" asp-page="/Properties/Index">
+                        <i class="flaticon-381-home-2"></i>
+                        <span class="nav-text">Properties</span>
+                    </a>
+                </li>
+                <li>
+                    <a class="ai-icon" asp-page="/Tenants/Index">
+                        <i class="flaticon-381-user-9"></i>
+                        <span class="nav-text">Tenants</span>
+                    </a>
+                </li>
+                <li>
+                    <a class="ai-icon" asp-page="/Leases/Index">
+                        <i class="flaticon-381-notepad"></i>
+                        <span class="nav-text">Leases</span>
+                    </a>
+                </li>
+                <li>
                     <a class="has-arrow ai-icon" href="javascript:void(0)" aria-expanded="false">
-                        <i class="flaticon-381-settings"></i>
-                        <span class="nav-text">Settings</span>
+                        <i class="flaticon-381-list"></i>
+                        <span class="nav-text">Billing</span>
                     </a>
                     <ul aria-expanded="false">
-                        <li><a asp-page="/Settings/Branding">Branding</a></li>
-                        <li><a asp-page="/Settings/Email">Email</a></li>
-                        <li><a asp-page="/Settings/Billing">Billing Defaults</a></li>
-                        <li><a asp-page="/Users/Index">Users</a></li>
+                        <li><a asp-page="/Bills/Index">Rent Bills</a></li>
+                        <li><a asp-page="/Bills/LateFees">Late Fees</a></li>
+                        <li><a asp-page="/Payments/Index">Payments</a></li>
                     </ul>
                 </li>
+                <li>
+                    <a class="has-arrow ai-icon" href="javascript:void(0)" aria-expanded="false">
+                        <i class="flaticon-381-briefcase"></i>
+                        <span class="nav-text">Property Operations</span>
+                    </a>
+                    <ul aria-expanded="false">
+                        <li><a asp-page="/Expenses/Index">Expenses</a></li>
+                        <li><a asp-page="/ServiceTickets/Index">Service Tickets</a></li>
+                    </ul>
+                </li>
+                <li>
+                    <a class="has-arrow ai-icon" href="javascript:void(0)" aria-expanded="false">
+                        <i class="flaticon-381-controls-3"></i>
+                        <span class="nav-text">Reports</span>
+                    </a>
+                    <ul aria-expanded="false">
+                        <li><a asp-page="/Reports/Receivables">Receivables Summary</a></li>
+                        <li><a asp-page="/Reports/UnpaidBills">Unpaid Bills</a></li>
+                        <li><a asp-page="/Reports/Payments">Payments</a></li>
+                        <li><a asp-page="/Reports/PassThroughExpenses">Pass-through Expenses</a></li>
+                        <li><a asp-page="/Reports/AnnualPnL">Annual P&amp;L</a></li>
+                    </ul>
+                </li>
+                <li>
+                    <a class="ai-icon" asp-page="/Documents/Index">
+                        <i class="flaticon-381-folder"></i>
+                        <span class="nav-text">Documents</span>
+                    </a>
+                </li>
+                @if (isAdmin)
+                {
+                    <li>
+                        <a class="has-arrow ai-icon" href="javascript:void(0)" aria-expanded="false">
+                            <i class="flaticon-381-settings"></i>
+                            <span class="nav-text">Settings</span>
+                        </a>
+                        <ul aria-expanded="false">
+                            <li><a asp-page="/Settings/Branding">Branding</a></li>
+                            <li><a asp-page="/Settings/Email">Email</a></li>
+                            <li><a asp-page="/Settings/Billing">Billing Defaults</a></li>
+                            <li><a asp-page="/Users/Index">Users</a></li>
+                        </ul>
+                    </li>
+                }
             }
         </ul>
         <div class="copyright">

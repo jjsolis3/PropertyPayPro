@@ -14,6 +14,11 @@ public class ApplicationUser : IdentityUser
     [StringLength(500)]
     public string? AvatarStorageKey { get; set; }
 
+    // Link to the Tenant record this login belongs to. Null for admin/manager
+    // users; populated for tenant-portal logins so their pages can be scoped.
+    public int? TenantId { get; set; }
+    public Tenant? Tenant { get; set; }
+
     public string DisplayName
     {
         get
