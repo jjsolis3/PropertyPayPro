@@ -10,9 +10,34 @@
     <div class="col-md-8">
         @if (!string.IsNullOrEmpty(Model.InviteLink))
         {
-            <div class="alert alert-success">
+            <div class="alert @(Model.EmailSent ? "alert-success" : Model.EmailError is not null ? "alert-warning" : "alert-info")">
                 <h5 class="alert-heading">Invitation created for @Model.InviteEmail</h5>
-                <p class="mb-2">Share this one-time link so they can set their password and log in:</p>
+
+                @if (Model.EmailSent)
+                {
+                    <p class="mb-2">
+                        <strong>✓ Invite emailed</strong> to @Model.InviteEmail. They should receive it within a few minutes.
+                    </p>
+                }
+                else if (Model.EmailError is not null)
+                {
+                    <p class="mb-2">
+                        <strong>⚠ Email send failed:</strong> @Model.EmailError
+                        <br/>Share the link below manually instead:
+                    </p>
+                }
+                else if (!Model.MailConfigured)
+                {
+                    <p class="mb-2">
+                        SMTP isn't configured. Copy the link below and share it with the user manually.
+                        (Configure SMTP under Settings → Email to have future invites emailed automatically.)
+                    </p>
+                }
+                else
+                {
+                    <p class="mb-2">Share this one-time link so they can set their password and log in:</p>
+                }
+
                 <div class="input-group">
                     <input type="text" readonly value="@Model.InviteLink" class="form-control" onclick="this.select()" />
                     <button type="button" class="btn btn-outline-primary"
@@ -21,7 +46,7 @@
                     </button>
                 </div>
                 <small class="text-muted d-block mt-2">
-                    Once SMTP is configured, this link will be emailed automatically. For now, copy and send it manually.
+                    Link expires within 24 hours per Identity defaults.
                 </small>
                 <div class="mt-3">
                     <a asp-page="Index" class="btn btn-outline-secondary">Back to Users</a>

@@ -31,6 +31,13 @@ builder.Services
     .AddRoles<IdentityRole>()
     .AddEntityFrameworkStores<ApplicationDbContext>();
 
+// Persist Data Protection keys to the DB so reset-password tokens, invite
+// links, and sign-in cookies survive container restarts. Without this,
+// every redeploy invalidates all outstanding tokens.
+builder.Services.AddDataProtection()
+    .PersistKeysToDbContext<ApplicationDbContext>()
+    .SetApplicationName("PropertyPayPro");
+
 builder.Services.AddAuthorization(options =>
 {
     options.FallbackPolicy = new AuthorizationPolicyBuilder()
