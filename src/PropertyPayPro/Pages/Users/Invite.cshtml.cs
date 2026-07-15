@@ -8,6 +8,7 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using PropertyPayPro.Data;
 using PropertyPayPro.Models;
+using PropertyPayPro.Services;
 
 namespace PropertyPayPro.Pages.Users;
 
@@ -16,12 +17,18 @@ public class InviteModel : PageModel
 {
     private readonly UserManager<ApplicationUser> _users;
     private readonly ApplicationDbContext _db;
+    private readonly MailService _mail;
 
-    public InviteModel(UserManager<ApplicationUser> users, ApplicationDbContext db)
+    public InviteModel(UserManager<ApplicationUser> users, ApplicationDbContext db, MailService mail)
     {
         _users = users;
         _db = db;
+        _mail = mail;
     }
+
+    public bool MailConfigured => _mail.IsConfigured;
+    public bool EmailSent { get; private set; }
+    public string? EmailError { get; private set; }
 
     public enum InviteRole
     {
@@ -123,6 +130,26 @@ public class InviteModel : PageModel
             values: new { area = "Identity", code = token, email = user.Email },
             protocol: Request.Scheme);
         InviteEmail = user.Email;
+
+        // Auto-send the invite via SMTP if it's configured. The link on the
+        // page stays as a manual fallback if SMTP fails or isn't set up.
+        if (_mail.IsConfigured && !string.IsNullOrEmpty(InviteLink))
+        {
+            try
+            {
+                var baseUrl = $"{Request.Scheme}://{Request.Host}";
+                var log = await _mail.SendInviteAsync(
+                    baseUrl, user.Email!, user.DisplayName, InviteLink,
+                    isTenant: Input.Role == InviteRole.Tenant);
+                if (log.Status == EmailStatus.Sent) EmailSent = true;
+                else EmailError = log.Error;
+            }
+            catch (Exception ex)
+            {
+                EmailError = ex.Message;
+            }
+        }
+
         return Page();
     }
 

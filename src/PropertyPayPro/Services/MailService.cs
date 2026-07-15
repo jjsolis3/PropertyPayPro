@@ -120,6 +120,19 @@ public class MailService
             attachments: null, leaseId: leaseId, ct: ct);
     }
 
+    public async Task<EmailLog> SendInviteAsync(
+        string baseUrl,
+        string toEmail,
+        string displayName,
+        string resetLink,
+        bool isTenant,
+        CancellationToken ct = default)
+    {
+        var subject = "You're invited to PropertyPayPro — set your password";
+        var body = EmailComposer.ComposeInvite(baseUrl, displayName, resetLink, isTenant);
+        return await TrySendAsync(EmailKind.Invite, toEmail, subject, body, attachments: null, ct: ct);
+    }
+
     private async Task<List<EmailAttachment>> LoadAttachmentsAsync(GeneratedDocument doc, CancellationToken ct)
     {
         await using var stream = await _storage.OpenReadAsync(doc.StorageKey, ct);

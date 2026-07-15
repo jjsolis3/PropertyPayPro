@@ -8,7 +8,8 @@ public enum EmailKind
     Receipt,
     Reminder,
     ReimbursementReminder,
-    Other
+    Other,
+    Invite
 }
 
 public enum EmailStatus
