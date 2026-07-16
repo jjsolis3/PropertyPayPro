@@ -84,12 +84,7 @@
                                 <input type="radio" class="btn-check" name="Input.Role" id="role-standard"
                                        value="@PropertyPayPro.Pages.Users.InviteModel.InviteRole.Standard"
                                        @(Model.Input.Role == PropertyPayPro.Pages.Users.InviteModel.InviteRole.Standard ? "checked" : "") />
-                                <label class="btn btn-outline-secondary" for="role-standard">Standard</label>
-
-                                <input type="radio" class="btn-check" name="Input.Role" id="role-manager"
-                                       value="@PropertyPayPro.Pages.Users.InviteModel.InviteRole.Manager"
-                                       @(Model.Input.Role == PropertyPayPro.Pages.Users.InviteModel.InviteRole.Manager ? "checked" : "") />
-                                <label class="btn btn-outline-info" for="role-manager">Manager (read-only)</label>
+                                <label class="btn btn-outline-secondary" for="role-standard">Standard user</label>
 
                                 <input type="radio" class="btn-check" name="Input.Role" id="role-admin"
                                        value="@PropertyPayPro.Pages.Users.InviteModel.InviteRole.Admin"
@@ -101,11 +96,9 @@
                                        @(Model.Input.Role == PropertyPayPro.Pages.Users.InviteModel.InviteRole.Tenant ? "checked" : "") />
                                 <label class="btn btn-outline-success" for="role-tenant">Tenant (portal)</label>
                             </div>
-                            <small class="text-muted d-block mt-1">
-                                <strong>Manager:</strong> read-only across Properties/Tenants/Leases/Bills/Payments/Expenses/Services/Reports.
-                                No Create/Edit/Delete; no Settings or Users.<br />
-                                <strong>Admin:</strong> full access.<br />
-                                <strong>Tenant:</strong> portal login — sees only their own bills, payments, expenses, tickets, and lease documents.
+                            <small class="text-muted">
+                                Tenant portal logins can view their own bills, payments, expenses, service tickets and lease documents.
+                                They cannot see other tenants' data or any admin pages.
                             </small>
                         </div>
 

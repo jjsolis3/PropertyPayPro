@@ -7,7 +7,7 @@ using PropertyPayPro.Models;
 
 namespace PropertyPayPro.Pages.Bills;
 
-[Authorize(Roles = IdentitySeed.AdminRole)]
+[Authorize]
 public class EditModel : PageModel
 {
     private readonly ApplicationDbContext _db;

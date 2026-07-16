@@ -8,7 +8,7 @@ using PropertyPayPro.Models;
 
 namespace PropertyPayPro.Pages.ServiceTickets;
 
-[Authorize(Roles = IdentitySeed.AdminRole)]
+[Authorize]
 public class CreateModel : PageModel
 {
     private readonly ApplicationDbContext _db;

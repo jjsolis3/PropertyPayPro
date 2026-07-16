@@ -35,7 +35,6 @@ public class InviteModel : PageModel
     public enum InviteRole
     {
         Standard,
-        Manager,
         Admin,
         Tenant
     }
@@ -122,10 +121,6 @@ public class InviteModel : PageModel
         if (Input.Role == InviteRole.Admin)
         {
             await _users.AddToRoleAsync(user, IdentitySeed.AdminRole);
-        }
-        else if (Input.Role == InviteRole.Manager)
-        {
-            await _users.AddToRoleAsync(user, IdentitySeed.ManagerRole);
         }
         else if (Input.Role == InviteRole.Tenant)
         {
