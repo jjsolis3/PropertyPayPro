@@ -1,0 +1,56 @@
+@page
+@model PropertyPayPro.Pages.Portal.DocumentsModel
+@{
+    ViewData["Title"] = "Lease Documents";
+}
+
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <div>
+        <h1 class="h3 mb-1">Lease Documents</h1>
+        <div class="text-muted">Documents attached to your leases. Click Download to view.</div>
+    </div>
+</div>
+
+<div class="card">
+    <div class="card-body">
+        <div class="table-responsive">
+            <table class="table table-striped mb-0 js-datatable" data-order='[[0,"desc"]]'>
+                <thead>
+                    <tr>
+                        <th>Uploaded</th>
+                        <th>File</th>
+                        <th>Description</th>
+                        <th>Property</th>
+                        <th class="text-end">Size</th>
+                        <th class="text-end"></th>
+                    </tr>
+                </thead>
+                <tbody>
+                @foreach (var d in Model.Documents)
+                {
+                    <tr>
+                        <td>@d.UploadedOn.ToString("yyyy-MM-dd")</td>
+                        <td>
+                            <i class="las la-file-alt me-1 text-primary"></i>
+                            <span class="fw-semibold">@d.FileName</span>
+                        </td>
+                        <td class="text-muted">@d.Description</td>
+                        <td>@d.Lease?.Property?.Name</td>
+                        <td class="text-end text-muted small">@((d.SizeBytes / 1024.0).ToString("N0")) KB</td>
+                        <td class="text-end">
+                            <a asp-page-handler="Download" asp-route-documentId="@d.Id"
+                               class="btn btn-sm btn-outline-primary">
+                                <i class="las la-download"></i> Download
+                            </a>
+                        </td>
+                    </tr>
+                }
+                @if (!Model.Documents.Any())
+                {
+                    <tr><td colspan="6" class="text-center text-muted py-3">No documents on file for your leases.</td></tr>
+                }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>

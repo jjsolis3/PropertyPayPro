@@ -9,16 +9,19 @@
     <h1 class="h3 mb-0">Rent Bills</h1>
     <div>
         <a asp-page="LateFees" class="btn btn-outline-warning">Late Fees</a>
-        @if (Model.MailConfigured)
+        @if (User.IsInRole(IdentitySeed.AdminRole))
         {
-            <form method="post" asp-page-handler="SendAllStatements" class="d-inline"
-                  onsubmit="return confirm('Email a statement to every tenant with an unpaid balance?');">
-                <button type="submit" class="btn btn-outline-info">Email Statements</button>
-            </form>
+            @if (Model.MailConfigured)
+            {
+                <form method="post" asp-page-handler="SendAllStatements" class="d-inline"
+                      onsubmit="return confirm('Email a statement to every tenant with an unpaid balance?');">
+                    <button type="submit" class="btn btn-outline-info">Email Statements</button>
+                </form>
+            }
+            <button type="button" class="btn btn-success" data-bs-toggle="modal" data-bs-target="#generateBillsModal">
+                <i class="las la-plus"></i> Generate Bills
+            </button>
         }
-        <button type="button" class="btn btn-success" data-bs-toggle="modal" data-bs-target="#generateBillsModal">
-            <i class="las la-plus"></i> Generate Bills
-        </button>
     </div>
 </div>
 

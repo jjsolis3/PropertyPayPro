@@ -8,7 +8,10 @@
 
 <div class="d-flex justify-content-between align-items-center mb-3">
     <h1 class="h3 mb-0">Service Tickets</h1>
-    <a asp-page="Create" class="btn btn-success">New Ticket</a>
+    @if (User.IsInRole(IdentitySeed.AdminRole))
+    {
+        <a asp-page="Create" class="btn btn-success">New Ticket</a>
+    }
 </div>
 
 <div class="row">

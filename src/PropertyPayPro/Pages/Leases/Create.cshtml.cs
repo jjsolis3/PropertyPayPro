@@ -9,7 +9,7 @@ using PropertyPayPro.Services;
 
 namespace PropertyPayPro.Pages.Leases;
 
-[Authorize]
+[Authorize(Roles = IdentitySeed.AdminRole)]
 public class CreateModel : PageModel
 {
     private readonly ApplicationDbContext _db;

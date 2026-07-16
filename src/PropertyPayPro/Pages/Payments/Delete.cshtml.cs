@@ -6,7 +6,7 @@ using PropertyPayPro.Models;
 
 namespace PropertyPayPro.Pages.Payments;
 
-[Authorize]
+[Authorize(Roles = IdentitySeed.AdminRole)]
 public class DeleteModel : PageModel
 {
     private readonly ApplicationDbContext _db;
