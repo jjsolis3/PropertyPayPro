@@ -36,7 +36,6 @@ public class IndexModel : PageModel
                 Email = u.Email ?? "",
                 DisplayName = u.DisplayName,
                 IsAdmin = roles.Contains(IdentitySeed.AdminRole),
-                IsManager = roles.Contains(IdentitySeed.ManagerRole),
                 IsTenant = roles.Contains(IdentitySeed.TenantRole),
                 TenantId = u.TenantId,
                 TenantName = u.Tenant is null ? null : $"{u.Tenant.FirstName} {u.Tenant.LastName}".Trim(),
@@ -132,7 +131,6 @@ public class IndexModel : PageModel
         public string Email { get; set; } = "";
         public string DisplayName { get; set; } = "";
         public bool IsAdmin { get; set; }
-        public bool IsManager { get; set; }
         public bool IsTenant { get; set; }
         public int? TenantId { get; set; }
         public string? TenantName { get; set; }

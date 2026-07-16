@@ -54,7 +54,6 @@
                     <td>@u.DisplayName</td>
                     <td>
                         @if (u.IsAdmin) { <span class="badge bg-primary">Admin</span> }
-                        else if (u.IsManager) { <span class="badge bg-info">Manager</span> }
                         else if (u.IsTenant)
                         {
                             <span class="badge bg-success">Tenant</span>
@@ -65,7 +64,7 @@
                                 </small>
                             }
                         }
-                        else { <span class="badge bg-secondary">Standard</span> }
+                        else { <span class="badge bg-secondary">User</span> }
                     </td>
                     <td>
                         @if (u.LockedOut) { <span class="badge bg-danger">Locked</span> }

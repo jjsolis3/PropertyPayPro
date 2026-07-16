@@ -49,10 +49,7 @@
     <div id="main-wrapper">
         <partial name="_NavHeader" />
         <partial name="_HeaderAdmin" />
-        @{
-            var sidebarPartial = ViewData["IsPortal"] is true ? "_SidebarPortal" : "_Sidebar";
-        }
-        <partial name="@sidebarPartial" />
+        <partial name="_Sidebar" />
 
         <div class="content-body default-height">
             <div class="container-fluid">

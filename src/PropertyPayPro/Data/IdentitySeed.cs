@@ -6,10 +6,9 @@ namespace PropertyPayPro.Data;
 public static class IdentitySeed
 {
     public const string AdminRole = "Admin";
-    public const string ManagerRole = "Manager";
     public const string TenantRole = "Tenant";
 
-    private static readonly string[] AllRoles = { AdminRole, ManagerRole, TenantRole };
+    private static readonly string[] AllRoles = { AdminRole, TenantRole };
 
     public static async Task EnsureAdminAsync(IServiceProvider services, IConfiguration config)
     {
