@@ -45,11 +45,20 @@ builder.Services.AddAuthorization(options =>
         .RequireAuthenticatedUser()
         .Build();
 
-    // Admin surfaces require the Admin role. Applied via the AuthorizeFolder
-    // conventions below so we don't have to sprinkle [Authorize(Roles=…)] on
-    // every page. Tenants get a distinct policy and their own /Portal folder.
+    // Three tiers of admin-facing access:
+    //   AdminOnly     — full write access to management pages (Create/Edit/Delete,
+    //                   Settings, Users).
+    //   ManagerOrAdmin — read access to the same pages. Managers see the same
+    //                   sidebar and list/detail pages as admins; Create/Edit/Delete
+    //                   PageModels carry their own [Authorize(Roles=AdminRole)] so
+    //                   Managers can't mutate. The UI hides those buttons for them.
+    //   TenantOnly    — the /Portal folder only.
     options.AddPolicy("AdminOnly", policy =>
         policy.RequireAuthenticatedUser().RequireRole(IdentitySeed.AdminRole));
+
+    options.AddPolicy("ManagerOrAdmin", policy =>
+        policy.RequireAuthenticatedUser()
+              .RequireRole(IdentitySeed.AdminRole, IdentitySeed.ManagerRole));
 
     options.AddPolicy("TenantOnly", policy =>
         policy.RequireAuthenticatedUser().RequireRole(IdentitySeed.TenantRole));
@@ -67,25 +76,30 @@ builder.Services
         options.Conventions.AllowAnonymousToAreaPage("Identity", "/Account/AccessDenied");
         options.Conventions.AllowAnonymousToPage("/Error");
 
-        // Admin-only folders. Each existing top-level Razor folder is gated on
-        // the Admin role so a tenant-portal login can't wander into them.
-        // Identity area pages (login/manage), the future /Portal folder, and
-        // the root pages "/Index", "/Privacy" fall through to the default
-        // authenticated-user policy.
-        var adminFolders = new[]
+        // Management folders that Managers can VIEW. Individual Create/Edit/
+        // Delete PageModels carry their own [Authorize(Roles=AdminRole)] so
+        // Managers can't mutate.
+        var managementFolders = new[]
         {
             "/Properties", "/Tenants", "/Leases", "/Bills", "/Payments",
             "/Receipts", "/Expenses", "/ServiceTickets", "/Documents",
-            "/Reports", "/Settings", "/Users"
+            "/Reports"
         };
-        foreach (var folder in adminFolders)
+        foreach (var folder in managementFolders)
         {
-            options.Conventions.AuthorizeFolder(folder, "AdminOnly");
+            options.Conventions.AuthorizeFolder(folder, "ManagerOrAdmin");
         }
-        // Root-level admin pages that aren't under a folder.
-        options.Conventions.AuthorizePage("/Index", "AdminOnly");
-        options.Conventions.AuthorizePage("/Privacy", "AdminOnly");
 
+        // Admin-only folders — Settings and user management. Managers can't
+        // reach these at all.
+        options.Conventions.AuthorizeFolder("/Settings", "AdminOnly");
+        options.Conventions.AuthorizeFolder("/Users", "AdminOnly");
+
+        // Root pages (dashboard, privacy) — Managers see the dashboard.
+        options.Conventions.AuthorizePage("/Index", "ManagerOrAdmin");
+        options.Conventions.AuthorizePage("/Privacy", "ManagerOrAdmin");
+
+        // Tenant portal.
         options.Conventions.AuthorizeFolder("/Portal", "TenantOnly");
     });
 

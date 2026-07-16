@@ -1,0 +1,119 @@
+@page
+@model PropertyPayPro.Pages.Portal.ServicesModel
+@using PropertyPayPro.Pages.Shared
+@{
+    ViewData["Title"] = "Service Tickets";
+}
+
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <div>
+        <h1 class="h3 mb-1">Service Tickets</h1>
+        <div class="text-muted">Maintenance requests on properties you lease. Read-only view.</div>
+    </div>
+</div>
+
+<div class="row">
+    <partial name="_KpiCard" model="@(new KpiCardModel {
+        Label = "Open", Value = Model.OpenCount.ToString(),
+        Color = "warning", Icon = "flaticon-381-warning" })" />
+    <partial name="_KpiCard" model="@(new KpiCardModel {
+        Label = "In Progress", Value = Model.InProgressCount.ToString(),
+        Color = "info", Icon = "flaticon-381-time" })" />
+    <partial name="_KpiCard" model="@(new KpiCardModel {
+        Label = "Completed", Value = Model.CompletedCount.ToString(),
+        Color = "success", Icon = "flaticon-381-list" })" />
+    <partial name="_KpiCard" model="@(new KpiCardModel {
+        Label = "Total on File", Value = Model.Tickets.Count.ToString(),
+        Color = "primary", Icon = "flaticon-381-notepad" })" />
+</div>
+
+<div class="card">
+    <div class="card-body">
+        <div class="table-responsive">
+            <table class="table table-striped mb-0 js-datatable" data-order='[[0,"desc"]]'>
+                <thead>
+                    <tr>
+                        <th>Reported</th>
+                        <th>Title</th>
+                        <th>Property</th>
+                        <th>Category</th>
+                        <th>Priority</th>
+                        <th>Scheduled</th>
+                        <th>Vendor</th>
+                        <th>Status</th>
+                    </tr>
+                </thead>
+                <tbody>
+                @foreach (var t in Model.Tickets)
+                {
+                    <tr>
+                        <td>@t.ReportedOn.ToString("yyyy-MM-dd")</td>
+                        <td>
+                            <div class="fw-semibold">@t.Title</div>
+                            @if (!string.IsNullOrWhiteSpace(t.Description))
+                            {
+                                <div class="text-muted small">@t.Description</div>
+                            }
+                        </td>
+                        <td>@t.Property?.Name</td>
+                        <td><span class="badge badge-outline-info">@t.Category</span></td>
+                        <td>
+                            @switch (t.Priority)
+                            {
+                                case ServicePriority.Urgent:
+                                    <span class="badge bg-danger">Urgent</span>
+                                    break;
+                                case ServicePriority.High:
+                                    <span class="badge bg-warning text-dark">High</span>
+                                    break;
+                                case ServicePriority.Low:
+                                    <span class="badge bg-secondary">Low</span>
+                                    break;
+                                default:
+                                    <span class="badge bg-light text-dark">Normal</span>
+                                    break;
+                            }
+                        </td>
+                        <td>@(t.ScheduledFor?.ToString("yyyy-MM-dd") ?? "—")</td>
+                        <td>
+                            @if (!string.IsNullOrWhiteSpace(t.Vendor))
+                            {
+                                <div>@t.Vendor</div>
+                                if (!string.IsNullOrWhiteSpace(t.VendorPhone))
+                                {
+                                    <div class="text-muted small">@t.VendorPhone</div>
+                                }
+                            }
+                            else
+                            {
+                                <span class="text-muted">—</span>
+                            }
+                        </td>
+                        <td>
+                            @switch (t.Status)
+                            {
+                                case ServiceTicketStatus.Open:
+                                    <span class="badge bg-warning text-dark">Open</span>
+                                    break;
+                                case ServiceTicketStatus.InProgress:
+                                    <span class="badge bg-info">In Progress</span>
+                                    break;
+                                case ServiceTicketStatus.Completed:
+                                    <span class="badge bg-success">Completed</span>
+                                    break;
+                                case ServiceTicketStatus.Cancelled:
+                                    <span class="badge bg-secondary">Cancelled</span>
+                                    break;
+                            }
+                        </td>
+                    </tr>
+                }
+                @if (!Model.Tickets.Any())
+                {
+                    <tr><td colspan="8" class="text-center text-muted py-3">No service tickets on file.</td></tr>
+                }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
