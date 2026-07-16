@@ -60,6 +60,39 @@ public class IndexModel : PageModel
         return RedirectToPage();
     }
 
+    /// <summary>
+    /// Admin override: set a user's password directly, without going through
+    /// the email-reset-link flow. Used when the reset-link flow fails or when
+    /// the admin needs to give the user a specific known password.
+    /// </summary>
+    public async Task<IActionResult> OnPostSetPasswordAsync(string id, string newPassword)
+    {
+        var u = await _users.FindByIdAsync(id);
+        if (u is null) return NotFound();
+
+        if (string.IsNullOrWhiteSpace(newPassword) || newPassword.Length < 8)
+        {
+            TempData["Error"] = "New password must be at least 8 characters.";
+            return RedirectToPage();
+        }
+
+        // Skip the reset-token roundtrip entirely — we're admin, we're
+        // authenticated, we're already on a page that requires the Admin
+        // role. Generate a token internally + apply it in one step so the
+        // password rules from Identity's options still get enforced.
+        var token = await _users.GeneratePasswordResetTokenAsync(u);
+        var result = await _users.ResetPasswordAsync(u, token, newPassword);
+        if (!result.Succeeded)
+        {
+            TempData["Error"] = $"Set password failed for {u.Email}: "
+                + string.Join(" ", result.Errors.Select(e => e.Description));
+            return RedirectToPage();
+        }
+
+        TempData["Message"] = $"Password updated for {u.Email}. Share it with them securely.";
+        return RedirectToPage();
+    }
+
     public async Task<IActionResult> OnPostToggleLockoutAsync(string id)
     {
         var u = await _users.FindByIdAsync(id);

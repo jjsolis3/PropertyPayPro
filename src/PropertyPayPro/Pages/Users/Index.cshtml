@@ -74,6 +74,10 @@
                         <form method="post" asp-page-handler="ResetPassword" asp-route-id="@u.Id" class="d-inline">
                             <button type="submit" class="btn btn-sm btn-outline-primary">Reset Password</button>
                         </form>
+                        <button type="button" class="btn btn-sm btn-outline-warning"
+                                data-bs-toggle="modal" data-bs-target="#setPwdModal-@u.Id">
+                            Set Password
+                        </button>
                         <form method="post" asp-page-handler="ToggleAdmin" asp-route-id="@u.Id" class="d-inline">
                             <button type="submit" class="btn btn-sm btn-outline-secondary">
                                 @(u.IsAdmin ? "Remove Admin" : "Make Admin")
@@ -95,3 +99,40 @@
         </table>
     </div>
 </div>
+
+@foreach (var u in Model.Users)
+{
+    <div class="modal fade" id="setPwdModal-@u.Id" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <form method="post" asp-page-handler="SetPassword" asp-route-id="@u.Id">
+                    <div class="modal-header">
+                        <h5 class="modal-title">Set password for @u.Email</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <p class="text-muted small">
+                            Admin override — bypasses the email/reset-link flow. The user's current
+                            password (if any) is discarded. Share the new password with them securely
+                            (in person, phone, or a private channel — not email).
+                        </p>
+                        <div class="mb-3">
+                            <label class="form-label">New password</label>
+                            <input type="password" name="newPassword" minlength="8" required autocomplete="new-password"
+                                   class="form-control" placeholder="At least 8 characters" />
+                        </div>
+                        <div class="form-check">
+                            <input type="checkbox" class="form-check-input" id="showPwd-@u.Id"
+                                   onclick="var p=this.closest('form').querySelector('input[name=newPassword]'); p.type=this.checked?'text':'password';" />
+                            <label class="form-check-label" for="showPwd-@u.Id">Show password</label>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancel</button>
+                        <button type="submit" class="btn btn-warning">Set password</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+}
