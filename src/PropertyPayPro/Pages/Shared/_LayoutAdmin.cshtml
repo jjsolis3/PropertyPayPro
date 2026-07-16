@@ -28,9 +28,12 @@
     <script>
         // Restore sidebar collapsed state before the sidebar renders,
         // otherwise it flashes open then snaps shut on every navigation.
+        // Only applied at desktop widths — on mobile the sidebar is a
+        // drawer that always starts closed regardless of desktop preference.
         (function () {
             try {
-                if (localStorage.getItem('pps-sidebar-collapsed') === '1') {
+                if (window.innerWidth >= 992
+                    && localStorage.getItem('pps-sidebar-collapsed') === '1') {
                     document.documentElement.classList.add('menu-toggle');
                 }
             } catch (e) { /* localStorage unavailable — ignore */ }
