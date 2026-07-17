@@ -1,0 +1,130 @@
+@page
+@model PropertyPayPro.Pages.Portal.IndexModel
+@using PropertyPayPro.Pages.Shared
+@{
+    ViewData["Title"] = "My Portal";
+    var t = Model.CurrentTenant!;
+    var l = Model.PrimaryLease;
+    var today = DateOnly.FromDateTime(DateTime.UtcNow);
+}
+
+<div class="card mb-3">
+    <div class="card-body">
+        <h1 class="h3 mb-1">Welcome, @t.FirstName</h1>
+        <div class="text-muted">Your tenant portal — bills, payments, and lease documents scoped to your account.</div>
+    </div>
+</div>
+
+<div class="row">
+    <partial name="_KpiCard" model="@(new KpiCardModel {
+        Label = "Current Balance", Value = Model.CurrentBalance.ToString("C"),
+        SubText = Model.CurrentBalance > 0 ? "Your share owed" : "Paid up",
+        Color = Model.CurrentBalance > 0 ? "danger" : "success",
+        Icon = "flaticon-381-list" })" />
+    <partial name="_KpiCard" model="@(new KpiCardModel {
+        Label = "Lifetime Paid", Value = Model.LifetimePaid.ToString("C"),
+        SubText = $"{Model.PaymentCount} payment(s)",
+        Color = "success", Icon = "las la-dollar-sign" })" />
+    <partial name="_KpiCard" model="@(new KpiCardModel {
+        Label = "On-time %", Value = $"{Model.OnTimePercent}%",
+        SubText = "Fully paid bills",
+        Color = "info", Icon = "flaticon-381-time" })" />
+    <partial name="_KpiCard" model="@(new KpiCardModel {
+        Label = "Active Leases", Value = Model.ActiveLeases.Count.ToString(),
+        SubText = $"of {Model.AllLeases.Count} total",
+        Color = "primary", Icon = "flaticon-381-notepad" })" />
+</div>
+
+@if (l is not null)
+{
+    var isActive = l.StartDate <= today && (l.IsMonthToMonth || l.EndDate >= today);
+    var term = l.IsMonthToMonth ? "M2M" : $"{l.StartDate:yyyy-MM-dd} → {l.EndDate:yyyy-MM-dd}";
+    <div class="card mb-3">
+        <div class="card-body">
+            <div class="d-flex flex-wrap align-items-center gap-3">
+                <div class="flex-grow-1">
+                    <i class="flaticon-381-home-2 me-2 text-primary"></i>
+                    <strong>@l.Property?.Name</strong>
+                    <span class="text-muted mx-2">•</span>
+                    <span>@term</span>
+                    <span class="text-muted mx-2">•</span>
+                    <span>@l.MonthlyRent.ToString("C")/mo</span>
+                    @if (isActive)
+                    {
+                        <span class="badge bg-success ms-2">Active</span>
+                    }
+                    else
+                    {
+                        <span class="badge bg-secondary ms-2">Ended</span>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+}
+
+<div class="row g-3">
+    <div class="col-lg-7">
+        <div class="card mb-3">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h4 class="card-title mb-0">Recent Payments</h4>
+                <a href="/Portal/Payments" class="btn btn-sm btn-outline-primary">All payments</a>
+            </div>
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table mb-0">
+                        <thead class="table-light">
+                            <tr><th>Date</th><th>Method</th><th>Reference</th><th class="text-end">Amount</th></tr>
+                        </thead>
+                        <tbody>
+                        @foreach (var p in Model.RecentPayments)
+                        {
+                            <tr>
+                                <td>@p.PaidOn.ToString("yyyy-MM-dd")</td>
+                                <td><span class="badge badge-outline-primary">@p.Method</span></td>
+                                <td class="text-muted small">@p.Reference</td>
+                                <td class="text-end fw-bold">@p.Amount.ToString("C")</td>
+                            </tr>
+                        }
+                        @if (!Model.RecentPayments.Any())
+                        {
+                            <tr><td colspan="4" class="text-center text-muted py-3">No payments yet.</td></tr>
+                        }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-lg-5">
+        <div class="card mb-3">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h4 class="card-title mb-0">Unpaid Bills</h4>
+                <a href="/Portal/Bills" class="btn btn-sm btn-outline-primary">All bills</a>
+            </div>
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table mb-0">
+                        <thead class="table-light">
+                            <tr><th>Period</th><th>Due</th><th class="text-end">Owed</th></tr>
+                        </thead>
+                        <tbody>
+                        @foreach (var s in Model.UnpaidShares.Take(10))
+                        {
+                            <tr>
+                                <td>@s.Charge.PeriodLabel</td>
+                                <td>@s.Charge.DueDate.ToString("MMM d")</td>
+                                <td class="text-end fw-bold">@s.Balance.ToString("C")</td>
+                            </tr>
+                        }
+                        @if (!Model.UnpaidShares.Any())
+                        {
+                            <tr><td colspan="3" class="text-center text-success py-3">All caught up.</td></tr>
+                        }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

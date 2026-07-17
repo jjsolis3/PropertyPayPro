@@ -36,6 +36,7 @@
 
 <div class="card">
     <div class="card-body">
+        <div class="table-responsive">
         <table class="table table-striped mb-0 js-datatable" data-order='[[0,"asc"]]'>
             <thead>
                 <tr>
@@ -54,6 +55,7 @@
                     <td>@u.DisplayName</td>
                     <td>
                         @if (u.IsAdmin) { <span class="badge bg-primary">Admin</span> }
+                        else if (u.IsManager) { <span class="badge bg-info">Manager</span> }
                         else if (u.IsTenant)
                         {
                             <span class="badge bg-success">Tenant</span>
@@ -64,7 +66,7 @@
                                 </small>
                             }
                         }
-                        else { <span class="badge bg-secondary">User</span> }
+                        else { <span class="badge bg-secondary">Standard</span> }
                     </td>
                     <td>
                         @if (u.LockedOut) { <span class="badge bg-danger">Locked</span> }
@@ -97,6 +99,7 @@
             }
             </tbody>
         </table>
+        </div>
     </div>
 </div>
 

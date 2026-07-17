@@ -6,7 +6,7 @@ using PropertyPayPro.Models;
 
 namespace PropertyPayPro.Pages.Properties;
 
-[Authorize]
+[Authorize(Roles = IdentitySeed.AdminRole)]
 public class CreateModel : PageModel
 {
     private readonly ApplicationDbContext _db;

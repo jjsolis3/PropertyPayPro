@@ -5,6 +5,7 @@
 @inject PropertyPayPro.Services.AppSettingsService AppSettings
 @{
     var isAdmin = false;
+    var isManager = false;
     var isTenant = false;
     if (SignInManager.IsSignedIn(User))
     {
@@ -12,12 +13,14 @@
         if (current is not null)
         {
             isAdmin = await UserManager.IsInRoleAsync(current, PropertyPayPro.Data.IdentitySeed.AdminRole);
+            isManager = await UserManager.IsInRoleAsync(current, PropertyPayPro.Data.IdentitySeed.ManagerRole);
             isTenant = await UserManager.IsInRoleAsync(current, PropertyPayPro.Data.IdentitySeed.TenantRole);
         }
     }
-    // Tenant-only accounts see just the portal link. Admin (or anyone without a
-    // specific role) gets the full management nav.
-    var showAdminNav = !isTenant || isAdmin;
+    // Admin + Manager see the management nav. Tenants get the portal link only.
+    // Anyone else (Standard user without a role) sees nothing — every page will
+    // deny them anyway.
+    var showAdminNav = isAdmin || isManager;
     var appSettings = await AppSettings.GetAsync();
 }
 <div class="deznav">
