@@ -27,13 +27,16 @@
     </style>
     <script>
         // Restore sidebar collapsed state before the sidebar renders,
-        // otherwise it flashes open then snaps shut on every navigation.
-        // Only applied at desktop widths — on mobile the sidebar is a
-        // drawer that always starts closed regardless of desktop preference.
+        // otherwise the icon strip vs full-text flashes on every load.
+        // On mobile the sidebar always starts collapsed (icon strip
+        // only) regardless of the desktop preference — otherwise the
+        // drawer would pop open on its own on a phone.
         (function () {
             try {
-                if (window.innerWidth >= 992
-                    && localStorage.getItem('pps-sidebar-collapsed') === '1') {
+                var isMobile = window.innerWidth < 992;
+                var collapsed = isMobile
+                    || localStorage.getItem('pps-sidebar-collapsed') === '1';
+                if (collapsed) {
                     document.documentElement.classList.add('menu-toggle');
                 }
             } catch (e) { /* localStorage unavailable — ignore */ }

@@ -20,60 +20,48 @@ body { margin: 0; }
     .nav-header .brand-title { display: none; }
 }
 
-/* Tablet / mobile drawer behavior.
-   Mophy's default sidebar assumes a wide viewport and its collapse-to-icons
-   state (.menu-toggle) doesn't fit small screens. On tablets/phones we
-   convert the sidebar into a slide-in drawer:
-     • Sidebar is fixed-position, off-screen by default.
-     • #main-wrapper.mobile-menu-open reveals it with a semi-transparent backdrop.
-     • Content-body always fills the full viewport width — no reserved gutter.
-   The desktop >=992px behavior is untouched. */
+/* Tablet / mobile sidebar behavior.
+   Same mental model as desktop — the burger toggles between the 6rem
+   icon strip (.menu-toggle) and the 16.5rem full-text sidebar (no
+   .menu-toggle) — but the expanded state OVERLAYS content instead of
+   pushing it aside, so the main content never gets squeezed.
+     • Icon strip (6rem) is always visible; content-body reserves that
+       gutter so nothing hides behind it.
+     • Expanded sidebar is fixed-position with a backdrop; tap the
+       backdrop or the burger to collapse it.
+   Desktop >=992px keeps Mophy's push-content behavior untouched. */
 @media (max-width: 991.98px) {
-    .content-body { margin-left: 0 !important; }
-    .footer { padding-left: 0 !important; }
+    /* Content sits to the right of the 6rem icon strip at all times.
+       Mophy would otherwise try to widen this margin to 16.5rem when
+       the sidebar expands — we don't want that on small screens. */
+    .content-body { margin-left: 6rem !important; }
+    .footer { padding-left: 6rem !important; }
 
-    /* Shrink the nav-header (top-left brand block) to a compact strip and
-       nudge the burger button to sit just to its right. */
-    .nav-header { width: 3.5rem !important; }
-    .nav-header .brand-logo { padding: 0 !important; justify-content: center !important; }
-    .nav-header .brand-title { display: none !important; }
-    .nav-header .logo-abbr { display: inline-block !important; }
-    .nav-header .nav-control { right: -3.5rem !important; }
-    .header .header-content { padding-left: 4.5rem !important; }
-
-    /* Sidebar becomes a fixed drawer. */
-    .deznav {
+    /* Expanded state (no .menu-toggle) — sidebar becomes a fixed
+       drawer that floats over content. */
+    #main-wrapper:not(.menu-toggle) .deznav {
         position: fixed !important;
-        left: -110% !important;
         top: var(--dz-header-height, 5rem);
+        left: 0 !important;
         height: calc(100vh - var(--dz-header-height, 5rem)) !important;
         width: 16.5rem !important;
         z-index: 999 !important;
-        transition: left .25s ease !important;
         box-shadow: 4px 0 16px rgba(0, 0, 0, 0.15);
         overflow-y: auto !important;
+        transition: transform .2s ease;
     }
-    #main-wrapper.mobile-menu-open .deznav { left: 0 !important; }
 
-    /* Force menu labels visible even when Mophy's .menu-toggle rules
-       would otherwise hide them (the burger click still adds menu-toggle
-       — we override its visual effects at mobile widths). */
-    .deznav .nav-text,
-    .deznav .badge,
-    .deznav .copyright,
-    .deznav .deznav-scroll,
-    .menu-toggle .deznav .nav-text,
-    .menu-toggle .deznav .badge,
-    .menu-toggle .deznav .copyright { display: block !important; }
-    .deznav .metismenu > li > a { text-align: left !important; }
-    .deznav .metismenu .nav-text { display: inline-block !important; }
-
-    /* Backdrop over content when drawer is open. */
-    #main-wrapper.mobile-menu-open::before {
+    /* Backdrop over the visible content area (right of the icon strip)
+       when the drawer is open. Clicks on it are handled by
+       sidebar-persist.js which re-adds .menu-toggle to close. */
+    #main-wrapper:not(.menu-toggle)::before {
         content: "";
         position: fixed;
-        inset: 0;
-        background: rgba(0, 0, 0, 0.4);
+        top: var(--dz-header-height, 5rem);
+        left: 6rem;
+        right: 0;
+        bottom: 0;
+        background: rgba(0, 0, 0, 0.35);
         z-index: 998;
     }
 }
