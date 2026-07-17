@@ -1,35 +1,42 @@
-// Sidebar behavior:
-//   • Desktop (>=992px): the burger toggles Mophy's .menu-toggle on
-//     #main-wrapper (full sidebar ↔ icons-only). The collapsed preference
-//     is persisted to localStorage so it survives page loads.
-//   • Tablet / phone (<992px): the burger toggles .mobile-menu-open on
-//     #main-wrapper — the sidebar slides in as an overlay drawer with a
-//     backdrop. The desktop collapsed preference is ignored here so the
-//     drawer always starts closed.
+// Sidebar behavior across all viewport sizes:
+//   • Burger toggles Mophy's .menu-toggle on #main-wrapper — same
+//     class Mophy already toggles — flipping the sidebar between the
+//     6rem icon strip (menu-toggle applied) and the 16.5rem full-text
+//     sidebar (menu-toggle removed).
+//   • On desktop (>=992px), the two states push content aside like
+//     Mophy's default. The collapsed preference is persisted so it
+//     survives navigation.
+//   • On tablet/phone (<992px), site.css keeps content-body pinned to
+//     the icon-strip gutter and turns the expanded state into a fixed
+//     drawer with a backdrop. Mobile always LOADS collapsed regardless
+//     of the desktop preference, so the drawer never pops open on its
+//     own. Tapping the backdrop closes the drawer.
 (function () {
     var KEY = 'pps-sidebar-collapsed';
     var MOBILE_BREAKPOINT = 992;
 
     function isMobile() { return window.innerWidth < MOBILE_BREAKPOINT; }
 
+    function setCollapsed(collapsed) {
+        var wrapper = document.getElementById('main-wrapper');
+        if (!wrapper) return;
+        wrapper.classList.toggle('menu-toggle', collapsed);
+        document.documentElement.classList.toggle('menu-toggle', collapsed);
+        document.querySelectorAll('.hamburger').forEach(function (h) {
+            h.classList.toggle('is-active', collapsed);
+        });
+    }
+
     function applyInitial() {
         try {
-            var wrapper = document.getElementById('main-wrapper');
-            if (!wrapper) return;
             if (isMobile()) {
-                // Never carry a desktop "collapsed" preference into mobile:
-                // that would render the sidebar as an unexpected open drawer.
-                wrapper.classList.remove('menu-toggle', 'mobile-menu-open');
-                document.documentElement.classList.remove('menu-toggle');
+                // Mobile always starts collapsed — icon strip visible,
+                // drawer closed. The persisted desktop preference is
+                // irrelevant here.
+                setCollapsed(true);
                 return;
             }
-            if (localStorage.getItem(KEY) === '1') {
-                wrapper.classList.add('menu-toggle');
-                document.documentElement.classList.add('menu-toggle');
-            } else {
-                wrapper.classList.remove('menu-toggle');
-                document.documentElement.classList.remove('menu-toggle');
-            }
+            setCollapsed(localStorage.getItem(KEY) === '1');
         } catch (e) { /* localStorage unavailable — ignore */ }
     }
 
@@ -39,54 +46,38 @@
         applyInitial();
     }
 
-    // Intercept the burger click in the capture phase so we can preempt
-    // Mophy's default handler at mobile widths without ripping it out.
+    // Burger click: let Mophy's own handler flip .menu-toggle, then
+    // persist (desktop only) and keep <html> in sync so the head-inline
+    // restore script picks the right initial state on the next load.
     document.addEventListener('click', function (e) {
         var trigger = e.target && e.target.closest && e.target.closest('.nav-control');
         if (!trigger) return;
-
-        var wrapper = document.getElementById('main-wrapper');
-        if (!wrapper) return;
-
-        if (isMobile()) {
-            // Prevent Mophy from toggling .menu-toggle (that would give us
-            // the desktop "collapse to icons" behavior instead of a drawer).
-            e.stopImmediatePropagation();
-            e.preventDefault();
-            wrapper.classList.toggle('mobile-menu-open');
-            document.querySelectorAll('.hamburger').forEach(function (h) {
-                h.classList.toggle('is-active');
-            });
-            return;
-        }
-
-        // Desktop: let Mophy's own handler flip .menu-toggle, then persist.
         setTimeout(function () {
             try {
+                var wrapper = document.getElementById('main-wrapper');
+                if (!wrapper) return;
                 var collapsed = wrapper.classList.contains('menu-toggle');
-                localStorage.setItem(KEY, collapsed ? '1' : '0');
-                if (collapsed) {
-                    document.documentElement.classList.add('menu-toggle');
-                } else {
-                    document.documentElement.classList.remove('menu-toggle');
+                document.documentElement.classList.toggle('menu-toggle', collapsed);
+                if (!isMobile()) {
+                    localStorage.setItem(KEY, collapsed ? '1' : '0');
                 }
             } catch (err) { /* ignore */ }
         }, 0);
-    }, true);
+    });
 
-    // Tap the backdrop to close the drawer.
+    // Backdrop tap on small screens: close the drawer. A tap inside the
+    // sidebar itself, or on the burger, doesn't count.
     document.addEventListener('click', function (e) {
         if (!isMobile()) return;
         var wrapper = document.getElementById('main-wrapper');
-        if (!wrapper || !wrapper.classList.contains('mobile-menu-open')) return;
-        // A click inside the sidebar or on the burger should NOT close.
+        if (!wrapper) return;
+        if (wrapper.classList.contains('menu-toggle')) return; // already collapsed
         if (e.target.closest('.deznav') || e.target.closest('.nav-control')) return;
-        wrapper.classList.remove('mobile-menu-open');
-        document.querySelectorAll('.hamburger.is-active').forEach(function (h) {
-            h.classList.remove('is-active');
-        });
+        setCollapsed(true);
     });
 
-    // Re-evaluate when viewport crosses the breakpoint (rotate, resize).
+    // Viewport crossing the breakpoint (rotate, resize): re-apply the
+    // rule so the desktop preference doesn't leak into the mobile state
+    // and vice versa.
     window.addEventListener('resize', applyInitial);
 })();
