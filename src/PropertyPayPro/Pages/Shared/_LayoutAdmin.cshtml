@@ -28,14 +28,16 @@
     <script>
         // Restore sidebar collapsed state before the sidebar renders,
         // otherwise the icon strip vs full-text flashes on every load.
-        // On mobile the sidebar always starts collapsed (icon strip
-        // only) regardless of the desktop preference — otherwise the
-        // drawer would pop open on its own on a phone.
+        // If the user has no stored preference yet, default to
+        // collapsed on mobile so a 16.5rem sidebar doesn't crush the
+        // content column on a phone.
         (function () {
             try {
-                var isMobile = window.innerWidth < 992;
-                var collapsed = isMobile
-                    || localStorage.getItem('pps-sidebar-collapsed') === '1';
+                var stored = localStorage.getItem('pps-sidebar-collapsed');
+                var collapsed;
+                if (stored === '1') collapsed = true;
+                else if (stored === '0') collapsed = false;
+                else collapsed = window.innerWidth < 992;
                 if (collapsed) {
                     document.documentElement.classList.add('menu-toggle');
                 }

@@ -20,51 +20,12 @@ body { margin: 0; }
     .nav-header .brand-title { display: none; }
 }
 
-/* Tablet / mobile sidebar behavior.
-   Same mental model as desktop — the burger toggles between the 6rem
-   icon strip (.menu-toggle) and the 16.5rem full-text sidebar (no
-   .menu-toggle) — but the expanded state OVERLAYS content instead of
-   pushing it aside, so the main content never gets squeezed.
-     • Icon strip (6rem) is always visible; content-body reserves that
-       gutter so nothing hides behind it.
-     • Expanded sidebar is fixed-position with a backdrop; tap the
-       backdrop or the burger to collapse it.
-   Desktop >=992px keeps Mophy's push-content behavior untouched. */
-@media (max-width: 991.98px) {
-    /* Content sits to the right of the 6rem icon strip at all times.
-       Mophy would otherwise try to widen this margin to 16.5rem when
-       the sidebar expands — we don't want that on small screens. */
-    .content-body { margin-left: 6rem !important; }
-    .footer { padding-left: 6rem !important; }
-
-    /* Expanded state (no .menu-toggle) — sidebar becomes a fixed
-       drawer that floats over content. */
-    #main-wrapper:not(.menu-toggle) .deznav {
-        position: fixed !important;
-        top: var(--dz-header-height, 5rem);
-        left: 0 !important;
-        height: calc(100vh - var(--dz-header-height, 5rem)) !important;
-        width: 16.5rem !important;
-        z-index: 999 !important;
-        box-shadow: 4px 0 16px rgba(0, 0, 0, 0.15);
-        overflow-y: auto !important;
-        transition: transform .2s ease;
-    }
-
-    /* Backdrop over the visible content area (right of the icon strip)
-       when the drawer is open. Clicks on it are handled by
-       sidebar-persist.js which re-adds .menu-toggle to close. */
-    #main-wrapper:not(.menu-toggle)::before {
-        content: "";
-        position: fixed;
-        top: var(--dz-header-height, 5rem);
-        left: 6rem;
-        right: 0;
-        bottom: 0;
-        background: rgba(0, 0, 0, 0.35);
-        z-index: 998;
-    }
-}
+/* Sidebar behavior at all viewport sizes matches Mophy's default
+   desktop model: the sidebar always pushes content aside via
+   .content-body's margin-left. No drawer, no backdrop, no overlay —
+   the sidebar and the content share the window regardless of screen
+   width. The burger toggles between the 6rem icon strip
+   (.menu-toggle applied) and the 16.5rem full-text sidebar. */
 
 /* DataTables polish to fit Mophy card style */
 table.dataTable { width: 100% !important; }
