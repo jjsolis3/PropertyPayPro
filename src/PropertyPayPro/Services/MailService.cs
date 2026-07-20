@@ -133,6 +133,68 @@ public class MailService
         return await TrySendAsync(EmailKind.Invite, toEmail, subject, body, attachments: null, ct: ct);
     }
 
+    /// <summary>
+    /// Sends a generated notice PDF to a specific tenant email as an
+    /// attachment. Notice creation (PDF build, LeaseDocument row) is
+    /// handled by the caller; this method just wraps the send + log.
+    /// </summary>
+    public async Task<EmailLog> SendNoticeAsync(
+        string baseUrl,
+        string toEmail,
+        int leaseId,
+        string noticeTitle,
+        string pdfFileName,
+        byte[] pdfBytes,
+        CancellationToken ct = default)
+    {
+        var subject = noticeTitle;
+        var body = EmailComposer.ComposeNotice(baseUrl, noticeTitle, pdfFileName);
+        var attachments = new List<EmailAttachment>
+        {
+            new(pdfFileName, "application/pdf", pdfBytes)
+        };
+        return await TrySendAsync(EmailKind.Notice, toEmail, subject, body, attachments,
+            leaseId: leaseId, ct: ct);
+    }
+
+    /// <summary>
+    /// Sends a broadcast email to a list of recipients. Each address gets
+    /// its own send + its own EmailLog row so failures on one address
+    /// don't stop the others. Body is treated as pre-composed HTML.
+    /// </summary>
+    public async Task<BroadcastResult> SendBroadcastAsync(
+        string baseUrl,
+        IEnumerable<string> recipients,
+        string subject,
+        string plainTextBody,
+        CancellationToken ct = default)
+    {
+        var body = EmailComposer.ComposeBroadcast(baseUrl, subject, plainTextBody);
+        var addresses = recipients
+            .Where(a => !string.IsNullOrWhiteSpace(a))
+            .Select(a => a.Trim())
+            .Distinct(StringComparer.OrdinalIgnoreCase)
+            .ToList();
+
+        var sent = 0;
+        var failed = 0;
+        var errors = new List<string>();
+        foreach (var address in addresses)
+        {
+            var log = await TrySendAsync(EmailKind.Broadcast, address, subject, body,
+                attachments: null, ct: ct);
+            if (log.Status == EmailStatus.Sent) sent++;
+            else
+            {
+                failed++;
+                if (!string.IsNullOrWhiteSpace(log.Error)) errors.Add($"{address}: {log.Error}");
+            }
+        }
+        return new BroadcastResult(addresses.Count, sent, failed, errors);
+    }
+
+    public record BroadcastResult(int TotalRecipients, int Sent, int Failed, IReadOnlyList<string> Errors);
+
     private async Task<List<EmailAttachment>> LoadAttachmentsAsync(GeneratedDocument doc, CancellationToken ct)
     {
         await using var stream = await _storage.OpenReadAsync(doc.StorageKey, ct);

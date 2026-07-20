@@ -105,6 +105,20 @@
                         <li><a asp-page="/Documents/Index">Generated PDFs</a></li>
                     </ul>
                 </li>
+                <li>
+                    <a class="has-arrow ai-icon" href="javascript:void(0)" aria-expanded="false">
+                        <i class="flaticon-381-warning"></i>
+                        <span class="nav-text">Notices</span>
+                    </a>
+                    <ul aria-expanded="false">
+                        <li><a asp-page="/Notices/Index">All Notices</a></li>
+                        @if (isAdmin)
+                        {
+                            <li><a asp-page="/Notices/Create">New Notice</a></li>
+                            <li><a asp-page="/Notices/Broadcast">Broadcast Message</a></li>
+                        }
+                    </ul>
+                </li>
                 @if (isAdmin)
                 {
                     <li>

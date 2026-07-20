@@ -1,0 +1,91 @@
+@page
+@model PropertyPayPro.Pages.Notices.CreateModel
+@{
+    ViewData["Title"] = "New Notice";
+}
+
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <div>
+        <h1 class="h3 mb-1">New Notice</h1>
+        <div class="text-muted">
+            Generate a formal PDF notice for a lease and (optionally) email it to the tenant(s).
+            The PDF is auto-attached to the lease as a Notice document.
+        </div>
+    </div>
+    <a asp-page="Index" class="btn btn-outline-secondary">Back to notices</a>
+</div>
+
+@if (!Model.MailConfigured)
+{
+    <div class="alert alert-warning">
+        SMTP is not configured — the notice will still be generated and attached to the lease,
+        but automatic email delivery is disabled.
+        Configure SMTP under Settings → Email to enable it.
+    </div>
+}
+
+<form method="post" asp-page-handler="Generate">
+    <div asp-validation-summary="ModelOnly" class="alert alert-danger" style="display:none"></div>
+
+    <div class="card mb-3">
+        <div class="card-body">
+            <div class="row g-3">
+                <div class="col-md-6">
+                    <label asp-for="Input.LeaseId" class="form-label"></label>
+                    <select asp-for="Input.LeaseId" asp-items="Model.LeaseOptions" class="form-select">
+                        <option value="">— Pick a lease —</option>
+                    </select>
+                </div>
+                <div class="col-md-4">
+                    <label asp-for="Input.Template" class="form-label"></label>
+                    <select asp-for="Input.Template" asp-items="Model.TemplateOptions" class="form-select"></select>
+                </div>
+                <div class="col-md-2 d-flex align-items-end">
+                    <button type="submit" formaction="?handler=Reload" class="btn btn-outline-primary w-100">
+                        Load template
+                    </button>
+                </div>
+            </div>
+            @if (Model.SelectedLease is not null)
+            {
+                <small class="text-muted d-block mt-2">
+                    <strong>@Model.SelectedLease.Property!.Name</strong> —
+                    @Model.SelectedLease.TenantNames
+                    (@Model.RecipientCount tenant(s) with email on file)
+                </small>
+            }
+            else
+            {
+                <small class="text-muted d-block mt-2">
+                    Pick a lease and template, then click <em>Load template</em> to pre-fill.
+                </small>
+            }
+        </div>
+    </div>
+
+    <div class="card mb-3">
+        <div class="card-body">
+            <div class="mb-3">
+                <label asp-for="Input.Title" class="form-label"></label>
+                <input asp-for="Input.Title" class="form-control" />
+                <span asp-validation-for="Input.Title" class="text-danger"></span>
+            </div>
+            <div class="mb-3">
+                <label asp-for="Input.Body" class="form-label"></label>
+                <textarea asp-for="Input.Body" class="form-control" rows="18"
+                          style="font-family: monospace; font-size: 0.9rem;"></textarea>
+                <small class="text-muted">
+                    Edit freely. The text you see here is what will appear in the generated PDF.
+                    Placeholders like <code>[ENTER NEW AMOUNT]</code> need to be filled in manually.
+                </small>
+                <span asp-validation-for="Input.Body" class="text-danger"></span>
+            </div>
+            <div class="form-check mb-3">
+                <input asp-for="Input.EmailToTenant" class="form-check-input" />
+                <label asp-for="Input.EmailToTenant" class="form-check-label"></label>
+            </div>
+            <button type="submit" class="btn btn-primary">Generate + Attach</button>
+            <a asp-page="Index" class="btn btn-outline-secondary">Cancel</a>
+        </div>
+    </div>
+</form>
