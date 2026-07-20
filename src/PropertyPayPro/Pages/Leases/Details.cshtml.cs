@@ -1,3 +1,4 @@
+using System.IO.Compression;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
@@ -35,37 +36,56 @@ public class DetailsModel : PageModel
         return Lease is null ? NotFound() : Page();
     }
 
-    public async Task<IActionResult> OnPostUploadAsync(int leaseId, IFormFile? file, string? description)
+    public async Task<IActionResult> OnPostUploadAsync(
+        int leaseId,
+        List<IFormFile>? files,
+        LeaseDocumentType type,
+        string? description,
+        DateOnly? effectiveDate,
+        DateOnly? expiresOn)
     {
         var lease = await _db.Leases.FindAsync(leaseId);
         if (lease is null) return NotFound();
 
-        if (file is null || file.Length == 0)
+        var valid = (files ?? new List<IFormFile>())
+            .Where(f => f.Length > 0)
+            .ToList();
+
+        if (valid.Count == 0)
         {
-            ModelState.AddModelError(string.Empty, "Choose a file to upload.");
+            ModelState.AddModelError(string.Empty, "Choose at least one file to upload.");
             await LoadAsync(leaseId);
             return Page();
         }
 
-        if (file.Length > 25 * 1024 * 1024)
+        foreach (var file in valid)
         {
-            ModelState.AddModelError(string.Empty, "File too large (25 MB max).");
-            await LoadAsync(leaseId);
-            return Page();
+            if (file.Length > 25 * 1024 * 1024)
+            {
+                ModelState.AddModelError(string.Empty, $"'{file.FileName}' is too large (25 MB max).");
+                await LoadAsync(leaseId);
+                return Page();
+            }
         }
 
-        await using var stream = file.OpenReadStream();
-        var key = await _storage.SaveAsync($"leases/{leaseId}", file.FileName, stream);
-
-        _db.LeaseDocuments.Add(new LeaseDocument
+        foreach (var file in valid)
         {
-            LeaseId = leaseId,
-            FileName = file.FileName,
-            ContentType = file.ContentType,
-            SizeBytes = file.Length,
-            StorageKey = key,
-            Description = description
-        });
+            await using var stream = file.OpenReadStream();
+            var key = await _storage.SaveAsync($"leases/{leaseId}", file.FileName, stream);
+
+            _db.LeaseDocuments.Add(new LeaseDocument
+            {
+                LeaseId = leaseId,
+                Type = type,
+                FileName = file.FileName,
+                ContentType = file.ContentType,
+                SizeBytes = file.Length,
+                StorageKey = key,
+                Description = description,
+                EffectiveDate = effectiveDate,
+                ExpiresOn = expiresOn
+            });
+        }
         await _db.SaveChangesAsync();
 
         return RedirectToPage(new { id = leaseId });
@@ -79,6 +99,56 @@ public class DetailsModel : PageModel
 
         var stream = await _storage.OpenReadAsync(doc.StorageKey);
         return File(stream, doc.ContentType, doc.FileName);
+    }
+
+    /// <summary>
+    /// Streams all documents attached to a lease as a single zip.
+    /// The archive is built entirely in memory — capped by the 25 MB
+    /// per-document upload limit, so an entire lease's document set
+    /// stays comfortably under any reasonable request memory budget.
+    /// </summary>
+    public async Task<IActionResult> OnGetDownloadAllAsync(int id)
+    {
+        var lease = await _db.Leases
+            .Include(l => l.Documents)
+            .Include(l => l.Property)
+            .FirstOrDefaultAsync(l => l.Id == id);
+        if (lease is null || lease.Documents.Count == 0) return NotFound();
+
+        var ms = new MemoryStream();
+        using (var zip = new ZipArchive(ms, ZipArchiveMode.Create, leaveOpen: true))
+        {
+            var used = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+            foreach (var d in lease.Documents.OrderBy(d => d.Type).ThenBy(d => d.UploadedOn))
+            {
+                var name = MakeUniqueEntryName(d, used);
+                var entry = zip.CreateEntry(name, CompressionLevel.Fastest);
+                await using var entryStream = entry.Open();
+                await using var srcStream = await _storage.OpenReadAsync(d.StorageKey);
+                await srcStream.CopyToAsync(entryStream);
+            }
+        }
+        ms.Position = 0;
+
+        var safeName = string.Join('-',
+            (lease.Property?.Name ?? "lease").Split(Path.GetInvalidFileNameChars()));
+        return File(ms, "application/zip", $"{safeName}-lease-{lease.Id}-documents.zip");
+    }
+
+    private static string MakeUniqueEntryName(LeaseDocument d, HashSet<string> used)
+    {
+        var folder = d.Type.ToString();
+        var baseName = $"{folder}/{d.FileName}";
+        var candidate = baseName;
+        var i = 1;
+        while (!used.Add(candidate))
+        {
+            var name = Path.GetFileNameWithoutExtension(d.FileName);
+            var ext = Path.GetExtension(d.FileName);
+            candidate = $"{folder}/{name}-{i}{ext}";
+            i++;
+        }
+        return candidate;
     }
 
     public async Task<IActionResult> OnPostDeleteDocumentAsync(int id, int documentId)

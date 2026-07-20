@@ -8,7 +8,7 @@ using PropertyPayPro.Services;
 
 namespace PropertyPayPro.Pages.Documents;
 
-[Authorize]
+[Authorize(Roles = IdentitySeed.AdminRole + "," + IdentitySeed.ManagerRole)]
 public class IndexModel : PageModel
 {
     private readonly ApplicationDbContext _db;

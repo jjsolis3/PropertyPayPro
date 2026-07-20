@@ -79,10 +79,17 @@ builder.Services
         // Management folders that Managers can VIEW. Individual Create/Edit/
         // Delete PageModels carry their own [Authorize(Roles=AdminRole)] so
         // Managers can't mutate.
+        //
+        // /Documents is NOT in this list — the folder holds pages with
+        // mixed access needs (the Lease Hub and Generated PDFs are
+        // Admin/Manager only, but Documents/Preview is scoped inside the
+        // page model so tenants can preview their own lease docs). Each
+        // page in /Documents carries its own [Authorize] attribute
+        // instead of relying on a folder convention.
         var managementFolders = new[]
         {
             "/Properties", "/Tenants", "/Leases", "/Bills", "/Payments",
-            "/Receipts", "/Expenses", "/ServiceTickets", "/Documents",
+            "/Receipts", "/Expenses", "/ServiceTickets",
             "/Reports"
         };
         foreach (var folder in managementFolders)

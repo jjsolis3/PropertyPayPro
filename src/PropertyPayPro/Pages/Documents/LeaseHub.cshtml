@@ -1,0 +1,161 @@
+@page
+@model PropertyPayPro.Pages.Documents.LeaseHubModel
+@using PropertyPayPro.Pages.Shared
+@{
+    ViewData["Title"] = "Lease Documents";
+}
+
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <div>
+        <h1 class="h3 mb-1">Lease Documents</h1>
+        <div class="text-muted">Every lease document in one place — searchable, filterable, with expiration alerts.</div>
+    </div>
+    <a asp-page="Index" class="btn btn-outline-secondary">Generated PDFs</a>
+</div>
+
+<div class="row">
+    <partial name="_KpiCard" model="@(new KpiCardModel {
+        Label = "Total Documents", Value = Model.TotalCount.ToString(),
+        Color = "primary", Icon = "flaticon-381-folder" })" />
+    <partial name="_KpiCard" model="@(new KpiCardModel {
+        Label = "Expiring in 30d", Value = Model.ExpiringSoonCount.ToString(),
+        SubText = "Insurance, W-9, background checks",
+        Color = Model.ExpiringSoonCount > 0 ? "warning" : "success",
+        Icon = "flaticon-381-time" })" />
+    <partial name="_KpiCard" model="@(new KpiCardModel {
+        Label = "Expired", Value = Model.ExpiredCount.ToString(),
+        Color = Model.ExpiredCount > 0 ? "danger" : "success",
+        Icon = "flaticon-381-warning" })" />
+    <partial name="_KpiCard" model="@(new KpiCardModel {
+        Label = "Properties Covered", Value = Model.Properties.Count.ToString(),
+        Color = "info", Icon = "flaticon-381-home-2" })" />
+</div>
+
+@if (Model.ExpiringSoon.Any())
+{
+    <div class="card border-warning mb-3">
+        <div class="card-header bg-warning-subtle">
+            <h5 class="mb-0"><i class="las la-exclamation-triangle text-warning"></i> Expiring in the next 30 days</h5>
+        </div>
+        <div class="card-body p-0">
+            <div class="table-responsive">
+                <table class="table table-sm mb-0">
+                    <thead class="table-light">
+                        <tr><th>File</th><th>Type</th><th>Property</th><th>Expires</th><th></th></tr>
+                    </thead>
+                    <tbody>
+                    @foreach (var d in Model.ExpiringSoon)
+                    {
+                        var status = LeaseDocumentDisplay.StatusBadge(d.ExpiresOn);
+                        var typeColor = LeaseDocumentDisplay.TypeBadgeColor(d.Type);
+                        <tr>
+                            <td class="fw-semibold">@d.FileName</td>
+                            <td><span class="badge bg-@typeColor">@LeaseDocumentDisplay.TypeLabel(d.Type)</span></td>
+                            <td>@d.Lease?.Property?.Name</td>
+                            <td><span class="badge bg-@status.color">@status.label</span></td>
+                            <td class="text-end">
+                                <a asp-page="Preview" asp-route-id="@d.Id" class="btn btn-sm btn-outline-info">Preview</a>
+                                <a asp-page="/Leases/Details" asp-route-id="@d.LeaseId" class="btn btn-sm btn-outline-secondary">Lease</a>
+                            </td>
+                        </tr>
+                    }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+}
+
+<div class="card">
+    <div class="card-body">
+        <form method="get" class="row g-2 mb-3">
+            <div class="col-md-4">
+                <input asp-for="Q" class="form-control" placeholder="Search filename, description, property..." />
+            </div>
+            <div class="col-md-3">
+                <select asp-for="TypeFilter"
+                        asp-items="Html.GetEnumSelectList<PropertyPayPro.Models.LeaseDocumentType>()"
+                        class="form-select">
+                    <option value="">All types</option>
+                </select>
+            </div>
+            <div class="col-md-2">
+                <select asp-for="PropertyFilter" class="form-select">
+                    <option value="">All properties</option>
+                    @foreach (var p in Model.Properties)
+                    {
+                        <option value="@p.Id">@p.Name</option>
+                    }
+                </select>
+            </div>
+            <div class="col-md-2">
+                <select asp-for="Status" class="form-select">
+                    <option value="">Any status</option>
+                    <option value="current">Current</option>
+                    <option value="expiring">Expiring soon</option>
+                    <option value="expired">Expired</option>
+                </select>
+            </div>
+            <div class="col-md-1">
+                <button type="submit" class="btn btn-primary w-100">Go</button>
+            </div>
+        </form>
+
+        <div class="table-responsive">
+            <table class="table table-striped mb-0 js-datatable" data-order='[[4,"desc"]]'>
+                <thead>
+                    <tr>
+                        <th>File</th>
+                        <th>Type</th>
+                        <th>Property / Lease</th>
+                        <th>Status</th>
+                        <th>Uploaded</th>
+                        <th class="text-end"></th>
+                    </tr>
+                </thead>
+                <tbody>
+                @foreach (var d in Model.Documents)
+                {
+                    var status = LeaseDocumentDisplay.StatusBadge(d.ExpiresOn);
+                    var typeColor = LeaseDocumentDisplay.TypeBadgeColor(d.Type);
+                    var previewable = LeaseDocumentDisplay.IsPreviewable(d.ContentType);
+                    <tr>
+                        <td>
+                            <span class="fw-semibold">@d.FileName</span>
+                            @if (!string.IsNullOrWhiteSpace(d.Description))
+                            { <br /><small class="text-muted">@d.Description</small> }
+                        </td>
+                        <td><span class="badge bg-@typeColor">@LeaseDocumentDisplay.TypeLabel(d.Type)</span></td>
+                        <td>
+                            <div>@d.Lease?.Property?.Name</div>
+                            <small class="text-muted">@d.Lease?.TenantNames</small>
+                        </td>
+                        <td>
+                            @if (!string.IsNullOrEmpty(status.label))
+                            {
+                                <span class="badge bg-@status.color">@status.label</span>
+                            }
+                            else
+                            {
+                                <span class="text-muted small">—</span>
+                            }
+                        </td>
+                        <td>@d.UploadedOn.ToString("yyyy-MM-dd")</td>
+                        <td class="text-end">
+                            @if (previewable)
+                            {
+                                <a asp-page="Preview" asp-route-id="@d.Id" class="btn btn-sm btn-outline-info">Preview</a>
+                            }
+                            <a asp-page="/Leases/Details" asp-route-id="@d.LeaseId" class="btn btn-sm btn-outline-secondary">Lease</a>
+                        </td>
+                    </tr>
+                }
+                @if (!Model.Documents.Any())
+                {
+                    <tr><td colspan="6" class="text-center text-muted py-3">No documents match those filters.</td></tr>
+                }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>

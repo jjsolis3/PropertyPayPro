@@ -1,0 +1,65 @@
+@page "{id:int}"
+@model PropertyPayPro.Pages.Documents.PreviewModel
+@using PropertyPayPro.Pages.Shared
+@{
+    ViewData["Title"] = "Preview — " + Model.Document!.FileName;
+    var d = Model.Document!;
+    var typeLabel = LeaseDocumentDisplay.TypeLabel(d.Type);
+    var typeColor = LeaseDocumentDisplay.TypeBadgeColor(d.Type);
+    var status = LeaseDocumentDisplay.StatusBadge(d.ExpiresOn);
+    var streamUrl = Url.Page(null, pageHandler: "Stream", values: new { id = d.Id });
+}
+
+<div class="card mb-3">
+    <div class="card-body d-flex flex-wrap align-items-center gap-3">
+        <div class="flex-grow-1">
+            <h4 class="mb-1">@d.FileName</h4>
+            <div>
+                <span class="badge bg-@typeColor me-1">@typeLabel</span>
+                @if (!string.IsNullOrEmpty(status.label))
+                {
+                    <span class="badge bg-@status.color me-1">@status.label</span>
+                }
+                <span class="text-muted small">Uploaded @d.UploadedOn.ToString("yyyy-MM-dd")</span>
+                @if (d.EffectiveDate.HasValue)
+                {
+                    <span class="text-muted small ms-2">• Effective @d.EffectiveDate.Value.ToString("yyyy-MM-dd")</span>
+                }
+            </div>
+            @if (!string.IsNullOrWhiteSpace(d.Description))
+            {
+                <div class="text-muted small mt-1">@d.Description</div>
+            }
+        </div>
+        <div class="flex-shrink-0">
+            <a href="@streamUrl" download="@d.FileName" class="btn btn-outline-secondary">Download</a>
+            <a href="@Model.BackUrl" class="btn btn-outline-primary">Back</a>
+        </div>
+    </div>
+</div>
+
+<div class="card">
+    <div class="card-body p-0" style="min-height: 70vh;">
+        @if (LeaseDocumentDisplay.IsPdf(d.ContentType))
+        {
+            <iframe src="@streamUrl" style="width:100%; height: 80vh; border: 0;"
+                    title="Preview of @d.FileName"></iframe>
+        }
+        else if (LeaseDocumentDisplay.IsImage(d.ContentType))
+        {
+            <div class="text-center p-3">
+                <img src="@streamUrl" alt="@d.FileName" class="img-fluid" style="max-height: 80vh;" />
+            </div>
+        }
+        else
+        {
+            <div class="text-center py-5">
+                <i class="las la-file-alt display-1 text-muted"></i>
+                <p class="mt-3 text-muted">
+                    Inline preview isn't available for <code>@d.ContentType</code> files.
+                </p>
+                <a href="@streamUrl" download="@d.FileName" class="btn btn-primary">Download to view</a>
+            </div>
+        }
+    </div>
+</div>

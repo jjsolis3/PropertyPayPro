@@ -1,5 +1,6 @@
 @page
 @model PropertyPayPro.Pages.Portal.DocumentsModel
+@using PropertyPayPro.Pages.Shared
 @{
     ViewData["Title"] = "Lease Documents";
 }
@@ -7,37 +8,57 @@
 <div class="d-flex justify-content-between align-items-center mb-3">
     <div>
         <h1 class="h3 mb-1">Lease Documents</h1>
-        <div class="text-muted">Documents attached to your leases. Click Download to view.</div>
+        <div class="text-muted">Documents attached to your leases. Preview or download.</div>
     </div>
 </div>
 
 <div class="card">
     <div class="card-body">
         <div class="table-responsive">
-            <table class="table table-striped mb-0 js-datatable" data-order='[[0,"desc"]]'>
+            <table class="table table-striped mb-0 js-datatable" data-order='[[3,"desc"]]'>
                 <thead>
                     <tr>
-                        <th>Uploaded</th>
                         <th>File</th>
-                        <th>Description</th>
+                        <th>Type</th>
                         <th>Property</th>
-                        <th class="text-end">Size</th>
+                        <th>Uploaded</th>
+                        <th>Status</th>
                         <th class="text-end"></th>
                     </tr>
                 </thead>
                 <tbody>
                 @foreach (var d in Model.Documents)
                 {
+                    var typeColor = LeaseDocumentDisplay.TypeBadgeColor(d.Type);
+                    var typeLabel = LeaseDocumentDisplay.TypeLabel(d.Type);
+                    var status = LeaseDocumentDisplay.StatusBadge(d.ExpiresOn);
+                    var previewable = LeaseDocumentDisplay.IsPreviewable(d.ContentType);
                     <tr>
-                        <td>@d.UploadedOn.ToString("yyyy-MM-dd")</td>
                         <td>
                             <i class="las la-file-alt me-1 text-primary"></i>
                             <span class="fw-semibold">@d.FileName</span>
+                            @if (!string.IsNullOrWhiteSpace(d.Description))
+                            { <br /><small class="text-muted">@d.Description</small> }
                         </td>
-                        <td class="text-muted">@d.Description</td>
+                        <td><span class="badge bg-@typeColor">@typeLabel</span></td>
                         <td>@d.Lease?.Property?.Name</td>
-                        <td class="text-end text-muted small">@((d.SizeBytes / 1024.0).ToString("N0")) KB</td>
+                        <td>@d.UploadedOn.ToString("yyyy-MM-dd")</td>
+                        <td>
+                            @if (!string.IsNullOrEmpty(status.label))
+                            {
+                                <span class="badge bg-@status.color">@status.label</span>
+                            }
+                            else
+                            {
+                                <span class="text-muted small">—</span>
+                            }
+                        </td>
                         <td class="text-end">
+                            @if (previewable)
+                            {
+                                <a asp-page="/Documents/Preview" asp-route-id="@d.Id"
+                                   class="btn btn-sm btn-outline-info">Preview</a>
+                            }
                             <a asp-page-handler="Download" asp-route-documentId="@d.Id"
                                class="btn btn-sm btn-outline-primary">
                                 <i class="las la-download"></i> Download
