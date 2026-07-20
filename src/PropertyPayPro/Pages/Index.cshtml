@@ -76,6 +76,55 @@
             </div>
         }
 
+        @if (Model.ExpiringSoonDocs.Any() || Model.ExpiredDocCount > 0)
+        {
+            <div class="card border-warning mb-3">
+                <div class="card-header d-flex justify-content-between align-items-center bg-warning-subtle">
+                    <h5 class="mb-0">
+                        <i class="las la-exclamation-triangle text-warning"></i>
+                        Documents expiring soon
+                        <small class="text-muted ms-2">
+                            @Model.ExpiringSoonCount in next 30d
+                            @if (Model.ExpiredDocCount > 0)
+                            {
+                                <span class="text-danger">• @Model.ExpiredDocCount already expired</span>
+                            }
+                        </small>
+                    </h5>
+                    <a asp-page="/Documents/LeaseHub" asp-route-Status="expiring" class="btn btn-sm btn-outline-warning">Review</a>
+                </div>
+                @if (Model.ExpiringSoonDocs.Any())
+                {
+                    <div class="card-body p-0">
+                        <div class="table-responsive">
+                            <table class="table table-sm mb-0">
+                                <thead class="table-light">
+                                    <tr><th>File</th><th>Type</th><th>Property</th><th>Expires</th><th></th></tr>
+                                </thead>
+                                <tbody>
+                                @foreach (var d in Model.ExpiringSoonDocs)
+                                {
+                                    var status = PropertyPayPro.Pages.Shared.LeaseDocumentDisplay.StatusBadge(d.ExpiresOn);
+                                    var typeColor = PropertyPayPro.Pages.Shared.LeaseDocumentDisplay.TypeBadgeColor(d.Type);
+                                    var typeLabel = PropertyPayPro.Pages.Shared.LeaseDocumentDisplay.TypeLabel(d.Type);
+                                    <tr>
+                                        <td class="fw-semibold">@d.FileName</td>
+                                        <td><span class="badge bg-@typeColor">@typeLabel</span></td>
+                                        <td>@d.Lease?.Property?.Name</td>
+                                        <td><span class="badge bg-@status.color">@status.label</span></td>
+                                        <td class="text-end">
+                                            <a asp-page="/Documents/Preview" asp-route-id="@d.Id" class="btn btn-sm btn-outline-info">Preview</a>
+                                        </td>
+                                    </tr>
+                                }
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                }
+            </div>
+        }
+
         <div class="row">
             <div class="col-xl-7">
                 <div class="card">

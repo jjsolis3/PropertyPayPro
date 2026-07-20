@@ -96,10 +96,14 @@
                     </ul>
                 </li>
                 <li>
-                    <a class="ai-icon" asp-page="/Documents/Index">
+                    <a class="has-arrow ai-icon" href="javascript:void(0)" aria-expanded="false">
                         <i class="flaticon-381-folder"></i>
                         <span class="nav-text">Documents</span>
                     </a>
+                    <ul aria-expanded="false">
+                        <li><a asp-page="/Documents/LeaseHub">Lease Documents</a></li>
+                        <li><a asp-page="/Documents/Index">Generated PDFs</a></li>
+                    </ul>
                 </li>
                 @if (isAdmin)
                 {

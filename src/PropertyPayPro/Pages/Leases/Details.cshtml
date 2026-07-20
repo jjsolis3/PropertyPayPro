@@ -251,30 +251,99 @@
             </div>
 
             <div class="tab-pane fade" id="tab-docs" role="tabpanel">
-                <h5 class="mb-2">Lease Documents</h5>
-                <form method="post" enctype="multipart/form-data" asp-page-handler="Upload" class="mb-3 row g-2 align-items-end">
+                <div class="d-flex justify-content-between align-items-center mb-2">
+                    <h5 class="mb-0">Lease Documents</h5>
+                    @if (Model.Lease.Documents.Any())
+                    {
+                        <a asp-page-handler="DownloadAll" class="btn btn-sm btn-outline-primary">
+                            <i class="las la-file-archive"></i> Download all (zip)
+                        </a>
+                    }
+                </div>
+
+                <form method="post" enctype="multipart/form-data" asp-page-handler="Upload" class="card border mb-3">
                     <input type="hidden" name="leaseId" value="@Model.Lease.Id" />
-                    <div class="col-md-4"><input type="file" name="file" class="form-control" required /></div>
-                    <div class="col-md-6"><input type="text" name="description" class="form-control" placeholder="Description (optional)" maxlength="255" /></div>
-                    <div class="col-md-2"><button type="submit" class="btn btn-primary w-100">Upload</button></div>
+                    <div class="card-body">
+                        <div class="row g-2">
+                            <div class="col-md-4">
+                                <label class="form-label small">Files (multiple allowed)</label>
+                                <input type="file" name="files" class="form-control" multiple required />
+                            </div>
+                            <div class="col-md-3">
+                                <label class="form-label small">Type</label>
+                                <select name="type" class="form-select"
+                                        asp-items="Html.GetEnumSelectList<PropertyPayPro.Models.LeaseDocumentType>()"></select>
+                            </div>
+                            <div class="col-md-5">
+                                <label class="form-label small">Description (optional)</label>
+                                <input type="text" name="description" class="form-control" maxlength="255" />
+                            </div>
+                            <div class="col-md-3">
+                                <label class="form-label small">Effective date (optional)</label>
+                                <input type="date" name="effectiveDate" class="form-control" />
+                            </div>
+                            <div class="col-md-3">
+                                <label class="form-label small">Expires on (optional)</label>
+                                <input type="date" name="expiresOn" class="form-control" />
+                            </div>
+                            <div class="col-md-6 d-flex align-items-end">
+                                <button type="submit" class="btn btn-primary">Upload</button>
+                                <small class="text-muted ms-3">
+                                    Type + expiration surface documents on the "expiring soon" dashboard.
+                                </small>
+                            </div>
+                        </div>
+                    </div>
                 </form>
+
                 @if (Model.Lease.Documents.Any())
                 {
                     <div class="table-responsive">
-                        <table class="table table-sm mb-0 js-datatable" data-order='[[1,"desc"]]' data-page-length="10">
-                            <thead class="table-light"><tr><th>File</th><th>Uploaded</th><th></th></tr></thead>
+                        <table class="table table-sm mb-0 js-datatable" data-order='[[3,"desc"]]' data-page-length="10">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>File</th>
+                                    <th>Type</th>
+                                    <th>Status</th>
+                                    <th>Uploaded</th>
+                                    <th class="text-end"></th>
+                                </tr>
+                            </thead>
                             <tbody>
                             @foreach (var d in Model.Lease.Documents.OrderByDescending(x => x.UploadedOn))
                             {
+                                var status = PropertyPayPro.Pages.Shared.LeaseDocumentDisplay.StatusBadge(d.ExpiresOn);
+                                var typeColor = PropertyPayPro.Pages.Shared.LeaseDocumentDisplay.TypeBadgeColor(d.Type);
+                                var typeLabel = PropertyPayPro.Pages.Shared.LeaseDocumentDisplay.TypeLabel(d.Type);
+                                var previewable = PropertyPayPro.Pages.Shared.LeaseDocumentDisplay.IsPreviewable(d.ContentType);
                                 <tr>
                                     <td>
-                                        @d.FileName
+                                        <span class="fw-semibold">@d.FileName</span>
                                         @if (!string.IsNullOrWhiteSpace(d.Description))
                                         { <br /><small class="text-muted">@d.Description</small> }
+                                        @if (d.EffectiveDate.HasValue)
+                                        { <br /><small class="text-muted">Effective @d.EffectiveDate.Value.ToString("yyyy-MM-dd")</small> }
+                                    </td>
+                                    <td><span class="badge bg-@typeColor">@typeLabel</span></td>
+                                    <td>
+                                        @if (!string.IsNullOrEmpty(status.label))
+                                        {
+                                            <span class="badge bg-@status.color">@status.label</span>
+                                        }
+                                        else
+                                        {
+                                            <span class="text-muted small">—</span>
+                                        }
                                     </td>
                                     <td>@d.UploadedOn.ToString("yyyy-MM-dd")</td>
                                     <td class="text-end">
-                                        <a asp-page-handler="Download" asp-route-documentId="@d.Id" class="btn btn-sm btn-outline-secondary">Download</a>
+                                        @if (previewable)
+                                        {
+                                            <a asp-page="/Documents/Preview" asp-route-id="@d.Id"
+                                               class="btn btn-sm btn-outline-info">Preview</a>
+                                        }
+                                        <a asp-page-handler="Download" asp-route-documentId="@d.Id"
+                                           class="btn btn-sm btn-outline-secondary">Download</a>
                                         <form method="post" asp-page-handler="DeleteDocument" class="d-inline">
                                             <input type="hidden" name="documentId" value="@d.Id" />
                                             <button type="submit" class="btn btn-sm btn-outline-danger"

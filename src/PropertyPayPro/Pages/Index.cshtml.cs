@@ -21,10 +21,15 @@ public class IndexModel : PageModel
     public List<RentPayment> RecentPayments { get; private set; } = new();
     public List<RentalCharge> UpcomingBills { get; private set; } = new();
 
+    public int ExpiringSoonCount { get; private set; }
+    public int ExpiredDocCount { get; private set; }
+    public List<LeaseDocument> ExpiringSoonDocs { get; private set; } = new();
+
     public async Task OnGetAsync()
     {
         var today = DateOnly.FromDateTime(DateTime.UtcNow);
         var firstOfMonth = new DateOnly(today.Year, today.Month, 1);
+        var soonCutoff = today.AddDays(30);
 
         PropertyCount = await _db.Properties.CountAsync();
         ActiveLeaseCount = await _db.Leases
@@ -54,5 +59,22 @@ public class IndexModel : PageModel
             .ThenByDescending(p => p.Id)
             .Take(8)
             .ToListAsync();
+
+        // Expiring lease documents — insurance certs, background checks,
+        // W-9s, anything with an ExpiresOn set. Surfaced here so admins
+        // notice them before they lapse.
+        ExpiringSoonDocs = await _db.LeaseDocuments
+            .Include(d => d.Lease).ThenInclude(l => l!.Property)
+            .Where(d => d.ExpiresOn.HasValue
+                && d.ExpiresOn.Value >= today
+                && d.ExpiresOn.Value <= soonCutoff)
+            .OrderBy(d => d.ExpiresOn)
+            .Take(5)
+            .ToListAsync();
+        ExpiringSoonCount = await _db.LeaseDocuments.CountAsync(d => d.ExpiresOn.HasValue
+            && d.ExpiresOn.Value >= today
+            && d.ExpiresOn.Value <= soonCutoff);
+        ExpiredDocCount = await _db.LeaseDocuments.CountAsync(d => d.ExpiresOn.HasValue
+            && d.ExpiresOn.Value < today);
     }
 }
