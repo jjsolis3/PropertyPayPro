@@ -254,6 +254,40 @@ public static class EmailComposer
             </p>");
     }
 
+    public static string ComposeNotice(
+        string baseUrl,
+        string noticeTitle,
+        string pdfFileName)
+    {
+        var logoUrl = $"{baseUrl}/img/brand/PPS_Logo_Main.png";
+        return BaseTemplate(noticeTitle, logoUrl, $@"
+            <h1 style=""margin:8px 0 4px;color:#333;"">{Esc(noticeTitle)}</h1>
+            <p style=""color:#666;margin:0 0 20px;"">A formal notice from your property management has been attached to this email.</p>
+
+            <p>The full notice is included as a PDF attachment: <strong>{Esc(pdfFileName)}</strong>.</p>
+
+            <p style=""margin-top:20px;color:#555;"">
+                Please review the attached notice carefully. If you have questions or believe
+                you have received it in error, contact your property manager as soon as possible.
+            </p>");
+    }
+
+    public static string ComposeBroadcast(
+        string baseUrl,
+        string subject,
+        string plainTextBody)
+    {
+        var logoUrl = $"{baseUrl}/img/brand/PPS_Logo_Main.png";
+        // Preserve line breaks the admin typed by converting them to <br />
+        // AFTER escaping — otherwise the escape swallows the newlines.
+        var htmlBody = Esc(plainTextBody).Replace("\r\n", "\n").Replace("\n", "<br />\n");
+        return BaseTemplate(subject, logoUrl, $@"
+            <h1 style=""margin:8px 0 4px;color:#333;"">{Esc(subject)}</h1>
+            <div style=""margin-top:20px;line-height:1.6;color:#333;"">
+                {htmlBody}
+            </div>");
+    }
+
     private static string BaseTemplate(string title, string logoUrl, string innerHtml) => $@"<!doctype html>
 <html><head><meta charset=""utf-8""><title>{title}</title></head>
 <body style=""font-family:-apple-system,BlinkMacSystemFont,Segoe UI,Roboto,Helvetica,Arial,sans-serif;background:#f5f5f5;margin:0;padding:24px;color:#333;"">

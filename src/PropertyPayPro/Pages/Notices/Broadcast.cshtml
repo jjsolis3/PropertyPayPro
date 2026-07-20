@@ -1,0 +1,115 @@
+@page
+@model PropertyPayPro.Pages.Notices.BroadcastModel
+@{
+    ViewData["Title"] = "Broadcast Message";
+}
+
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <div>
+        <h1 class="h3 mb-1">Broadcast Message</h1>
+        <div class="text-muted">
+            Send a one-off message to a group of tenants. Use for outage notices,
+            reminders, or announcements. Each send is logged.
+        </div>
+    </div>
+    <a asp-page="Index" class="btn btn-outline-secondary">Back to notices</a>
+</div>
+
+@if (TempData["Message"] is string msg)
+{
+    <div class="alert alert-success alert-dismissible fade show">@msg
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+}
+@if (TempData["Error"] is string err)
+{
+    <div class="alert alert-warning alert-dismissible fade show">@err
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+}
+
+@if (!Model.MailConfigured)
+{
+    <div class="alert alert-warning">
+        SMTP is not configured — broadcasts cannot be sent until SMTP is set up
+        under Settings → Email.
+    </div>
+}
+
+<form method="post">
+    <div asp-validation-summary="ModelOnly" class="alert alert-danger"></div>
+
+    <div class="card mb-3">
+        <div class="card-body">
+            <div class="mb-3">
+                <label asp-for="Input.Subject" class="form-label"></label>
+                <input asp-for="Input.Subject" class="form-control" />
+                <span asp-validation-for="Input.Subject" class="text-danger"></span>
+            </div>
+            <div class="mb-3">
+                <label asp-for="Input.Body" class="form-label"></label>
+                <textarea asp-for="Input.Body" class="form-control" rows="10"></textarea>
+                <small class="text-muted">Plain text; line breaks are preserved. Recipients see this as an email.</small>
+                <span asp-validation-for="Input.Body" class="text-danger"></span>
+            </div>
+        </div>
+    </div>
+
+    <div class="card mb-3">
+        <div class="card-header">
+            <h5 class="mb-0">Recipients</h5>
+        </div>
+        <div class="card-body">
+            <div class="form-check mb-2">
+                <input type="radio" asp-for="Input.Scope" value="AllTenants"
+                       id="scope-all" class="form-check-input" />
+                <label for="scope-all" class="form-check-label">
+                    <strong>All tenants</strong> with an email on file
+                    <span class="badge bg-secondary ms-2">@Model.CountAll</span>
+                </label>
+            </div>
+            <div class="form-check mb-2">
+                <input type="radio" asp-for="Input.Scope" value="ActiveLeasesOnly"
+                       id="scope-active" class="form-check-input" />
+                <label for="scope-active" class="form-check-label">
+                    Tenants on <strong>active leases only</strong>
+                    <span class="badge bg-secondary ms-2">@Model.CountActive</span>
+                </label>
+            </div>
+            <div class="form-check mb-2">
+                <input type="radio" asp-for="Input.Scope" value="SpecificProperty"
+                       id="scope-property" class="form-check-input" />
+                <label for="scope-property" class="form-check-label">
+                    Tenants at a <strong>specific property</strong>
+                </label>
+            </div>
+            <div class="ms-4" id="property-picker">
+                <select asp-for="Input.PropertyId" class="form-select"
+                        asp-items="Model.PropertyOptions">
+                    <option value="">— Pick a property —</option>
+                </select>
+                <span asp-validation-for="Input.PropertyId" class="text-danger"></span>
+                <small class="text-muted d-block mt-1">
+                    Only tenants on <em>active</em> leases at the chosen property are included.
+                </small>
+                <div class="mt-2 small text-muted" id="per-property-hint">
+                    Active recipients per property:
+                    @foreach (var p in Model.PropertyOptions.Cast<Microsoft.AspNetCore.Mvc.Rendering.SelectListItem>())
+                    {
+                        int.TryParse(p.Value, out var pid);
+                        Model.CountPerProperty.TryGetValue(pid, out var pcount);
+                        <span class="badge bg-light text-dark border me-1">@p.Text: @pcount</span>
+                    }
+                </div>
+            </div>
+        </div>
+        <div class="card-footer bg-white">
+            <button type="submit" class="btn btn-primary"
+                    onclick="return confirm('Send this broadcast now? Each recipient gets an email.');"
+                    disabled="@(!Model.MailConfigured)">
+                <i class="las la-paper-plane"></i> Send Broadcast
+            </button>
+            <a asp-page="Index" class="btn btn-outline-secondary">Cancel</a>
+        </div>
+    </div>
+</form>

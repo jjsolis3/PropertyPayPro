@@ -9,7 +9,9 @@ public enum EmailKind
     Reminder,
     ReimbursementReminder,
     Other,
-    Invite
+    Invite,
+    Notice,
+    Broadcast
 }
 
 public enum EmailStatus

@@ -32,6 +32,12 @@
         </div>
         <div class="flex-shrink-0">
             <a asp-page="/Reports/Statement" asp-route-leaseId="@Model.Lease.Id" class="btn btn-outline-info">View Statement</a>
+            @if (User.IsInRole(IdentitySeed.AdminRole))
+            {
+                <a asp-page="/Notices/Create" asp-route-leaseId="@Model.Lease.Id" class="btn btn-outline-warning">
+                    <i class="las la-file-alt"></i> New Notice
+                </a>
+            }
             <a asp-page="/Payments/Create" asp-route-leaseId="@Model.Lease.Id" class="btn btn-success">Record Payment</a>
             <a asp-page="Edit" asp-route-id="@Model.Lease.Id" class="btn btn-primary">Edit</a>
             <a asp-page="Index" class="btn btn-outline-secondary">Back</a>
