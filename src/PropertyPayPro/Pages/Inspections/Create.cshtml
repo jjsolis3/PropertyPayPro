@@ -1,0 +1,79 @@
+@page
+@model PropertyPayPro.Pages.Inspections.CreateModel
+@{
+    ViewData["Title"] = "New Inspection";
+}
+
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <h1 class="h3 mb-0">New Inspection</h1>
+    <a asp-page="Index" class="btn btn-outline-secondary">Back</a>
+</div>
+
+<div class="card">
+    <div class="card-body">
+        <form method="post">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+            <div class="row g-3">
+                <div class="col-md-8">
+                    <label asp-for="Input.LeaseId" class="form-label">Lease</label>
+                    <select asp-for="Input.LeaseId" asp-items="Model.LeaseOptions" class="form-select">
+                        <option value="">— Pick a lease —</option>
+                    </select>
+                    <span asp-validation-for="Input.LeaseId" class="text-danger"></span>
+                </div>
+                <div class="col-md-4">
+                    <label asp-for="Input.Kind" class="form-label">Kind</label>
+                    <select asp-for="Input.Kind"
+                            asp-items="Html.GetEnumSelectList<PropertyPayPro.Models.InspectionKind>()"
+                            class="form-select"></select>
+                </div>
+
+                <div class="col-md-4">
+                    <label asp-for="Input.ScheduledFor" class="form-label">Scheduled for</label>
+                    <input asp-for="Input.ScheduledFor" type="date" class="form-control" />
+                </div>
+                <div class="col-md-4">
+                    <label asp-for="Input.ConductedBy" class="form-label">Conducted by</label>
+                    <input asp-for="Input.ConductedBy" class="form-control" placeholder="Your name" />
+                </div>
+                <div class="col-md-4 d-flex align-items-end">
+                    <div class="form-check">
+                        <input asp-for="Input.TenantPresent" class="form-check-input" />
+                        <label asp-for="Input.TenantPresent" class="form-check-label">Tenant present</label>
+                    </div>
+                </div>
+
+                <div class="col-12">
+                    <div class="form-check">
+                        <input asp-for="Input.SeedFromTemplate" class="form-check-input" />
+                        <label asp-for="Input.SeedFromTemplate" class="form-check-label">
+                            <strong>Seed with standard room / item checklist</strong>
+                            <small class="text-muted d-block">
+                                Creates ~55 pre-filled items across Living Room, Kitchen, Bedrooms,
+                                Bathrooms, Laundry, and Utility Systems. You can add / edit / delete
+                                any of them once inside.
+                            </small>
+                        </label>
+                    </div>
+                </div>
+                <div class="col-12">
+                    <div class="form-check">
+                        <input asp-for="Input.AutoLinkMoveIn" class="form-check-input" />
+                        <label asp-for="Input.AutoLinkMoveIn" class="form-check-label">
+                            Auto-link to most recent completed move-in (move-out only)
+                            <small class="text-muted d-block">
+                                Convenient shortcut for building a deposit-deduction diff — ignored on move-in.
+                            </small>
+                        </label>
+                    </div>
+                </div>
+            </div>
+
+            <div class="mt-3">
+                <button type="submit" class="btn btn-primary">Create + open editor</button>
+                <a asp-page="Index" class="btn btn-outline-secondary">Cancel</a>
+            </div>
+        </form>
+    </div>
+</div>

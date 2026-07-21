@@ -17,6 +17,7 @@
     var paymentCount = Model.Lease.Payments.Count;
     var docCount = Model.Lease.Documents.Count;
     var pdfCount = Model.GeneratedDocs.Count;
+    var inspectionCount = Model.Inspections.Count;
 }
 
 <div class="card mb-3">
@@ -92,6 +93,11 @@
             <li class="nav-item" role="presentation">
                 <button class="nav-link" data-bs-toggle="tab" data-bs-target="#tab-pdfs" type="button" role="tab">
                     Generated PDFs <span class="badge bg-secondary ms-1">@pdfCount</span>
+                </button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" data-bs-toggle="tab" data-bs-target="#tab-inspections" type="button" role="tab">
+                    Inspections <span class="badge bg-secondary ms-1">@inspectionCount</span>
                 </button>
             </li>
         </ul>
@@ -391,6 +397,77 @@
                         </tbody>
                     </table>
                 </div>
+            </div>
+
+            <div class="tab-pane fade" id="tab-inspections" role="tabpanel">
+                <div class="d-flex justify-content-between align-items-center mb-2">
+                    <h5 class="mb-0">Move-in / Move-out Inspections</h5>
+                    @if (User.IsInRole(IdentitySeed.AdminRole))
+                    {
+                        <a asp-page="/Inspections/Create" asp-route-leaseId="@Model.Lease.Id"
+                           class="btn btn-sm btn-success">
+                            <i class="las la-plus"></i> New inspection
+                        </a>
+                    }
+                </div>
+                @if (Model.Inspections.Any())
+                {
+                    <div class="table-responsive">
+                        <table class="table table-sm mb-0" data-page-length="10">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>Kind</th>
+                                    <th>Scheduled</th>
+                                    <th>Status</th>
+                                    <th>Items</th>
+                                    <th class="text-end">Deductions</th>
+                                    <th class="text-end"></th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                            @foreach (var insp in Model.Inspections)
+                            {
+                                var kColor = insp.Kind == PropertyPayPro.Models.InspectionKind.MoveIn ? "success" : "warning";
+                                var sColor = insp.Status == PropertyPayPro.Models.InspectionStatus.Completed ? "success" : "secondary";
+                                <tr>
+                                    <td><span class="badge bg-@kColor">@(insp.Kind == PropertyPayPro.Models.InspectionKind.MoveIn ? "Move-in" : "Move-out")</span></td>
+                                    <td>
+                                        @insp.ScheduledFor.ToString("yyyy-MM-dd")
+                                        @if (insp.CompletedOn.HasValue)
+                                        { <br /><small class="text-muted">Completed @insp.CompletedOn.Value.ToString("MMM d")</small> }
+                                    </td>
+                                    <td><span class="badge bg-@sColor">@insp.Status</span></td>
+                                    <td>@insp.Items.Count</td>
+                                    <td class="text-end">
+                                        @if (insp.Kind == PropertyPayPro.Models.InspectionKind.MoveOut && insp.TotalDeductions > 0)
+                                        {
+                                            <span class="fw-bold text-danger">@insp.TotalDeductions.ToString("C")</span>
+                                        }
+                                        else
+                                        {
+                                            <span class="text-muted">—</span>
+                                        }
+                                    </td>
+                                    <td class="text-end">
+                                        <a asp-page="/Inspections/Details" asp-route-id="@insp.Id" class="btn btn-sm btn-outline-primary">Open</a>
+                                    </td>
+                                </tr>
+                            }
+                            </tbody>
+                        </table>
+                    </div>
+                }
+                else
+                {
+                    <p class="text-muted mb-0">
+                        No inspections on this lease yet.
+                        @if (User.IsInRole(IdentitySeed.AdminRole))
+                        {
+                            <a asp-page="/Inspections/Create" asp-route-leaseId="@Model.Lease.Id">Create one</a>
+                            @:.
+                        }
+                    </p>
+                }
             </div>
         </div>
     </div>

@@ -1,0 +1,328 @@
+@page "{id:int}"
+@model PropertyPayPro.Pages.Inspections.DetailsModel
+@using PropertyPayPro.Pages.Shared
+@{
+    var i = Model.Inspection!;
+    ViewData["Title"] = (i.Kind == PropertyPayPro.Models.InspectionKind.MoveIn ? "Move-in" : "Move-out") + " Inspection #" + i.Id;
+    var kindLabel = i.Kind == PropertyPayPro.Models.InspectionKind.MoveIn ? "Move-in" : "Move-out";
+    var isMoveOut = i.Kind == PropertyPayPro.Models.InspectionKind.MoveOut;
+    var isCompleted = i.Status == PropertyPayPro.Models.InspectionStatus.Completed;
+    var canEdit = Model.CanEdit;
+    var conditions = Enum.GetValues<PropertyPayPro.Models.InspectionCondition>();
+}
+
+<div class="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-2">
+    <div>
+        <h1 class="h3 mb-1">@kindLabel Inspection <small class="text-muted">#@i.Id</small></h1>
+        <div class="text-muted">
+            @i.Lease!.Property!.Name — @i.Lease.TenantNames
+        </div>
+    </div>
+    <div>
+        @if (Model.GeneratedDoc is not null)
+        {
+            <a asp-page="/Documents/Preview" asp-route-id="@Model.GeneratedDoc.Id"
+               class="btn btn-outline-info">
+                <i class="las la-file-pdf"></i> View PDF Report
+            </a>
+        }
+        <a asp-page="/Leases/Details" asp-route-id="@i.LeaseId" class="btn btn-outline-secondary">Lease</a>
+        <a asp-page="Index" class="btn btn-outline-secondary">Back</a>
+    </div>
+</div>
+
+@if (TempData["Message"] is string msg)
+{
+    <div class="alert alert-success alert-dismissible fade show">@msg
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+}
+@if (TempData["Error"] is string err)
+{
+    <div class="alert alert-warning alert-dismissible fade show">@err
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+}
+
+@if (isCompleted)
+{
+    <div class="alert alert-success">
+        <i class="las la-check-circle"></i>
+        <strong>Completed @i.CompletedOn?.ToString("MMMM d, yyyy").</strong>
+        This inspection is read-only. The generated report has been attached to the lease.
+    </div>
+}
+
+<div class="row">
+    <partial name="_KpiCard" model="@(new KpiCardModel {
+        Label = "Kind", Value = kindLabel,
+        Color = isMoveOut ? "warning" : "success",
+        Icon = "flaticon-381-notepad" })" />
+    <partial name="_KpiCard" model="@(new KpiCardModel {
+        Label = "Status", Value = isCompleted ? "Completed" : "Draft",
+        Color = isCompleted ? "success" : "secondary",
+        Icon = "flaticon-381-time" })" />
+    <partial name="_KpiCard" model="@(new KpiCardModel {
+        Label = "Items", Value = i.Items.Count.ToString(),
+        SubText = i.Items.Sum(it => it.Photos.Count) + " photo(s)",
+        Color = "primary", Icon = "flaticon-381-list" })" />
+    @if (isMoveOut)
+    {
+        var deposit = i.Lease!.SecurityDeposit;
+        var refund = Math.Max(0m, deposit - i.TotalDeductions);
+        <partial name="_KpiCard" model="@(new KpiCardModel {
+            Label = "Deductions / Refund",
+            Value = i.TotalDeductions.ToString("C") + " / " + refund.ToString("C"),
+            SubText = "Deposit " + deposit.ToString("C"),
+            Color = i.TotalDeductions > 0 ? "danger" : "success",
+            Icon = "las la-dollar-sign" })" />
+    }
+    else
+    {
+        <partial name="_KpiCard" model="@(new KpiCardModel {
+            Label = "Scheduled", Value = i.ScheduledFor.ToString("MMM d, yyyy"),
+            Color = "info", Icon = "flaticon-381-time" })" />
+    }
+</div>
+
+@if (i.PairedMoveIn is not null)
+{
+    <div class="alert alert-info">
+        <i class="las la-link"></i>
+        Diffing against
+        <a asp-page="Details" asp-route-id="@i.PairedMoveIn.Id" class="alert-link">
+            move-in inspection #@i.PairedMoveIn.Id from @i.PairedMoveIn.ScheduledFor.ToString("MMMM d, yyyy")
+        </a>.
+    </div>
+}
+
+<div class="card mb-3">
+    <div class="card-header"><h5 class="mb-0">Inspection Header</h5></div>
+    <div class="card-body">
+        <form method="post" asp-page-handler="UpdateHeader">
+            <input type="hidden" name="Id" value="@i.Id" />
+            <div class="row g-2 align-items-end">
+                <div class="col-md-3">
+                    <label class="form-label small">Scheduled for</label>
+                    <input type="date" name="ScheduledFor" value="@i.ScheduledFor.ToString("yyyy-MM-dd")"
+                           class="form-control" @(canEdit ? "" : "disabled") />
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label small">Conducted by</label>
+                    <input type="text" name="ConductedBy" value="@i.ConductedBy" maxlength="120"
+                           class="form-control" @(canEdit ? "" : "disabled") />
+                </div>
+                <div class="col-md-2">
+                    <div class="form-check">
+                        <input type="checkbox" name="TenantPresent" value="true" class="form-check-input"
+                               id="tenantPresent" @(i.TenantPresent ? "checked" : "") @(canEdit ? "" : "disabled") />
+                        <label for="tenantPresent" class="form-check-label">Tenant present</label>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label small">Overall notes</label>
+                    <input type="text" name="OverallNotes" value="@i.OverallNotes" maxlength="2000"
+                           class="form-control" @(canEdit ? "" : "disabled") />
+                </div>
+            </div>
+            @if (canEdit)
+            {
+                <button type="submit" class="btn btn-sm btn-outline-primary mt-2">Save header</button>
+            }
+        </form>
+    </div>
+</div>
+
+@foreach (var room in Model.RoomGroups)
+{
+    <div class="card mb-3">
+        <div class="card-header"><h5 class="mb-0">@room.Key <small class="text-muted">(@room.Count() items)</small></h5></div>
+        <div class="card-body p-0">
+            <div class="table-responsive">
+                <table class="table mb-0 align-middle">
+                    <thead class="table-light">
+                        <tr>
+                            <th>Item</th>
+                            <th>Condition</th>
+                            <th>Notes</th>
+                            @if (isMoveOut)
+                            {
+                                <th class="text-end">Deduction</th>
+                            }
+                            <th>Photos</th>
+                            <th></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                    @foreach (var it in room)
+                    {
+                        <tr>
+                            <td colspan="@(isMoveOut ? 6 : 5)" class="p-0">
+                                <form method="post" asp-page-handler="UpdateItem" class="d-flex flex-wrap align-items-start gap-2 p-2 border-bottom">
+                                    <input type="hidden" name="Id" value="@it.Id" />
+                                    <input type="hidden" name="InspectionId" value="@i.Id" />
+                                    <input type="hidden" name="Room" value="@it.Room" />
+
+                                    <div style="flex:2 1 180px; min-width: 160px;">
+                                        <input type="text" name="Item" value="@it.Item" maxlength="120"
+                                               class="form-control form-control-sm fw-semibold"
+                                               @(canEdit ? "" : "disabled") />
+                                    </div>
+                                    <div style="flex:1 1 140px; min-width: 140px;">
+                                        <select name="Condition" class="form-select form-select-sm"
+                                                @(canEdit ? "" : "disabled")>
+                                            @foreach (var cond in conditions)
+                                            {
+                                                <option value="@cond" selected="@(it.Condition == cond)">@cond</option>
+                                            }
+                                        </select>
+                                    </div>
+                                    <div style="flex:3 1 240px; min-width: 240px;">
+                                        <input type="text" name="Notes" value="@it.Notes" maxlength="2000"
+                                               class="form-control form-control-sm"
+                                               placeholder="Notes..." @(canEdit ? "" : "disabled") />
+                                    </div>
+                                    @if (isMoveOut)
+                                    {
+                                        <div style="flex:1 1 110px; min-width: 110px;">
+                                            <input type="number" step="0.01" name="DeductionAmount"
+                                                   value="@it.DeductionAmount"
+                                                   class="form-control form-control-sm text-end"
+                                                   placeholder="$0.00" @(canEdit ? "" : "disabled") />
+                                        </div>
+                                        <div style="flex:2 1 200px; min-width: 180px;">
+                                            <input type="text" name="DeductionReason"
+                                                   value="@it.DeductionReason" maxlength="500"
+                                                   class="form-control form-control-sm"
+                                                   placeholder="Deduction reason..." @(canEdit ? "" : "disabled") />
+                                        </div>
+                                    }
+                                    <div style="flex:0 0 auto;">
+                                        @if (canEdit)
+                                        {
+                                            <button type="submit" class="btn btn-sm btn-outline-primary">Save</button>
+                                        }
+                                    </div>
+                                </form>
+
+                                <div class="p-2 d-flex flex-wrap gap-2 align-items-start">
+                                    @foreach (var ph in it.Photos)
+                                    {
+                                        <div class="position-relative" style="width: 100px;">
+                                            <a asp-page-handler="Photo" asp-route-id="@i.Id" asp-route-photoId="@ph.Id" target="_blank">
+                                                <img src="@Url.Page(null, pageHandler: "Photo", values: new { id = i.Id, photoId = ph.Id })"
+                                                     alt="@ph.FileName"
+                                                     class="img-thumbnail"
+                                                     style="width: 100px; height: 100px; object-fit: cover;" />
+                                            </a>
+                                            @if (canEdit)
+                                            {
+                                                <form method="post" asp-page-handler="DeletePhoto"
+                                                      class="position-absolute top-0 end-0">
+                                                    <input type="hidden" name="inspectionId" value="@i.Id" />
+                                                    <input type="hidden" name="photoId" value="@ph.Id" />
+                                                    <button type="submit"
+                                                            class="btn btn-sm btn-danger py-0 px-1"
+                                                            style="font-size: 0.7rem;"
+                                                            onclick="return confirm('Delete this photo?');">×</button>
+                                                </form>
+                                            }
+                                        </div>
+                                    }
+                                    @if (canEdit)
+                                    {
+                                        <form method="post" asp-page-handler="UploadPhoto"
+                                              enctype="multipart/form-data"
+                                              class="d-flex align-items-center gap-2 border rounded p-2"
+                                              style="min-height: 100px;">
+                                            <input type="hidden" name="inspectionId" value="@i.Id" />
+                                            <input type="hidden" name="itemId" value="@it.Id" />
+                                            <input type="file" name="file" accept="image/*" required
+                                                   class="form-control form-control-sm" style="max-width: 180px;" />
+                                            <input type="text" name="caption" placeholder="Caption (optional)"
+                                                   maxlength="255"
+                                                   class="form-control form-control-sm" style="max-width: 200px;" />
+                                            <button type="submit" class="btn btn-sm btn-outline-info">
+                                                <i class="las la-upload"></i> Add photo
+                                            </button>
+                                        </form>
+
+                                        <form method="post" asp-page-handler="DeleteItem" class="ms-auto">
+                                            <input type="hidden" name="inspectionId" value="@i.Id" />
+                                            <input type="hidden" name="itemId" value="@it.Id" />
+                                            <button type="submit" class="btn btn-sm btn-outline-danger"
+                                                    onclick="return confirm('Delete item @it.Item and all its photos?');">
+                                                Delete item
+                                            </button>
+                                        </form>
+                                    }
+                                </div>
+                            </td>
+                        </tr>
+                    }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        @if (canEdit)
+        {
+            <div class="card-footer bg-white">
+                <form method="post" asp-page-handler="AddItem" class="d-flex align-items-center gap-2">
+                    <input type="hidden" name="InspectionId" value="@i.Id" />
+                    <input type="hidden" name="Room" value="@room.Key" />
+                    <input type="text" name="Item" required maxlength="120"
+                           placeholder="Add item to @room.Key..."
+                           class="form-control form-control-sm" style="max-width: 300px;" />
+                    <button type="submit" class="btn btn-sm btn-outline-success">Add item</button>
+                </form>
+            </div>
+        }
+    </div>
+}
+
+@if (canEdit)
+{
+    <div class="card mb-3 border-success">
+        <div class="card-header"><h5 class="mb-0">Add a new room</h5></div>
+        <div class="card-body">
+            <form method="post" asp-page-handler="AddItem" class="row g-2">
+                <input type="hidden" name="InspectionId" value="@i.Id" />
+                <div class="col-md-4">
+                    <label class="form-label small">Room name</label>
+                    <input type="text" name="Room" required maxlength="80"
+                           placeholder="e.g. Basement"
+                           class="form-control" />
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label small">First item in this room</label>
+                    <input type="text" name="Item" required maxlength="120"
+                           placeholder="e.g. Walls"
+                           class="form-control" />
+                </div>
+                <div class="col-md-2 d-flex align-items-end">
+                    <button type="submit" class="btn btn-outline-success">Add room + item</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div class="card border-primary mb-3">
+        <div class="card-body d-flex flex-wrap justify-content-between align-items-center gap-3">
+            <div>
+                <h5 class="mb-1">Ready to finalize?</h5>
+                <p class="mb-0 text-muted small">
+                    Completing generates a branded PDF report and attaches it to the lease as a
+                    <strong>@(isMoveOut ? "MoveOutInspection" : "MoveInChecklist")</strong> document.
+                    After completion, this inspection can no longer be edited.
+                </p>
+            </div>
+            <form method="post" asp-page-handler="Complete">
+                <input type="hidden" name="id" value="@i.Id" />
+                <button type="submit" class="btn btn-primary"
+                        onclick="return confirm('Complete this inspection and generate the PDF report?');">
+                    <i class="las la-check"></i> Complete + Generate PDF
+                </button>
+            </form>
+        </div>
+    </div>
+}

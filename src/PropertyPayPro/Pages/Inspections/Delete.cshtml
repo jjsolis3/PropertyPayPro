@@ -1,0 +1,41 @@
+@page "{id:int}"
+@model PropertyPayPro.Pages.Inspections.DeleteModel
+@{
+    ViewData["Title"] = "Delete Inspection";
+    var i = Model.Inspection;
+    var photoCount = i.Items.Sum(it => it.Photos.Count);
+}
+
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <h1 class="h3 mb-0">Delete Inspection</h1>
+    <a asp-page="Details" asp-route-id="@i.Id" class="btn btn-outline-secondary">Cancel</a>
+</div>
+
+<div class="card border-danger">
+    <div class="card-body">
+        <p class="text-danger fw-bold">Delete this inspection and all its items + photos?</p>
+        <dl class="row mb-0">
+            <dt class="col-sm-3">Kind</dt>
+            <dd class="col-sm-9">@(i.Kind == PropertyPayPro.Models.InspectionKind.MoveIn ? "Move-in" : "Move-out")</dd>
+            <dt class="col-sm-3">Property</dt>
+            <dd class="col-sm-9">@i.Lease?.Property?.Name</dd>
+            <dt class="col-sm-3">Scheduled</dt>
+            <dd class="col-sm-9">@i.ScheduledFor.ToString("yyyy-MM-dd")</dd>
+            <dt class="col-sm-3">Items</dt>
+            <dd class="col-sm-9">@i.Items.Count</dd>
+            <dt class="col-sm-3">Photos</dt>
+            <dd class="col-sm-9">@photoCount</dd>
+        </dl>
+        <p class="text-muted small mt-3 mb-0">
+            If the inspection has been completed, its generated PDF report will REMAIN on the
+            lease as a LeaseDocument (the report is a permanent record even if you remove the
+            draft-inspection scratch data behind it).
+        </p>
+    </div>
+    <div class="card-footer bg-white">
+        <form method="post">
+            <button type="submit" class="btn btn-danger">Delete</button>
+            <a asp-page="Details" asp-route-id="@i.Id" class="btn btn-outline-secondary">Cancel</a>
+        </form>
+    </div>
+</div>
