@@ -195,6 +195,27 @@ public class MailService
 
     public record BroadcastResult(int TotalRecipients, int Sent, int Failed, IReadOnlyList<string> Errors);
 
+    /// <summary>
+    /// Emails a scheduled-maintenance heads-up to a specific address —
+    /// used by MaintenanceSchedulerService for both tenant and admin
+    /// notifications when a preventive ticket is auto-generated.
+    /// </summary>
+    public async Task<EmailLog> SendMaintenanceReminderAsync(
+        string baseUrl,
+        string toEmail,
+        MaintenanceSchedule schedule,
+        DateOnly scheduledFor,
+        bool forAdmin,
+        CancellationToken ct = default)
+    {
+        var subject = forAdmin
+            ? $"[Admin] Preventive maintenance scheduled — {schedule.Property?.Name} — {schedule.Title}"
+            : $"Scheduled maintenance — {schedule.Property?.Name} — {schedule.Title}";
+        var body = EmailComposer.ComposeMaintenanceReminder(baseUrl, schedule, scheduledFor, forAdmin);
+        return await TrySendAsync(EmailKind.MaintenanceReminder, toEmail, subject, body,
+            attachments: null, ct: ct);
+    }
+
     private async Task<List<EmailAttachment>> LoadAttachmentsAsync(GeneratedDocument doc, CancellationToken ct)
     {
         await using var stream = await _storage.OpenReadAsync(doc.StorageKey, ct);

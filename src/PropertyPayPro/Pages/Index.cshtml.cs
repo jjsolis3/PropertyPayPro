@@ -25,6 +25,8 @@ public class IndexModel : PageModel
     public int ExpiredDocCount { get; private set; }
     public List<LeaseDocument> ExpiringSoonDocs { get; private set; } = new();
 
+    public List<MaintenanceSchedule> UpcomingMaintenance { get; private set; } = new();
+
     public async Task OnGetAsync()
     {
         var today = DateOnly.FromDateTime(DateTime.UtcNow);
@@ -76,5 +78,15 @@ public class IndexModel : PageModel
             && d.ExpiresOn.Value <= soonCutoff);
         ExpiredDocCount = await _db.LeaseDocuments.CountAsync(d => d.ExpiresOn.HasValue
             && d.ExpiresOn.Value < today);
+
+        // Preventive maintenance due in the next 30 days.
+        var maintenanceCutoff = today.AddDays(30);
+        var maintenance = await _db.MaintenanceSchedules
+            .Include(m => m.Property)
+            .Where(m => m.Active && m.NextDueDate <= maintenanceCutoff)
+            .OrderBy(m => m.NextDueDate)
+            .Take(5)
+            .ToListAsync();
+        UpcomingMaintenance = maintenance;
     }
 }

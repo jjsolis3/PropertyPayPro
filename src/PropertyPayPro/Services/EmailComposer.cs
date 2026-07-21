@@ -272,6 +272,49 @@ public static class EmailComposer
             </p>");
     }
 
+    public static string ComposeMaintenanceReminder(
+        string baseUrl,
+        MaintenanceSchedule schedule,
+        DateOnly scheduledFor,
+        bool forAdmin)
+    {
+        var property = schedule.Property!;
+        var logoUrl = $"{baseUrl}/img/brand/PPS_Logo_Main.png";
+        var vendorLine = string.IsNullOrWhiteSpace(schedule.Vendor)
+            ? ""
+            : $"<li><strong>Vendor:</strong> {Esc(schedule.Vendor)}"
+              + (string.IsNullOrWhiteSpace(schedule.VendorPhone) ? "" : $" — {Esc(schedule.VendorPhone)}")
+              + "</li>";
+        var descLine = string.IsNullOrWhiteSpace(schedule.Description)
+            ? ""
+            : $"<p style=\"margin-top:16px;\">{Esc(schedule.Description).Replace("\n", "<br />")}</p>";
+
+        var (subtitle, intro) = forAdmin
+            ? ("Preventive Maintenance — Admin Alert",
+               $"A preventive maintenance ticket has been created for <strong>{Esc(property.Name)}</strong>. Please coordinate with the vendor and (if needed) with the tenants.")
+            : ("Scheduled Maintenance Notice",
+               $"Please be advised of upcoming scheduled maintenance at <strong>{Esc(property.Name)}</strong>. This is routine, preventive service — nothing to worry about.");
+
+        return BaseTemplate(schedule.Title, logoUrl, $@"
+            <h1 style=""margin:8px 0 4px;color:#333;"">{Esc(schedule.Title)}</h1>
+            <p style=""color:#666;margin:0 0 20px;"">{subtitle}</p>
+
+            <p>{intro}</p>
+
+            <ul style=""line-height:1.8;"">
+                <li><strong>Property:</strong> {Esc(property.Name)}, {Esc(property.AddressLine1)}, {Esc(property.City)}</li>
+                <li><strong>Scheduled for:</strong> on or around {scheduledFor:MMMM d, yyyy}</li>
+                <li><strong>Category:</strong> {schedule.Category}</li>
+                {vendorLine}
+            </ul>
+
+            {descLine}
+
+            <p style=""margin-top:20px;color:#555;"">
+                If access arrangements need to change, please contact us as soon as possible.
+            </p>");
+    }
+
     public static string ComposeBroadcast(
         string baseUrl,
         string subject,

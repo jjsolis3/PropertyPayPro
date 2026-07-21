@@ -90,7 +90,7 @@ builder.Services
         {
             "/Properties", "/Tenants", "/Leases", "/Bills", "/Payments",
             "/Receipts", "/Expenses", "/ServiceTickets",
-            "/Reports", "/Notices"
+            "/Reports", "/Notices", "/Maintenance"
         };
         foreach (var folder in managementFolders)
         {
@@ -129,6 +129,7 @@ builder.Services.Configure<PropertyPayPro.Services.EmailOptions>(options =>
 builder.Services.AddSingleton<PropertyPayPro.Services.IEmailSender, PropertyPayPro.Services.SmtpEmailSender>();
 builder.Services.AddScoped<PropertyPayPro.Services.MailService>();
 builder.Services.AddScoped<PropertyPayPro.Services.PdfService>();
+builder.Services.AddScoped<PropertyPayPro.Services.MaintenanceSchedulerService>();
 
 var app = builder.Build();
 
@@ -231,6 +232,36 @@ app.MapPost("/api/jobs/generate-monthly-charges", async (
 
     var created = await billing.GenerateChargesForPeriodAsync(y, m);
     return Results.Ok(new { year = y, month = m, created });
+}).AllowAnonymous();
+
+// Preventive maintenance — external cron target. Same X-Job-Token
+// pattern as generate-monthly-charges. Run daily; MaintenanceScheduler
+// only spawns a ticket when a schedule's NextDueDate is inside its
+// LeadDays window, so most days it does nothing.
+app.MapPost("/api/jobs/generate-preventive-maintenance", async (
+    HttpContext ctx,
+    PropertyPayPro.Services.MaintenanceSchedulerService scheduler,
+    IConfiguration config) =>
+{
+    var expectedToken = config["JOB_TOKEN"];
+    if (string.IsNullOrWhiteSpace(expectedToken))
+    {
+        return Results.Problem("JOB_TOKEN is not configured.", statusCode: 500);
+    }
+    var providedToken = ctx.Request.Headers["X-Job-Token"].ToString();
+    if (providedToken != expectedToken)
+    {
+        return Results.Unauthorized();
+    }
+
+    var baseUrl = $"{ctx.Request.Scheme}://{ctx.Request.Host}";
+    var result = await scheduler.GenerateDueTicketsAsync(baseUrl);
+    return Results.Ok(new
+    {
+        schedulesEvaluated = result.SchedulesEvaluated,
+        ticketsCreated = result.TicketsCreated,
+        notificationsSent = result.NotificationsSent
+    });
 }).AllowAnonymous();
 
 app.Run();
