@@ -76,6 +76,48 @@
             </div>
         }
 
+        @if (Model.UpcomingMaintenance.Any())
+        {
+            <div class="card border-info mb-3">
+                <div class="card-header d-flex justify-content-between align-items-center bg-info-subtle">
+                    <h5 class="mb-0">
+                        <i class="las la-tools text-info"></i>
+                        Upcoming maintenance
+                        <small class="text-muted ms-2">Next 30 days</small>
+                    </h5>
+                    <a asp-page="/Maintenance/Index" class="btn btn-sm btn-outline-info">Manage schedules</a>
+                </div>
+                <div class="card-body p-0">
+                    <div class="table-responsive">
+                        <table class="table table-sm mb-0">
+                            <thead class="table-light">
+                                <tr><th>Title</th><th>Property</th><th>Next Due</th><th>Cadence</th></tr>
+                            </thead>
+                            <tbody>
+                            @foreach (var m in Model.UpcomingMaintenance)
+                            {
+                                var days = m.DaysUntilDue;
+                                var badgeColor = days < 0 ? "danger" : (days <= m.LeadDays ? "warning" : "success");
+                                var badgeText = days < 0
+                                    ? $"Overdue {-days}d"
+                                    : (days == 0 ? "Due today" : $"In {days}d");
+                                <tr>
+                                    <td class="fw-semibold">@m.Title</td>
+                                    <td>@m.Property?.Name</td>
+                                    <td>
+                                        @m.NextDueDate.ToString("yyyy-MM-dd")
+                                        <span class="badge bg-@badgeColor ms-2">@badgeText</span>
+                                    </td>
+                                    <td>Every @m.RecurrenceMonths mo</td>
+                                </tr>
+                            }
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        }
+
         @if (Model.ExpiringSoonDocs.Any() || Model.ExpiredDocCount > 0)
         {
             <div class="card border-warning mb-3">

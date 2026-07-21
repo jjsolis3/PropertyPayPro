@@ -1,0 +1,32 @@
+@page "{id:int}"
+@model PropertyPayPro.Pages.Maintenance.DeleteModel
+@{
+    ViewData["Title"] = "Delete Maintenance Schedule";
+}
+
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <h1 class="h3 mb-0">Delete Schedule</h1>
+    <a asp-page="Index" class="btn btn-outline-secondary">Back</a>
+</div>
+
+<div class="card border-danger">
+    <div class="card-body">
+        <p class="text-danger fw-bold">Are you sure you want to delete this schedule?</p>
+        <dl class="row mb-0">
+            <dt class="col-sm-3">Title</dt><dd class="col-sm-9">@Model.Schedule.Title</dd>
+            <dt class="col-sm-3">Property</dt><dd class="col-sm-9">@Model.Schedule.Property?.Name</dd>
+            <dt class="col-sm-3">Cadence</dt><dd class="col-sm-9">Every @Model.Schedule.RecurrenceMonths month(s)</dd>
+            <dt class="col-sm-3">Next Due</dt><dd class="col-sm-9">@Model.Schedule.NextDueDate.ToString("yyyy-MM-dd")</dd>
+        </dl>
+        <p class="text-muted small mt-3 mb-0">
+            Previously generated ServiceTickets are NOT affected — they stay in their normal
+            ticket list. Only the recurring rule is removed.
+        </p>
+    </div>
+    <div class="card-footer bg-white">
+        <form method="post">
+            <button type="submit" class="btn btn-danger">Delete</button>
+            <a asp-page="Index" class="btn btn-outline-secondary">Cancel</a>
+        </form>
+    </div>
+</div>

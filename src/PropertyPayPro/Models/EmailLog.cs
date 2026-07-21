@@ -11,7 +11,8 @@ public enum EmailKind
     Other,
     Invite,
     Notice,
-    Broadcast
+    Broadcast,
+    MaintenanceReminder
 }
 
 public enum EmailStatus

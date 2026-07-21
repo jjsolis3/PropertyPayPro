@@ -22,6 +22,7 @@ public class ApplicationDbContext : IdentityDbContext<ApplicationUser>, IDataPro
     public DbSet<LeaseDocument> LeaseDocuments => Set<LeaseDocument>();
     public DbSet<PropertyExpense> PropertyExpenses => Set<PropertyExpense>();
     public DbSet<ServiceTicket> ServiceTickets => Set<ServiceTicket>();
+    public DbSet<MaintenanceSchedule> MaintenanceSchedules => Set<MaintenanceSchedule>();
     public DbSet<EmailLog> EmailLogs => Set<EmailLog>();
     public DbSet<GeneratedDocument> GeneratedDocuments => Set<GeneratedDocument>();
     public DbSet<AppSettings> AppSettings => Set<AppSettings>();
@@ -92,6 +93,12 @@ public class ApplicationDbContext : IdentityDbContext<ApplicationUser>, IDataPro
             .WithMany()
             .HasForeignKey(t => t.PropertyId)
             .OnDelete(DeleteBehavior.Restrict);
+
+        builder.Entity<MaintenanceSchedule>()
+            .HasOne(s => s.Property)
+            .WithMany()
+            .HasForeignKey(s => s.PropertyId)
+            .OnDelete(DeleteBehavior.Cascade);
 
         builder.Entity<GeneratedDocument>()
             .HasOne(d => d.Lease).WithMany().HasForeignKey(d => d.LeaseId)

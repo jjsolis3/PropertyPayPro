@@ -1,0 +1,140 @@
+@page
+@model PropertyPayPro.Pages.Maintenance.IndexModel
+@using PropertyPayPro.Pages.Shared
+@{
+    ViewData["Title"] = "Maintenance Schedules";
+}
+
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <div>
+        <h1 class="h3 mb-1">Maintenance Schedules</h1>
+        <div class="text-muted">
+            Recurring preventive maintenance. Tickets are auto-generated
+            as each schedule comes due, with optional email notifications
+            to tenants and management staff.
+        </div>
+    </div>
+    <div>
+        @if (User.IsInRole(IdentitySeed.AdminRole))
+        {
+            <form method="post" asp-page-handler="GenerateNow" class="d-inline">
+                <button type="submit" class="btn btn-outline-info">
+                    <i class="las la-sync"></i> Generate due now
+                </button>
+            </form>
+            <a asp-page="Create" class="btn btn-success">
+                <i class="las la-plus"></i> New Schedule
+            </a>
+        }
+    </div>
+</div>
+
+@if (TempData["Message"] is string msg)
+{
+    <div class="alert alert-success alert-dismissible fade show">@msg
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+}
+
+<div class="row">
+    <partial name="_KpiCard" model="@(new KpiCardModel {
+        Label = "Active Schedules", Value = Model.ActiveCount.ToString(),
+        Color = "primary", Icon = "flaticon-381-time" })" />
+    <partial name="_KpiCard" model="@(new KpiCardModel {
+        Label = "Due Soon", Value = Model.DueSoonCount.ToString(),
+        SubText = "Inside lead-time window",
+        Color = Model.DueSoonCount > 0 ? "warning" : "success",
+        Icon = "flaticon-381-warning" })" />
+    <partial name="_KpiCard" model="@(new KpiCardModel {
+        Label = "Paused", Value = Model.PausedCount.ToString(),
+        Color = "secondary", Icon = "flaticon-381-list" })" />
+    <partial name="_KpiCard" model="@(new KpiCardModel {
+        Label = "Total on File", Value = Model.Schedules.Count.ToString(),
+        Color = "info", Icon = "flaticon-381-notepad" })" />
+</div>
+
+<div class="card">
+    <div class="card-body">
+        <div class="table-responsive">
+            <table class="table table-striped mb-0 js-datatable" data-order='[[3,"asc"]]'>
+                <thead>
+                    <tr>
+                        <th>Title</th>
+                        <th>Property</th>
+                        <th>Cadence</th>
+                        <th>Next Due</th>
+                        <th>Status</th>
+                        <th>Notifications</th>
+                        <th>Last Generated</th>
+                        <th class="text-end"></th>
+                    </tr>
+                </thead>
+                <tbody>
+                @foreach (var s in Model.Schedules)
+                {
+                    var statusColor = !s.Active
+                        ? "secondary"
+                        : s.DaysUntilDue < 0
+                            ? "danger"
+                            : (s.DaysUntilDue <= s.LeadDays ? "warning" : "success");
+                    var statusText = !s.Active
+                        ? "Paused"
+                        : s.DaysUntilDue < 0
+                            ? $"Overdue by {-s.DaysUntilDue}d"
+                            : s.DaysUntilDue == 0
+                                ? "Due today"
+                                : (s.DaysUntilDue <= s.LeadDays ? $"Due in {s.DaysUntilDue}d" : $"In {s.DaysUntilDue}d");
+                    <tr>
+                        <td>
+                            <span class="fw-semibold">@s.Title</span>
+                            <br /><small class="text-muted">@s.Category</small>
+                        </td>
+                        <td>@s.Property?.Name</td>
+                        <td>Every @s.RecurrenceMonths month(s)</td>
+                        <td>@s.NextDueDate.ToString("yyyy-MM-dd")</td>
+                        <td><span class="badge bg-@statusColor">@statusText</span></td>
+                        <td>
+                            @if (s.NotifyTenants) { <span class="badge bg-info me-1">Tenants</span> }
+                            @if (s.NotifyAdmins) { <span class="badge bg-primary me-1">Admins</span> }
+                            @if (!s.NotifyTenants && !s.NotifyAdmins) { <span class="text-muted small">—</span> }
+                        </td>
+                        <td>
+                            @if (s.LastGeneratedOn.HasValue)
+                            {
+                                @s.LastGeneratedOn.Value.ToString("yyyy-MM-dd")
+                                @if (s.LastServiceTicketId.HasValue)
+                                {
+                                    <br /><a asp-page="/ServiceTickets/Details" asp-route-id="@s.LastServiceTicketId"
+                                             class="small">Last ticket #@s.LastServiceTicketId</a>
+                                }
+                            }
+                            else
+                            {
+                                <span class="text-muted small">—</span>
+                            }
+                        </td>
+                        <td class="text-end">
+                            @if (User.IsInRole(IdentitySeed.AdminRole))
+                            {
+                                <a asp-page="Edit" asp-route-id="@s.Id" class="btn btn-sm btn-outline-primary">Edit</a>
+                                <a asp-page="Delete" asp-route-id="@s.Id" class="btn btn-sm btn-outline-danger">Delete</a>
+                            }
+                        </td>
+                    </tr>
+                }
+                @if (!Model.Schedules.Any())
+                {
+                    <tr><td colspan="8" class="text-center text-muted py-3">
+                        No maintenance schedules yet.
+                        @if (User.IsInRole(IdentitySeed.AdminRole))
+                        {
+                            <a asp-page="Create">Add one</a>
+                            @:.
+                        }
+                    </td></tr>
+                }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
