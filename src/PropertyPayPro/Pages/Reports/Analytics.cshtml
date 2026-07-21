@@ -1,0 +1,311 @@
+@page
+@model PropertyPayPro.Pages.Reports.AnalyticsModel
+@using PropertyPayPro.Pages.Shared
+@using System.Text.Json
+@{
+    ViewData["Title"] = "Analytics";
+
+    // Serialize once and use ! to skip nullability warnings — these
+    // arrays are always populated by OnGetAsync().
+    string J(object v) => JsonSerializer.Serialize(v);
+
+    var occupancy = Model.TotalLeaseCount == 0
+        ? 0
+        : (int)Math.Round(Model.ActiveLeaseCount * 100.0 / Model.TotalLeaseCount);
+}
+
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <div>
+        <h1 class="h3 mb-1">Analytics</h1>
+        <div class="text-muted">Trailing 12 months of revenue, expenses, delinquency, and forward projection.</div>
+    </div>
+</div>
+
+<div class="row">
+    <partial name="_KpiCard" model="@(new KpiCardModel {
+        Label = "Revenue (12 mo)", Value = Model.Revenue12mo.ToString("C0"),
+        Color = "success", Icon = "las la-dollar-sign" })" />
+    <partial name="_KpiCard" model="@(new KpiCardModel {
+        Label = "Expenses (12 mo)", Value = Model.Expenses12mo.ToString("C0"),
+        Color = "danger", Icon = "flaticon-381-briefcase" })" />
+    <partial name="_KpiCard" model="@(new KpiCardModel {
+        Label = "Net (12 mo)", Value = Model.Net12mo.ToString("C0"),
+        SubText = Model.Net12mo >= 0 ? "In the black" : "Cash-flow negative",
+        Color = Model.Net12mo >= 0 ? "success" : "danger",
+        Icon = "flaticon-381-notepad" })" />
+    <partial name="_KpiCard" model="@(new KpiCardModel {
+        Label = "Delinquent Balance", Value = Model.AgingTotal.ToString("C0"),
+        SubText = $"{Model.AgingChargeCount} past-due charge(s)",
+        Color = Model.AgingTotal > 0 ? "warning" : "success",
+        Icon = "flaticon-381-warning" })" />
+</div>
+
+<div class="row">
+    <partial name="_KpiCard" model="@(new KpiCardModel {
+        Label = "Monthly Rent Roll", Value = Model.MonthlyRentRoll.ToString("C0"),
+        SubText = $"From {Model.ActiveLeaseCount} active lease(s)",
+        Color = "primary", Icon = "flaticon-381-list" })" />
+    <partial name="_KpiCard" model="@(new KpiCardModel {
+        Label = "Occupancy", Value = $"{occupancy}%",
+        SubText = $"{Model.ActiveLeaseCount}/{Model.TotalLeaseCount} leases active",
+        Color = "info", Icon = "flaticon-381-home-2" })" />
+    <partial name="_KpiCard" model="@(new KpiCardModel {
+        Label = "On-time Payment %", Value = $"{Model.OnTimePercent}%",
+        SubText = "Rolling 12 months",
+        Color = Model.OnTimePercent >= 80 ? "success" : "warning",
+        Icon = "flaticon-381-time" })" />
+    <partial name="_KpiCard" model="@(new KpiCardModel {
+        Label = "Properties", Value = Model.PropertyCount.ToString(),
+        Color = "primary", Icon = "flaticon-381-home-2" })" />
+</div>
+
+<div class="row g-3">
+    <div class="col-xl-8">
+        <div class="card">
+            <div class="card-header"><h4 class="card-title mb-0">Revenue vs Expenses — trailing 12 months</h4></div>
+            <div class="card-body">
+                <canvas id="revenueExpensesChart" height="120"></canvas>
+            </div>
+        </div>
+    </div>
+    <div class="col-xl-4">
+        <div class="card h-100">
+            <div class="card-header"><h4 class="card-title mb-0">Expenses by category</h4></div>
+            <div class="card-body">
+                @if (Model.CategoryLabels.Any())
+                {
+                    <canvas id="expenseCategoryChart" height="200"></canvas>
+                }
+                else
+                {
+                    <p class="text-muted text-center py-4">No expenses in the trailing 12 months.</p>
+                }
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row g-3 mt-1">
+    <div class="col-xl-7">
+        <div class="card">
+            <div class="card-header"><h4 class="card-title mb-0">Per-property revenue vs expenses (12 mo)</h4></div>
+            <div class="card-body">
+                @if (Model.PropertyLabels.Any())
+                {
+                    <canvas id="perPropertyChart" height="180"></canvas>
+                }
+                else
+                {
+                    <p class="text-muted text-center py-4">No properties on file.</p>
+                }
+            </div>
+        </div>
+    </div>
+    <div class="col-xl-5">
+        <div class="card h-100">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h4 class="card-title mb-0">Delinquency aging</h4>
+                @if (Model.AgingTotal > 0)
+                {
+                    <a asp-page="/Reports/UnpaidBills" class="btn btn-sm btn-outline-primary">Detail</a>
+                }
+            </div>
+            <div class="card-body">
+                @if (Model.AgingTotal == 0)
+                {
+                    <p class="text-success text-center py-4">
+                        <i class="las la-check-circle" style="font-size:3rem;"></i>
+                        <br />All accounts current.
+                    </p>
+                }
+                else
+                {
+                    <div class="table-responsive">
+                        <table class="table table-sm mb-0">
+                            <thead class="table-light">
+                                <tr><th>Bucket</th><th class="text-end">Charges</th><th class="text-end">Balance</th></tr>
+                            </thead>
+                            <tbody>
+                            @foreach (var b in Model.AgingBuckets)
+                            {
+                                var pct = Model.AgingTotal == 0 ? 0 : (int)Math.Round(b.Amount * 100 / Model.AgingTotal);
+                                var color = b.Label.StartsWith("0")
+                                    ? "warning"
+                                    : b.Label.StartsWith("31")
+                                        ? "warning"
+                                        : "danger";
+                                <tr>
+                                    <td>
+                                        <span class="fw-semibold">@b.Label</span>
+                                        <div class="progress mt-1" style="height:6px;">
+                                            <div class="progress-bar bg-@color" style="width:@(pct)%;"></div>
+                                        </div>
+                                    </td>
+                                    <td class="text-end">@b.Count</td>
+                                    <td class="text-end fw-bold">@b.Amount.ToString("C")</td>
+                                </tr>
+                            }
+                            </tbody>
+                            <tfoot class="table-light">
+                                <tr>
+                                    <td class="fw-bold">Total past-due</td>
+                                    <td class="text-end fw-bold">@Model.AgingChargeCount</td>
+                                    <td class="text-end fw-bold text-danger">@Model.AgingTotal.ToString("C")</td>
+                                </tr>
+                            </tfoot>
+                        </table>
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="card mt-3">
+    <div class="card-header">
+        <h4 class="card-title mb-0">Rent-roll forecast</h4>
+        <small class="text-muted">Projection assumes every active lease stays in place at its current monthly rent — doesn't model renewals, terminations, or rent changes.</small>
+    </div>
+    <div class="card-body">
+        <div class="row text-center">
+            <div class="col-md-4">
+                <p class="text-muted mb-1">Next 3 months</p>
+                <h2 class="text-primary">@Model.Forecast3mo.ToString("C0")</h2>
+            </div>
+            <div class="col-md-4">
+                <p class="text-muted mb-1">Next 6 months</p>
+                <h2 class="text-primary">@Model.Forecast6mo.ToString("C0")</h2>
+            </div>
+            <div class="col-md-4">
+                <p class="text-muted mb-1">Next 12 months</p>
+                <h2 class="text-primary">@Model.Forecast12mo.ToString("C0")</h2>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+<script>
+    (function () {
+        const labels = @Html.Raw(J(Model.MonthLabels));
+        const revenue = @Html.Raw(J(Model.RevenueByMonth));
+        const expenses = @Html.Raw(J(Model.ExpensesByMonth));
+        const propLabels = @Html.Raw(J(Model.PropertyLabels));
+        const propRevenue = @Html.Raw(J(Model.PropertyRevenue));
+        const propExpenses = @Html.Raw(J(Model.PropertyExpenses));
+        const catLabels = @Html.Raw(J(Model.CategoryLabels));
+        const catAmounts = @Html.Raw(J(Model.CategoryAmounts));
+
+        // Palette matching the Bootstrap "primary/success/danger/info/warning" hues.
+        const c = {
+            revenue: 'rgba(46, 189, 133, 1)',
+            revenueFill: 'rgba(46, 189, 133, 0.15)',
+            expenses: 'rgba(220, 53, 69, 1)',
+            expensesFill: 'rgba(220, 53, 69, 0.15)',
+            categories: [
+                '#2196f3', '#4caf50', '#ff9800', '#e91e63', '#9c27b0',
+                '#00bcd4', '#ff5722', '#795548', '#607d8b', '#3f51b5'
+            ]
+        };
+
+        // Shared currency formatter — Chart.js v4 axis/tooltip callbacks
+        // want plain strings, not Chart.js "value objects".
+        const money = v => '$' + Number(v).toLocaleString(undefined, { maximumFractionDigits: 0 });
+
+        function initLineChart() {
+            const el = document.getElementById('revenueExpensesChart');
+            if (!el) return;
+            new Chart(el.getContext('2d'), {
+                type: 'line',
+                data: {
+                    labels,
+                    datasets: [
+                        { label: 'Revenue', data: revenue, borderColor: c.revenue,
+                          backgroundColor: c.revenueFill, fill: true, tension: 0.3 },
+                        { label: 'Expenses', data: expenses, borderColor: c.expenses,
+                          backgroundColor: c.expensesFill, fill: true, tension: 0.3 }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: { beginAtZero: true, ticks: { callback: money } }
+                    },
+                    plugins: {
+                        tooltip: {
+                            callbacks: {
+                                label: ctx => ctx.dataset.label + ': ' + money(ctx.parsed.y)
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        function initPerPropertyChart() {
+            const el = document.getElementById('perPropertyChart');
+            if (!el || propLabels.length === 0) return;
+            new Chart(el.getContext('2d'), {
+                type: 'bar',
+                data: {
+                    labels: propLabels,
+                    datasets: [
+                        { label: 'Revenue', data: propRevenue, backgroundColor: c.revenue },
+                        { label: 'Expenses', data: propExpenses, backgroundColor: c.expenses }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: { beginAtZero: true, ticks: { callback: money } }
+                    },
+                    plugins: {
+                        tooltip: {
+                            callbacks: {
+                                label: ctx => ctx.dataset.label + ': ' + money(ctx.parsed.y)
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        function initCategoryChart() {
+            const el = document.getElementById('expenseCategoryChart');
+            if (!el || catLabels.length === 0) return;
+            new Chart(el.getContext('2d'), {
+                type: 'doughnut',
+                data: {
+                    labels: catLabels,
+                    datasets: [{
+                        data: catAmounts,
+                        backgroundColor: catLabels.map((_, i) => c.categories[i % c.categories.length])
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { position: 'bottom' },
+                        tooltip: {
+                            callbacks: {
+                                label: ctx => ctx.label + ': ' + money(ctx.parsed)
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        if (typeof Chart === 'undefined') {
+            console.warn('Chart.js not loaded — analytics charts will not render.');
+            return;
+        }
+        initLineChart();
+        initPerPropertyChart();
+        initCategoryChart();
+    })();
+</script>
+}
