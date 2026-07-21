@@ -23,6 +23,9 @@ public class ApplicationDbContext : IdentityDbContext<ApplicationUser>, IDataPro
     public DbSet<PropertyExpense> PropertyExpenses => Set<PropertyExpense>();
     public DbSet<ServiceTicket> ServiceTickets => Set<ServiceTicket>();
     public DbSet<MaintenanceSchedule> MaintenanceSchedules => Set<MaintenanceSchedule>();
+    public DbSet<Inspection> Inspections => Set<Inspection>();
+    public DbSet<InspectionItem> InspectionItems => Set<InspectionItem>();
+    public DbSet<InspectionPhoto> InspectionPhotos => Set<InspectionPhoto>();
     public DbSet<EmailLog> EmailLogs => Set<EmailLog>();
     public DbSet<GeneratedDocument> GeneratedDocuments => Set<GeneratedDocument>();
     public DbSet<AppSettings> AppSettings => Set<AppSettings>();
@@ -98,6 +101,35 @@ public class ApplicationDbContext : IdentityDbContext<ApplicationUser>, IDataPro
             .HasOne(s => s.Property)
             .WithMany()
             .HasForeignKey(s => s.PropertyId)
+            .OnDelete(DeleteBehavior.Cascade);
+
+        builder.Entity<Inspection>()
+            .HasOne(i => i.Lease)
+            .WithMany()
+            .HasForeignKey(i => i.LeaseId)
+            .OnDelete(DeleteBehavior.Cascade);
+
+        // PairedMoveIn is a self-reference used by a MoveOut inspection
+        // to link back to the MoveIn baseline it's diffing against.
+        // NoAction on delete so removing the MoveIn doesn't cascade into
+        // the MoveOut (we'd rather leave a dangling reference than
+        // silently destroy the exit inspection).
+        builder.Entity<Inspection>()
+            .HasOne(i => i.PairedMoveIn)
+            .WithMany()
+            .HasForeignKey(i => i.PairedMoveInId)
+            .OnDelete(DeleteBehavior.NoAction);
+
+        builder.Entity<InspectionItem>()
+            .HasOne(x => x.Inspection)
+            .WithMany(i => i.Items)
+            .HasForeignKey(x => x.InspectionId)
+            .OnDelete(DeleteBehavior.Cascade);
+
+        builder.Entity<InspectionPhoto>()
+            .HasOne(p => p.InspectionItem)
+            .WithMany(i => i.Photos)
+            .HasForeignKey(p => p.InspectionItemId)
             .OnDelete(DeleteBehavior.Cascade);
 
         builder.Entity<GeneratedDocument>()

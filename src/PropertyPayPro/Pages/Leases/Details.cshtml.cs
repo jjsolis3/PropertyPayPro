@@ -24,6 +24,7 @@ public class DetailsModel : PageModel
     public Lease? Lease { get; private set; }
     public List<RentalCharge> Charges { get; private set; } = new();
     public List<GeneratedDocument> GeneratedDocs { get; private set; } = new();
+    public List<Inspection> Inspections { get; private set; } = new();
 
     public decimal TotalBilled { get; private set; }
     public decimal TotalPaid { get; private set; }
@@ -185,6 +186,13 @@ public class DetailsModel : PageModel
             .Where(d => d.LeaseId == id)
             .OrderByDescending(d => d.CreatedUtc)
             .Take(20)
+            .ToListAsync();
+
+        Inspections = await _db.Inspections
+            .Where(i => i.LeaseId == id)
+            .Include(i => i.Items)
+            .OrderByDescending(i => i.ScheduledFor)
+            .ThenByDescending(i => i.Id)
             .ToListAsync();
     }
 }

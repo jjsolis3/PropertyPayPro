@@ -90,7 +90,7 @@ builder.Services
         {
             "/Properties", "/Tenants", "/Leases", "/Bills", "/Payments",
             "/Receipts", "/Expenses", "/ServiceTickets",
-            "/Reports", "/Notices", "/Maintenance"
+            "/Reports", "/Notices", "/Maintenance", "/Inspections"
         };
         foreach (var folder in managementFolders)
         {

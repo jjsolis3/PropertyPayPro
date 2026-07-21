@@ -1,0 +1,137 @@
+@page
+@model PropertyPayPro.Pages.Inspections.IndexModel
+@using PropertyPayPro.Pages.Shared
+@{
+    ViewData["Title"] = "Inspections";
+}
+
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <div>
+        <h1 class="h3 mb-1">Inspections</h1>
+        <div class="text-muted">Move-in and move-out condition inspections across all leases.</div>
+    </div>
+    @if (User.IsInRole(IdentitySeed.AdminRole))
+    {
+        <a asp-page="Create" class="btn btn-success">
+            <i class="las la-plus"></i> New Inspection
+        </a>
+    }
+</div>
+
+@if (TempData["Message"] is string msg)
+{
+    <div class="alert alert-success alert-dismissible fade show">@msg
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+}
+
+<div class="row">
+    <partial name="_KpiCard" model="@(new KpiCardModel {
+        Label = "Total on File", Value = Model.TotalCount.ToString(),
+        Color = "primary", Icon = "flaticon-381-notepad" })" />
+    <partial name="_KpiCard" model="@(new KpiCardModel {
+        Label = "In Progress", Value = Model.DraftCount.ToString(),
+        SubText = "Draft status",
+        Color = Model.DraftCount > 0 ? "warning" : "success",
+        Icon = "flaticon-381-time" })" />
+    <partial name="_KpiCard" model="@(new KpiCardModel {
+        Label = "Completed This Year", Value = Model.CompletedThisYearCount.ToString(),
+        Color = "success", Icon = "flaticon-381-list" })" />
+</div>
+
+<div class="card">
+    <div class="card-body">
+        <form method="get" class="row g-2 mb-3">
+            <div class="col-md-3">
+                <select asp-for="KindFilter"
+                        asp-items="Html.GetEnumSelectList<PropertyPayPro.Models.InspectionKind>()"
+                        class="form-select">
+                    <option value="">All kinds</option>
+                </select>
+            </div>
+            <div class="col-md-3">
+                <select asp-for="StatusFilter"
+                        asp-items="Html.GetEnumSelectList<PropertyPayPro.Models.InspectionStatus>()"
+                        class="form-select">
+                    <option value="">All statuses</option>
+                </select>
+            </div>
+            <div class="col-md-4">
+                <select asp-for="PropertyFilter" class="form-select">
+                    <option value="">All properties</option>
+                    @foreach (var p in Model.Properties)
+                    {
+                        <option value="@p.Id">@p.Name</option>
+                    }
+                </select>
+            </div>
+            <div class="col-md-2">
+                <button type="submit" class="btn btn-primary w-100">Filter</button>
+            </div>
+        </form>
+
+        <div class="table-responsive">
+            <table class="table table-striped mb-0 js-datatable" data-order='[[2,"desc"]]'>
+                <thead>
+                    <tr>
+                        <th>Kind</th>
+                        <th>Property / Lease</th>
+                        <th>Scheduled</th>
+                        <th>Status</th>
+                        <th>Items</th>
+                        <th class="text-end">Deductions</th>
+                        <th class="text-end"></th>
+                    </tr>
+                </thead>
+                <tbody>
+                @foreach (var i in Model.Inspections)
+                {
+                    var kindColor = i.Kind == PropertyPayPro.Models.InspectionKind.MoveIn ? "success" : "warning";
+                    var statusColor = i.Status == PropertyPayPro.Models.InspectionStatus.Completed ? "success" : "secondary";
+                    <tr>
+                        <td><span class="badge bg-@kindColor">@(i.Kind == PropertyPayPro.Models.InspectionKind.MoveIn ? "Move-in" : "Move-out")</span></td>
+                        <td>
+                            <div>@i.Lease?.Property?.Name</div>
+                            <small class="text-muted">@i.Lease?.TenantNames</small>
+                        </td>
+                        <td>
+                            @i.ScheduledFor.ToString("yyyy-MM-dd")
+                            @if (i.CompletedOn.HasValue)
+                            {
+                                <br /><small class="text-muted">Completed @i.CompletedOn.Value.ToString("MMM d")</small>
+                            }
+                        </td>
+                        <td><span class="badge bg-@statusColor">@i.Status</span></td>
+                        <td>@i.Items.Count</td>
+                        <td class="text-end">
+                            @if (i.Kind == PropertyPayPro.Models.InspectionKind.MoveOut && i.TotalDeductions > 0)
+                            {
+                                <span class="fw-bold text-danger">@i.TotalDeductions.ToString("C")</span>
+                            }
+                            else
+                            {
+                                <span class="text-muted">—</span>
+                            }
+                        </td>
+                        <td class="text-end">
+                            <a asp-page="Details" asp-route-id="@i.Id" class="btn btn-sm btn-outline-primary">Open</a>
+                            <a asp-page="/Leases/Details" asp-route-id="@i.LeaseId" class="btn btn-sm btn-outline-secondary">Lease</a>
+                        </td>
+                    </tr>
+                }
+                @if (!Model.Inspections.Any())
+                {
+                    <tr><td colspan="7" class="text-center text-muted py-3">
+                        No inspections yet.
+                        @if (User.IsInRole(IdentitySeed.AdminRole))
+                        {
+                            <a asp-page="Create">Create one</a>
+                            @:.
+                        }
+                    </td></tr>
+                }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
