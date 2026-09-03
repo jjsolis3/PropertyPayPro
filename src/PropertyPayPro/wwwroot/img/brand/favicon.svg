@@ -1,5 +1,26 @@
-<svg width="32" height="32" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
-    <rect width="32" height="32" rx="8" fill="#2A6FFF"/>
-    <path d="M9 22V10h5.5a4 4 0 1 1 0 8H12v4H9zm3-7h2.5a1.5 1.5 0 1 0 0-3H12v3z" fill="#fff"/>
-    <path d="M19 22V10h5.5a4 4 0 1 1 0 8H22v4h-3zm3-7h2.5a1.5 1.5 0 1 0 0-3H22v3z" fill="#fff" opacity=".7"/>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="64" height="64" role="img" aria-label="PropertyPayPro">
+    <!--
+        PropertyPayPro favicon.
+        Rounded-square gradient (brand blue -> teal) with a white house
+        silhouette and a 2x2 navy window grid — a simplified read of the
+        full brand mark that still holds up at 16x16.
+    -->
+    <defs>
+        <linearGradient id="pps-bg" x1="0" y1="0" x2="1" y2="1">
+            <stop offset="0" stop-color="#2A6FFF"/>
+            <stop offset="1" stop-color="#22C1B4"/>
+        </linearGradient>
+    </defs>
+
+    <!-- Rounded-square background. rx=12 matches iOS/Android app-icon rounding. -->
+    <rect width="64" height="64" rx="12" fill="url(#pps-bg)"/>
+
+    <!-- White pentagon house body: roof peak at (32,10), base from (8,54) to (56,54). -->
+    <path d="M32 9 L57 29 L57 55 L7 55 L7 29 Z" fill="#ffffff"/>
+
+    <!-- 2x2 window grid in deep navy for punch. -->
+    <rect x="20" y="30" width="10" height="9" fill="#1E3A8A"/>
+    <rect x="34" y="30" width="10" height="9" fill="#1E3A8A"/>
+    <rect x="20" y="42" width="10" height="9" fill="#1E3A8A"/>
+    <rect x="34" y="42" width="10" height="9" fill="#1E3A8A"/>
 </svg>
