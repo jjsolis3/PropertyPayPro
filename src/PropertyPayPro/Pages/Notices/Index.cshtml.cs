@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.EntityFrameworkCore;
 using PropertyPayPro.Data;
 using PropertyPayPro.Models;
+using PropertyPayPro.Services;
 
 namespace PropertyPayPro.Pages.Notices;
 
@@ -16,8 +17,13 @@ namespace PropertyPayPro.Pages.Notices;
 public class IndexModel : PageModel
 {
     private readonly ApplicationDbContext _db;
+    private readonly IDocumentStorage _storage;
 
-    public IndexModel(ApplicationDbContext db) { _db = db; }
+    public IndexModel(ApplicationDbContext db, IDocumentStorage storage)
+    {
+        _db = db;
+        _storage = storage;
+    }
 
     [BindProperty(SupportsGet = true)]
     public int? PropertyFilter { get; set; }
@@ -29,8 +35,36 @@ public class IndexModel : PageModel
     public List<Property> Properties { get; private set; } = new();
     public int TotalCount { get; private set; }
     public int Last30DaysCount { get; private set; }
+    public int SentCount { get; private set; }
 
     public async Task OnGetAsync()
+    {
+        await LoadAsync();
+    }
+
+    public async Task<IActionResult> OnPostDeleteAsync(int id)
+    {
+        if (!User.IsInRole(IdentitySeed.AdminRole)) return Forbid();
+
+        var doc = await _db.LeaseDocuments
+            .FirstOrDefaultAsync(d => d.Id == id && d.Type == LeaseDocumentType.Notice);
+        if (doc is null)
+        {
+            TempData["Error"] = "That notice no longer exists.";
+            return RedirectToPage();
+        }
+
+        // Best-effort delete of the stored PDF; missing-file errors are fine.
+        try { await _storage.DeleteAsync(doc.StorageKey); } catch { /* ignore */ }
+
+        _db.LeaseDocuments.Remove(doc);
+        await _db.SaveChangesAsync();
+
+        TempData["Message"] = $"Notice \"{doc.Description ?? doc.FileName}\" deleted.";
+        return RedirectToPage(new { PropertyFilter, Q });
+    }
+
+    private async Task LoadAsync()
     {
         Properties = await _db.Properties.OrderBy(p => p.Name).ToListAsync();
 
@@ -56,5 +90,7 @@ public class IndexModel : PageModel
         var cutoff = DateTime.UtcNow.AddDays(-30);
         Last30DaysCount = await _db.LeaseDocuments
             .CountAsync(d => d.Type == LeaseDocumentType.Notice && d.UploadedOn >= cutoff);
+        SentCount = await _db.LeaseDocuments
+            .CountAsync(d => d.Type == LeaseDocumentType.Notice && d.LastSentUtc != null);
     }
 }

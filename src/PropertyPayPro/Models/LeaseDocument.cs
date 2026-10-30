@@ -58,4 +58,34 @@ public class LeaseDocument
     /// </summary>
     [DataType(DataType.Date)]
     public DateOnly? ExpiresOn { get; set; }
+
+    /// <summary>
+    /// Original title given to a generated notice. Only populated for
+    /// Type=Notice documents so the notice can be reopened and the PDF
+    /// regenerated from the same text after editing. Null on uploaded
+    /// files (nothing to regenerate).
+    /// </summary>
+    [StringLength(200)]
+    public string? SourceTitle { get; set; }
+
+    /// <summary>
+    /// Original body text of a generated notice. Pairs with SourceTitle;
+    /// null on uploaded files.
+    /// </summary>
+    [StringLength(16000)]
+    public string? SourceBody { get; set; }
+
+    /// <summary>
+    /// Count of successful outbound email deliveries that included this
+    /// document as an attachment. Lets the UI render a "Sent Nx" badge
+    /// without a per-row EmailLog join.
+    /// </summary>
+    public int SentCount { get; set; }
+
+    /// <summary>
+    /// Timestamp of the most recent successful send that included this
+    /// document. Null if never sent.
+    /// </summary>
+    public DateTime? LastSentUtc { get; set; }
 }
+

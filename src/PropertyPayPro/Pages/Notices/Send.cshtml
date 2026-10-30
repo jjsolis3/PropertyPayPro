@@ -1,0 +1,187 @@
+@page "{id:int}"
+@model PropertyPayPro.Pages.Notices.SendModel
+@{
+    ViewData["Title"] = "Send Notice";
+    var doc = Model.Notice!;
+}
+
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <div>
+        <h1 class="h3 mb-1">Send Notice</h1>
+        <div class="text-muted">
+            @doc.Lease?.Property?.Name — @doc.Lease?.TenantNames
+            @if (doc.SentCount > 0)
+            {
+                <span class="badge bg-success ms-2">Previously sent @doc.SentCount × on @doc.LastSentUtc?.ToLocalTime().ToString("MMM d yyyy")</span>
+            }
+        </div>
+    </div>
+    <div>
+        <a asp-page="Edit" asp-route-id="@doc.Id" class="btn btn-outline-warning">Edit PDF</a>
+        <a asp-page="Index" class="btn btn-outline-secondary">Back</a>
+    </div>
+</div>
+
+@if (!Model.MailConfigured)
+{
+    <div class="alert alert-danger">
+        <strong>SMTP is not configured.</strong> Set the email provider in
+        appsettings or environment variables before you can send.
+    </div>
+}
+
+<form method="post" asp-page-handler="Send">
+    <input type="hidden" asp-for="Input.NoticeId" />
+
+    <div class="row">
+        <div class="col-lg-8">
+            <div class="card mb-3">
+                <div class="card-header"><strong>Cover email</strong></div>
+                <div class="card-body">
+                    <div class="row g-2 mb-3">
+                        <div class="col-md-9">
+                            <label asp-for="Input.Template" class="form-label"></label>
+                            <select asp-for="Input.Template" asp-items="Model.TemplateOptions" class="form-select"></select>
+                            <small class="text-muted">Pick a template to pre-fill subject and body. You can edit both before sending.</small>
+                        </div>
+                        <div class="col-md-3 d-flex align-items-end">
+                            <button type="submit" asp-page-handler="ReloadTemplate" class="btn btn-outline-secondary w-100">Load template</button>
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <label asp-for="Input.Subject" class="form-label"></label>
+                        <input asp-for="Input.Subject" class="form-control" />
+                        <span asp-validation-for="Input.Subject" class="text-danger"></span>
+                    </div>
+                    <div class="mb-3">
+                        <label asp-for="Input.Body" class="form-label"></label>
+                        <textarea asp-for="Input.Body" class="form-control" rows="14"
+                                  style="font-family: monospace; font-size: 0.9rem;"></textarea>
+                        <small class="text-muted">
+                            This becomes the email body. The branded HTML wrapper is applied automatically.
+                        </small>
+                        <span asp-validation-for="Input.Body" class="text-danger"></span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-4">
+            <div class="card mb-3">
+                <div class="card-header"><strong>Attachments</strong></div>
+                <div class="card-body">
+                    <div class="form-check mb-2">
+                        <input class="form-check-input" type="checkbox"
+                               name="Input.AttachmentIds" value="@doc.Id"
+                               id="att-primary" checked disabled />
+                        <input type="hidden" name="Input.AttachmentIds" value="@doc.Id" />
+                        <label class="form-check-label" for="att-primary">
+                            <strong>@doc.FileName</strong>
+                            <br /><small class="text-muted">The notice (always included)</small>
+                        </label>
+                    </div>
+                    @if (Model.AvailableAttachments.Any())
+                    {
+                        <hr />
+                        <div class="small text-muted mb-2">Other documents on this lease:</div>
+                        @foreach (var a in Model.AvailableAttachments)
+                        {
+                            <div class="form-check mb-1">
+                                <input class="form-check-input" type="checkbox"
+                                       name="Input.AttachmentIds" value="@a.Id"
+                                       id="att-@a.Id" />
+                                <label class="form-check-label" for="att-@a.Id">
+                                    @a.FileName
+                                    <br /><small class="text-muted">@a.Type — @((a.SizeBytes / 1024.0).ToString("0.0")) KB</small>
+                                </label>
+                            </div>
+                        }
+                    }
+                    else
+                    {
+                        <small class="text-muted">No other documents on this lease.</small>
+                    }
+                </div>
+            </div>
+
+            <div class="card mb-3">
+                <div class="card-header"><strong>Recipients</strong></div>
+                <div class="card-body">
+                    @if (Model.AvailableRecipients.Any())
+                    {
+                        @foreach (var t in Model.AvailableRecipients)
+                        {
+                            <div class="form-check mb-1">
+                                <input class="form-check-input" type="checkbox"
+                                       name="Input.Recipients" value="@t.Email"
+                                       id="rcpt-@t.Id"
+                                       checked="@(Model.Input.Recipients.Contains(t.Email ?? ""))" />
+                                <label class="form-check-label" for="rcpt-@t.Id">
+                                    @t.FirstName @t.LastName
+                                    <br /><small class="text-muted">@t.Email</small>
+                                </label>
+                            </div>
+                        }
+                    }
+                    else
+                    {
+                        <div class="text-danger small">
+                            No tenant on this lease has an email on file.
+                            <a asp-page="/Leases/Details" asp-route-id="@doc.LeaseId">Edit the lease</a>
+                            to add one.
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+    <div class="mb-4">
+        <button type="submit" class="btn btn-success btn-lg"
+                disabled="@(!Model.MailConfigured || !Model.AvailableRecipients.Any())">
+            <i class="las la-paper-plane"></i> Send package
+        </button>
+        <a asp-page="Index" class="btn btn-outline-secondary">Cancel</a>
+    </div>
+</form>
+
+@if (Model.RecentDeliveries.Any())
+{
+    <div class="card">
+        <div class="card-header"><strong>Delivery history for this lease</strong></div>
+        <div class="card-body p-0">
+            <table class="table table-sm mb-0">
+                <thead>
+                    <tr>
+                        <th>When</th>
+                        <th>To</th>
+                        <th>Subject</th>
+                        <th>Status</th>
+                    </tr>
+                </thead>
+                <tbody>
+                @foreach (var log in Model.RecentDeliveries)
+                {
+                    <tr>
+                        <td><small>@log.CreatedUtc.ToLocalTime().ToString("yyyy-MM-dd HH:mm")</small></td>
+                        <td><small>@log.ToAddress</small></td>
+                        <td><small>@log.Subject</small></td>
+                        <td>
+                            @if (log.Status == PropertyPayPro.Models.EmailStatus.Sent)
+                            {
+                                <span class="badge bg-success">Sent</span>
+                            }
+                            else
+                            {
+                                <span class="badge bg-danger" title="@log.Error">Failed</span>
+                            }
+                        </td>
+                    </tr>
+                }
+                </tbody>
+            </table>
+        </div>
+    </div>
+}

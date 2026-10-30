@@ -158,6 +158,48 @@ public class MailService
     }
 
     /// <summary>
+    /// Sends a "notice package" — a cover email with one or more PDF
+    /// attachments — to a list of recipients. Caller supplies the fully
+    /// composed subject + plain-text body (templated client-side) and
+    /// the pre-loaded attachment bytes. Each recipient gets its own send
+    /// and its own EmailLog row; one failure doesn't halt the batch.
+    /// </summary>
+    public async Task<NoticePackageResult> SendNoticePackageAsync(
+        string baseUrl,
+        int leaseId,
+        IEnumerable<string> recipients,
+        string subject,
+        string plainTextBody,
+        IReadOnlyList<EmailAttachment> attachments,
+        CancellationToken ct = default)
+    {
+        var body = EmailComposer.ComposeNoticeDelivery(baseUrl, subject, plainTextBody, attachments);
+        var addresses = recipients
+            .Where(a => !string.IsNullOrWhiteSpace(a))
+            .Select(a => a.Trim())
+            .Distinct(StringComparer.OrdinalIgnoreCase)
+            .ToList();
+
+        var sent = 0;
+        var failed = 0;
+        var errors = new List<string>();
+        foreach (var address in addresses)
+        {
+            var log = await TrySendAsync(EmailKind.Notice, address, subject, body,
+                attachments, leaseId: leaseId, ct: ct);
+            if (log.Status == EmailStatus.Sent) sent++;
+            else
+            {
+                failed++;
+                if (!string.IsNullOrWhiteSpace(log.Error)) errors.Add($"{address}: {log.Error}");
+            }
+        }
+        return new NoticePackageResult(addresses.Count, sent, failed, errors);
+    }
+
+    public record NoticePackageResult(int TotalRecipients, int Sent, int Failed, IReadOnlyList<string> Errors);
+
+    /// <summary>
     /// Sends a broadcast email to a list of recipients. Each address gets
     /// its own send + its own EmailLog row so failures on one address
     /// don't stop the others. Body is treated as pre-composed HTML.

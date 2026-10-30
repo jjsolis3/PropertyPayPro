@@ -130,7 +130,11 @@ public class CreateModel : PageModel
             SizeBytes = pdfBytes.Length,
             StorageKey = storageKey,
             Description = Input.Title,
-            EffectiveDate = today
+            EffectiveDate = today,
+            // Persist the source title + body so the notice can be
+            // reopened, edited, and the PDF regenerated from scratch.
+            SourceTitle = Input.Title,
+            SourceBody = Input.Body
         };
         _db.LeaseDocuments.Add(doc);
         await _db.SaveChangesAsync();
@@ -152,13 +156,19 @@ public class CreateModel : PageModel
                 var log = await _mail.SendNoticeAsync(baseUrl, addr, lease.Id, Input.Title, fileName, pdfBytes);
                 if (log.Status == EmailStatus.Sent) sent++; else failed++;
             }
+            if (sent > 0)
+            {
+                doc.SentCount += sent;
+                doc.LastSentUtc = DateTime.UtcNow;
+                await _db.SaveChangesAsync();
+            }
             emailSummary = recipients.Count == 0
                 ? " No tenant on this lease has an email on file — skipped emailing."
                 : $" Emailed to {sent} recipient(s){(failed > 0 ? $"; {failed} failed" : "")}.";
         }
 
         TempData["Message"] = $"Notice \"{Input.Title}\" saved to the lease.{emailSummary}";
-        return RedirectToPage("/Leases/Details", new { id = lease.Id });
+        return RedirectToPage("Index");
     }
 
     private async Task LoadDropdownsAsync()
