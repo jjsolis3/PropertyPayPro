@@ -1,0 +1,164 @@
+@page
+@model PropertyPayPro.Pages.Settings.EmailLogsModel
+@using PropertyPayPro.Models
+@using PropertyPayPro.Pages.Shared
+@{
+    ViewData["Title"] = "Email Logs";
+    ViewData["SettingsTab"] = "emaillogs";
+}
+
+<h1 class="h3 mb-3">Email Logs</h1>
+<partial name="_SettingsNav" />
+
+@if (TempData["Message"] is string msg)
+{
+    <div class="alert alert-success alert-dismissible fade show">@msg
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+}
+@if (TempData["Error"] is string err)
+{
+    <div class="alert alert-danger alert-dismissible fade show">@err
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+}
+
+<div class="row">
+    <partial name="_KpiCard" model="@(new KpiCardModel {
+        Label = "Delivered", Value = Model.SentTotal.ToString(),
+        Color = "success", Icon = "flaticon-381-send-2" })" />
+    <partial name="_KpiCard" model="@(new KpiCardModel {
+        Label = "Failed", Value = Model.FailedTotal.ToString(),
+        Color = "danger", Icon = "flaticon-381-warning" })" />
+    <partial name="_KpiCard" model="@(new KpiCardModel {
+        Label = "Showing", Value = Model.Total.ToString(),
+        Color = "info", Icon = "flaticon-381-list" })" />
+</div>
+
+<div class="card mb-3">
+    <div class="card-body">
+        <form method="get" class="row g-2 align-items-end">
+            <div class="col-md-3">
+                <label asp-for="Kind" class="form-label">Kind</label>
+                <select asp-for="Kind" class="form-select">
+                    <option value="">(any)</option>
+                    @foreach (var k in Enum.GetValues<EmailKind>())
+                    {
+                        <option value="@k">@k</option>
+                    }
+                </select>
+            </div>
+            <div class="col-md-3">
+                <label asp-for="Status" class="form-label">Status</label>
+                <select asp-for="Status" class="form-select">
+                    <option value="">(any)</option>
+                    @foreach (var s in Enum.GetValues<EmailStatus>())
+                    {
+                        <option value="@s">@s</option>
+                    }
+                </select>
+            </div>
+            <div class="col-md-4">
+                <label asp-for="Q" class="form-label">Search</label>
+                <input asp-for="Q" class="form-control" placeholder="recipient or subject..." />
+            </div>
+            <div class="col-md-2">
+                <button type="submit" class="btn btn-primary w-100">Filter</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<div class="card">
+    <div class="card-body p-0">
+        <table class="table table-sm table-striped mb-0">
+            <thead>
+                <tr>
+                    <th>When (local)</th>
+                    <th>Kind</th>
+                    <th>To</th>
+                    <th>Subject</th>
+                    <th>Status</th>
+                    <th>Error / Preview</th>
+                    <th class="text-end"></th>
+                </tr>
+            </thead>
+            <tbody>
+            @foreach (var l in Model.Logs)
+            {
+                <tr>
+                    <td><small>@l.CreatedUtc.ToLocalTime().ToString("yyyy-MM-dd HH:mm")</small></td>
+                    <td><span class="badge bg-light text-dark">@l.Kind</span></td>
+                    <td><small>@l.ToAddress</small></td>
+                    <td><small>@l.Subject</small></td>
+                    <td>
+                        @if (l.Status == EmailStatus.Sent)
+                        {
+                            <span class="badge bg-success">Sent</span>
+                        }
+                        else
+                        {
+                            <span class="badge bg-danger">Failed</span>
+                        }
+                    </td>
+                    <td>
+                        @if (l.Status == EmailStatus.Failed && !string.IsNullOrEmpty(l.Error))
+                        {
+                            <small class="text-danger" title="@l.Error">
+                                @(l.Error.Length > 80 ? l.Error[..80] + "…" : l.Error)
+                            </small>
+                        }
+                    </td>
+                    <td class="text-end">
+                        @if (l.Status == EmailStatus.Failed && !string.IsNullOrEmpty(l.BodyHtml))
+                        {
+                            <form method="post" asp-page-handler="Resend"
+                                  asp-route-id="@l.Id" class="d-inline"
+                                  onsubmit="return confirm('Resend this message to @l.ToAddress?');">
+                                <input type="hidden" name="Kind" value="@Model.Kind" />
+                                <input type="hidden" name="Status" value="@Model.Status" />
+                                <input type="hidden" name="Q" value="@Model.Q" />
+                                <input type="hidden" name="Page" value="@Model.Page" />
+                                <button type="submit" class="btn btn-sm btn-outline-primary"
+                                        title="Replay with the stored body">
+                                    <i class="las la-redo"></i> Resend
+                                </button>
+                            </form>
+                        }
+                    </td>
+                </tr>
+            }
+            @if (!Model.Logs.Any())
+            {
+                <tr><td colspan="7" class="text-center text-muted py-3">No log entries match your filters.</td></tr>
+            }
+            </tbody>
+        </table>
+    </div>
+    @if (Model.HasPrev || Model.HasNext)
+    {
+        <div class="card-footer d-flex justify-content-between">
+            <div>Page @Model.Page of @((Model.Total + 99) / 100)</div>
+            <div>
+                @if (Model.HasPrev)
+                {
+                    <a asp-page="/Settings/EmailLogs"
+                       asp-route-page="@(Model.Page - 1)"
+                       asp-route-kind="@Model.Kind"
+                       asp-route-status="@Model.Status"
+                       asp-route-q="@Model.Q"
+                       class="btn btn-sm btn-outline-secondary">Previous</a>
+                }
+                @if (Model.HasNext)
+                {
+                    <a asp-page="/Settings/EmailLogs"
+                       asp-route-page="@(Model.Page + 1)"
+                       asp-route-kind="@Model.Kind"
+                       asp-route-status="@Model.Status"
+                       asp-route-q="@Model.Q"
+                       class="btn btn-sm btn-outline-secondary">Next</a>
+                }
+            </div>
+        </div>
+    }
+</div>

@@ -27,15 +27,18 @@ public class EditModel : PageModel
     private readonly ApplicationDbContext _db;
     private readonly IDocumentStorage _storage;
     private readonly IWebHostEnvironment _env;
+    private readonly IAuditLog _audit;
 
     public EditModel(
         ApplicationDbContext db,
         IDocumentStorage storage,
-        IWebHostEnvironment env)
+        IWebHostEnvironment env,
+        IAuditLog audit)
     {
         _db = db;
         _storage = storage;
         _env = env;
+        _audit = audit;
     }
 
     public class InputModel
@@ -105,6 +108,11 @@ public class EditModel : PageModel
         doc.SourceTitle = Input.Title;
         doc.SourceBody = Input.Body;
         await _db.SaveChangesAsync();
+
+        await _audit.WriteAsync("NoticeEdited",
+            entityType: nameof(LeaseDocument),
+            entityId: doc.Id,
+            details: $"Lease #{doc.LeaseId}; title=\"{Input.Title}\"; file={newFileName}");
 
         TempData["Message"] = $"Notice \"{Input.Title}\" regenerated.";
         return RedirectToPage("Index");

@@ -131,6 +131,18 @@ builder.Services.AddScoped<PropertyPayPro.Services.MailService>();
 builder.Services.AddScoped<PropertyPayPro.Services.PdfService>();
 builder.Services.AddScoped<PropertyPayPro.Services.MaintenanceSchedulerService>();
 
+// Audit log depends on HttpContextAccessor so it can pick up the
+// current user without each caller having to pass one in.
+builder.Services.AddHttpContextAccessor();
+builder.Services.AddScoped<PropertyPayPro.Services.IAuditLog, PropertyPayPro.Services.AuditLog>();
+
+// Scheduled task infrastructure. Each handler is registered as
+// IScheduledTaskHandler so the dispatcher can discover them by Kind.
+builder.Services.AddScoped<PropertyPayPro.Services.ScheduledTasks.IScheduledTaskHandler,
+    PropertyPayPro.Services.ScheduledTasks.NoticeSendHandler>();
+builder.Services.AddScoped<PropertyPayPro.Services.ScheduledTasks.ScheduledTaskDispatcher>();
+builder.Services.AddHostedService<PropertyPayPro.Services.ScheduledTasks.ScheduledTaskRunner>();
+
 var app = builder.Build();
 
 using (var scope = app.Services.CreateScope())

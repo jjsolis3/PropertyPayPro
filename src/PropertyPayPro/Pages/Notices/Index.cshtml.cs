@@ -18,11 +18,13 @@ public class IndexModel : PageModel
 {
     private readonly ApplicationDbContext _db;
     private readonly IDocumentStorage _storage;
+    private readonly IAuditLog _audit;
 
-    public IndexModel(ApplicationDbContext db, IDocumentStorage storage)
+    public IndexModel(ApplicationDbContext db, IDocumentStorage storage, IAuditLog audit)
     {
         _db = db;
         _storage = storage;
+        _audit = audit;
     }
 
     [BindProperty(SupportsGet = true)]
@@ -59,6 +61,11 @@ public class IndexModel : PageModel
 
         _db.LeaseDocuments.Remove(doc);
         await _db.SaveChangesAsync();
+
+        await _audit.WriteAsync("NoticeDeleted",
+            entityType: nameof(LeaseDocument),
+            entityId: doc.Id,
+            details: $"Lease #{doc.LeaseId}; file={doc.FileName}; sentCount={doc.SentCount}");
 
         TempData["Message"] = $"Notice \"{doc.Description ?? doc.FileName}\" deleted.";
         return RedirectToPage(new { PropertyFilter, Q });

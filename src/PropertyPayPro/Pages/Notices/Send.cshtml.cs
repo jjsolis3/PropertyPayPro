@@ -1,4 +1,5 @@
 using System.ComponentModel.DataAnnotations;
+using System.Text.Json;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
@@ -7,6 +8,7 @@ using Microsoft.EntityFrameworkCore;
 using PropertyPayPro.Data;
 using PropertyPayPro.Models;
 using PropertyPayPro.Services;
+using PropertyPayPro.Services.ScheduledTasks;
 
 namespace PropertyPayPro.Pages.Notices;
 
@@ -17,9 +19,9 @@ namespace PropertyPayPro.Pages.Notices;
 /// Admin picks which lease documents to attach (the notice is pre-
 /// checked), which tenants to send to (all with email on file are
 /// pre-checked), and a cover email template that pre-fills Subject +
-/// Body. All three are editable before Send. Each recipient gets its
-/// own EmailLog row. On success, the notice's SentCount and
-/// LastSentUtc are updated so Index can show a "Sent" badge.
+/// Body. Setting Send-at to a future time enqueues a ScheduledTask
+/// instead of sending immediately; the background runner picks it up
+/// and runs the same code path at the right time.
 /// </summary>
 [Authorize(Roles = IdentitySeed.AdminRole)]
 public class SendModel : PageModel
@@ -27,12 +29,18 @@ public class SendModel : PageModel
     private readonly ApplicationDbContext _db;
     private readonly IDocumentStorage _storage;
     private readonly MailService _mail;
+    private readonly IAuditLog _audit;
 
-    public SendModel(ApplicationDbContext db, IDocumentStorage storage, MailService mail)
+    public SendModel(
+        ApplicationDbContext db,
+        IDocumentStorage storage,
+        MailService mail,
+        IAuditLog audit)
     {
         _db = db;
         _storage = storage;
         _mail = mail;
+        _audit = audit;
     }
 
     public class InputModel
@@ -50,11 +58,17 @@ public class SendModel : PageModel
         [Display(Name = "Template")]
         public NoticeEmailTemplateKind Template { get; set; } = NoticeEmailTemplateKind.FormalNoticeDelivery;
 
-        /// <summary>Which LeaseDocument ids to attach.</summary>
         public List<int> AttachmentIds { get; set; } = new();
-
-        /// <summary>Which tenant email addresses to send to.</summary>
         public List<string> Recipients { get; set; } = new();
+
+        /// <summary>
+        /// Optional future-dated send. Interpreted as the admin's
+        /// local time (datetime-local input) and converted to UTC
+        /// before enqueueing. Blank / in the past = send now.
+        /// </summary>
+        [Display(Name = "Send at")]
+        [DataType(DataType.DateTime)]
+        public DateTime? SendAtLocal { get; set; }
     }
 
     [BindProperty] public InputModel Input { get; set; } = new();
@@ -63,6 +77,7 @@ public class SendModel : PageModel
     public List<LeaseDocument> AvailableAttachments { get; private set; } = new();
     public List<Tenant> AvailableRecipients { get; private set; } = new();
     public List<EmailLog> RecentDeliveries { get; private set; } = new();
+    public List<ScheduledTask> PendingScheduled { get; private set; } = new();
     public SelectList TemplateOptions { get; private set; } = default!;
     public bool MailConfigured => _mail.IsConfigured;
 
@@ -110,12 +125,34 @@ public class SendModel : PageModel
             return Page();
         }
 
-        // Pull the chosen attachments from storage. Any id the user
-        // snuck in that's not on this lease is silently dropped.
         var allowedIds = AvailableAttachments.Select(a => a.Id).ToHashSet();
         allowedIds.Add(Notice!.Id);
-        var chosen = await _db.LeaseDocuments
+        var chosenIds = await _db.LeaseDocuments
             .Where(d => Input.AttachmentIds.Contains(d.Id) && allowedIds.Contains(d.Id))
+            .Select(d => d.Id)
+            .ToListAsync();
+
+        // Translate the admin's local time to UTC. The browser sends
+        // the datetime-local as "unspecified"; we treat it as the
+        // server's local kind to stay consistent across the app.
+        var sendAtUtc = Input.SendAtLocal.HasValue
+            ? DateTime.SpecifyKind(Input.SendAtLocal.Value, DateTimeKind.Local).ToUniversalTime()
+            : (DateTime?)null;
+
+        // Future dates enqueue a task; blank or past = immediate send.
+        if (sendAtUtc.HasValue && sendAtUtc.Value > DateTime.UtcNow.AddMinutes(1))
+        {
+            await EnqueueAsync(chosenIds, sendAtUtc.Value);
+            return RedirectToPage("Index");
+        }
+
+        return await SendNowAsync(chosenIds);
+    }
+
+    private async Task<IActionResult> SendNowAsync(List<int> chosenIds)
+    {
+        var chosen = await _db.LeaseDocuments
+            .Where(d => chosenIds.Contains(d.Id))
             .ToListAsync();
 
         var attachments = new List<EmailAttachment>();
@@ -135,7 +172,6 @@ public class SendModel : PageModel
 
         if (result.Sent > 0)
         {
-            // Bump the Sent counters on every doc that was in this package.
             var now = DateTime.UtcNow;
             foreach (var d in chosen)
             {
@@ -144,6 +180,11 @@ public class SendModel : PageModel
             }
             await _db.SaveChangesAsync();
         }
+
+        await _audit.WriteAsync("NoticeSent",
+            entityType: nameof(LeaseDocument),
+            entityId: Notice!.Id,
+            details: $"To {result.Sent}/{result.TotalRecipients}; subject=\"{Input.Subject}\"; attachments={chosenIds.Count}");
 
         TempData["Message"] = $"Notice package sent to {result.Sent} recipient(s)"
             + (result.Failed > 0 ? $"; {result.Failed} failed." : ".");
@@ -154,7 +195,37 @@ public class SendModel : PageModel
         return RedirectToPage("Index");
     }
 
-    // ---- Helpers ----
+    private async Task EnqueueAsync(List<int> chosenIds, DateTime sendAtUtc)
+    {
+        var baseUrl = $"{Request.Scheme}://{Request.Host}";
+        var payload = new NoticeSendPayload(
+            LeaseId: Notice!.LeaseId,
+            PrimaryNoticeId: Notice.Id,
+            AttachmentIds: chosenIds.ToArray(),
+            Recipients: Input.Recipients.ToArray(),
+            Subject: Input.Subject,
+            Body: Input.Body,
+            BaseUrl: baseUrl);
+
+        var task = new ScheduledTask
+        {
+            Kind = ScheduledTaskKind.NoticeSend,
+            Status = ScheduledTaskStatus.Pending,
+            RunAtUtc = sendAtUtc,
+            PayloadJson = JsonSerializer.Serialize(payload),
+            CreatedByUserId = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value,
+            Description = $"Notice \"{Input.Subject}\" to {Input.Recipients.Count} recipient(s)",
+        };
+        _db.ScheduledTasks.Add(task);
+        await _db.SaveChangesAsync();
+
+        await _audit.WriteAsync("NoticeScheduled",
+            entityType: nameof(LeaseDocument),
+            entityId: Notice!.Id,
+            details: $"RunAtUtc={sendAtUtc:O}; subject=\"{Input.Subject}\"; recipients={Input.Recipients.Count}");
+
+        TempData["Message"] = $"Scheduled send for {sendAtUtc.ToLocalTime():yyyy-MM-dd HH:mm} to {Input.Recipients.Count} recipient(s).";
+    }
 
     private async Task<bool> LoadAsync(int noticeId)
     {
@@ -180,6 +251,16 @@ public class SendModel : PageModel
             .Take(10)
             .ToListAsync();
 
+        // Pending/running scheduled sends for this notice, newest first.
+        // Matched by the primary notice id embedded in the payload JSON.
+        var noticeIdNeedle = $"\"PrimaryNoticeId\":{Notice.Id}";
+        PendingScheduled = await _db.ScheduledTasks
+            .Where(t => t.Kind == ScheduledTaskKind.NoticeSend
+                && (t.Status == ScheduledTaskStatus.Pending || t.Status == ScheduledTaskStatus.Running)
+                && t.PayloadJson.Contains(noticeIdNeedle))
+            .OrderBy(t => t.RunAtUtc)
+            .ToListAsync();
+
         TemplateOptions = new SelectList(
             NoticeEmailTemplateCatalog.Kinds.Select(k => new { Value = k.Kind, Text = k.Label }),
             "Value", "Text");
@@ -196,5 +277,24 @@ public class SendModel : PageModel
             Notice.SourceTitle ?? Notice.Description ?? Notice.FileName);
         Input.Subject = tpl.Subject;
         Input.Body = tpl.Body;
+    }
+
+    public async Task<IActionResult> OnPostCancelScheduledAsync(int taskId)
+    {
+        var task = await _db.ScheduledTasks.FirstOrDefaultAsync(t =>
+            t.Id == taskId && t.Status == ScheduledTaskStatus.Pending);
+        if (task is null)
+        {
+            TempData["Error"] = "That scheduled send is no longer pending.";
+            return RedirectToPage(new { id = Input.NoticeId });
+        }
+        task.Status = ScheduledTaskStatus.Cancelled;
+        task.CompletedUtc = DateTime.UtcNow;
+        await _db.SaveChangesAsync();
+        await _audit.WriteAsync("ScheduledTaskCancelled",
+            entityType: nameof(ScheduledTask), entityId: task.Id,
+            details: task.Description);
+        TempData["Message"] = "Scheduled send cancelled.";
+        return RedirectToPage(new { id = Input.NoticeId });
     }
 }
