@@ -28,17 +28,20 @@ public class CreateModel : PageModel
     private readonly IDocumentStorage _storage;
     private readonly MailService _mail;
     private readonly IWebHostEnvironment _env;
+    private readonly IAuditLog _audit;
 
     public CreateModel(
         ApplicationDbContext db,
         IDocumentStorage storage,
         MailService mail,
-        IWebHostEnvironment env)
+        IWebHostEnvironment env,
+        IAuditLog audit)
     {
         _db = db;
         _storage = storage;
         _mail = mail;
         _env = env;
+        _audit = audit;
     }
 
     [BindProperty] public InputModel Input { get; set; } = new();
@@ -139,6 +142,11 @@ public class CreateModel : PageModel
         _db.LeaseDocuments.Add(doc);
         await _db.SaveChangesAsync();
 
+        await _audit.WriteAsync("NoticeCreated",
+            entityType: nameof(LeaseDocument),
+            entityId: doc.Id,
+            details: $"Lease #{lease.Id}; title=\"{Input.Title}\"; file={fileName}");
+
         // Optionally email each tenant with an email on file.
         var emailSummary = "";
         if (Input.EmailToTenant && _mail.IsConfigured)
@@ -161,6 +169,10 @@ public class CreateModel : PageModel
                 doc.SentCount += sent;
                 doc.LastSentUtc = DateTime.UtcNow;
                 await _db.SaveChangesAsync();
+                await _audit.WriteAsync("NoticeSent",
+                    entityType: nameof(LeaseDocument),
+                    entityId: doc.Id,
+                    details: $"Delivered at generation: {sent}/{recipients.Count}");
             }
             emailSummary = recipients.Count == 0
                 ? " No tenant on this lease has an email on file — skipped emailing."

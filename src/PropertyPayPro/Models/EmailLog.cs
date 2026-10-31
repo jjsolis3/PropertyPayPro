@@ -37,6 +37,14 @@ public class EmailLog
     [StringLength(2000)]
     public string? Error { get; set; }
 
+    /// <summary>
+    /// The rendered HTML body that was (or was attempted to be) sent.
+    /// Stored so admins can resend a failed delivery or audit the
+    /// exact message content later. Not stored for very large bodies
+    /// (the sender truncates past the column limit).
+    /// </summary>
+    public string? BodyHtml { get; set; }
+
     public int? LeaseId { get; set; }
     public int? RentPaymentId { get; set; }
 

@@ -136,16 +136,89 @@
         </div>
     </div>
 
+    <div class="card mb-3">
+        <div class="card-header"><strong>Delivery timing</strong></div>
+        <div class="card-body">
+            <div class="row g-2 align-items-end">
+                <div class="col-md-5">
+                    <label asp-for="Input.SendAtLocal" class="form-label"></label>
+                    <input asp-for="Input.SendAtLocal" type="datetime-local" class="form-control" />
+                    <small class="text-muted">
+                        Leave empty to send immediately. A future time queues the
+                        package; the background runner delivers it within a minute of that time.
+                    </small>
+                </div>
+                <div class="col-md-7">
+                    <small class="text-muted">
+                        Times are in your local timezone. UTC now:
+                        <code>@DateTime.UtcNow.ToString("yyyy-MM-dd HH:mm")</code>
+                    </small>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <div asp-validation-summary="ModelOnly" class="text-danger"></div>
 
     <div class="mb-4">
         <button type="submit" class="btn btn-success btn-lg"
                 disabled="@(!Model.MailConfigured || !Model.AvailableRecipients.Any())">
-            <i class="las la-paper-plane"></i> Send package
+            <i class="las la-paper-plane"></i> Send / Schedule
         </button>
         <a asp-page="Index" class="btn btn-outline-secondary">Cancel</a>
     </div>
 </form>
+
+@if (Model.PendingScheduled.Any())
+{
+    <div class="card mb-3 border-primary">
+        <div class="card-header bg-primary text-white">
+            <strong>Scheduled sends</strong>
+        </div>
+        <div class="card-body p-0">
+            <table class="table table-sm mb-0">
+                <thead>
+                    <tr>
+                        <th>Run at (local)</th>
+                        <th>Status</th>
+                        <th>Description</th>
+                        <th class="text-end"></th>
+                    </tr>
+                </thead>
+                <tbody>
+                @foreach (var t in Model.PendingScheduled)
+                {
+                    <tr>
+                        <td><small>@t.RunAtUtc.ToLocalTime().ToString("yyyy-MM-dd HH:mm")</small></td>
+                        <td>
+                            @if (t.Status == PropertyPayPro.Models.ScheduledTaskStatus.Pending)
+                            {
+                                <span class="badge bg-info">Pending</span>
+                            }
+                            else
+                            {
+                                <span class="badge bg-warning">Running</span>
+                            }
+                        </td>
+                        <td><small>@t.Description</small></td>
+                        <td class="text-end">
+                            @if (t.Status == PropertyPayPro.Models.ScheduledTaskStatus.Pending)
+                            {
+                                <form method="post" asp-page-handler="CancelScheduled"
+                                      asp-route-taskId="@t.Id" class="d-inline"
+                                      onsubmit="return confirm('Cancel this scheduled send?');">
+                                    <input type="hidden" name="Input.NoticeId" value="@Model.Notice!.Id" />
+                                    <button type="submit" class="btn btn-sm btn-outline-danger">Cancel</button>
+                                </form>
+                            }
+                        </td>
+                    </tr>
+                }
+                </tbody>
+            </table>
+        </div>
+    </div>
+}
 
 @if (Model.RecentDeliveries.Any())
 {

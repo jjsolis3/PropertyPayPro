@@ -1,0 +1,120 @@
+@page
+@model PropertyPayPro.Pages.Settings.AuditModel
+@{
+    ViewData["Title"] = "Audit Log";
+    ViewData["SettingsTab"] = "audit";
+}
+
+<h1 class="h3 mb-3">Audit Log</h1>
+<partial name="_SettingsNav" />
+
+<div class="card mb-3">
+    <div class="card-body">
+        <form method="get" class="row g-2 align-items-end">
+            <div class="col-md-2">
+                <label asp-for="Action" class="form-label">Action</label>
+                <select asp-for="Action" class="form-select">
+                    <option value="">(any)</option>
+                    @foreach (var a in Model.KnownActions)
+                    {
+                        <option value="@a">@a</option>
+                    }
+                </select>
+            </div>
+            <div class="col-md-2">
+                <label asp-for="EntityType" class="form-label">Entity</label>
+                <select asp-for="EntityType" class="form-select">
+                    <option value="">(any)</option>
+                    @foreach (var e in Model.KnownEntityTypes)
+                    {
+                        <option value="@e">@e</option>
+                    }
+                </select>
+            </div>
+            <div class="col-md-2">
+                <label asp-for="User" class="form-label">User</label>
+                <input asp-for="User" class="form-control" placeholder="email..." />
+            </div>
+            <div class="col-md-2">
+                <label asp-for="FromLocal" class="form-label">From</label>
+                <input asp-for="FromLocal" type="datetime-local" class="form-control" />
+            </div>
+            <div class="col-md-2">
+                <label asp-for="ToLocal" class="form-label">To</label>
+                <input asp-for="ToLocal" type="datetime-local" class="form-control" />
+            </div>
+            <div class="col-md-2">
+                <button type="submit" class="btn btn-primary w-100">Filter</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<div class="card">
+    <div class="card-body p-0">
+        <table class="table table-sm table-striped mb-0">
+            <thead>
+                <tr>
+                    <th>When (local)</th>
+                    <th>User</th>
+                    <th>Action</th>
+                    <th>Entity</th>
+                    <th>Details</th>
+                    <th>IP</th>
+                </tr>
+            </thead>
+            <tbody>
+            @foreach (var a in Model.Entries)
+            {
+                <tr>
+                    <td><small>@a.CreatedUtc.ToLocalTime().ToString("yyyy-MM-dd HH:mm:ss")</small></td>
+                    <td><small>@(a.UserEmail ?? "—")</small></td>
+                    <td><span class="badge bg-light text-dark">@a.Action</span></td>
+                    <td>
+                        @if (a.EntityType is not null)
+                        {
+                            <small>@a.EntityType@(a.EntityId.HasValue ? "#" + a.EntityId : "")</small>
+                        }
+                    </td>
+                    <td><small style="white-space: pre-wrap;">@a.Details</small></td>
+                    <td><small class="text-muted">@a.IpAddress</small></td>
+                </tr>
+            }
+            @if (!Model.Entries.Any())
+            {
+                <tr><td colspan="6" class="text-center text-muted py-3">No audit entries match your filters.</td></tr>
+            }
+            </tbody>
+        </table>
+    </div>
+    @if (Model.HasPrev || Model.HasNext)
+    {
+        <div class="card-footer d-flex justify-content-between">
+            <div>Showing @Model.Entries.Count of @Model.Total</div>
+            <div>
+                @if (Model.HasPrev)
+                {
+                    <a asp-page="/Settings/Audit"
+                       asp-route-page="@(Model.Page - 1)"
+                       asp-route-action="@Model.Action"
+                       asp-route-entityType="@Model.EntityType"
+                       asp-route-user="@Model.User"
+                       asp-route-fromLocal="@Model.FromLocal?.ToString("s")"
+                       asp-route-toLocal="@Model.ToLocal?.ToString("s")"
+                       class="btn btn-sm btn-outline-secondary">Previous</a>
+                }
+                @if (Model.HasNext)
+                {
+                    <a asp-page="/Settings/Audit"
+                       asp-route-page="@(Model.Page + 1)"
+                       asp-route-action="@Model.Action"
+                       asp-route-entityType="@Model.EntityType"
+                       asp-route-user="@Model.User"
+                       asp-route-fromLocal="@Model.FromLocal?.ToString("s")"
+                       asp-route-toLocal="@Model.ToLocal?.ToString("s")"
+                       class="btn btn-sm btn-outline-secondary">Next</a>
+                }
+            </div>
+        </div>
+    }
+</div>

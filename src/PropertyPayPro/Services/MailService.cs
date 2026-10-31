@@ -274,19 +274,35 @@ public class MailService
         try
         {
             await _sender.SendAsync(to, subject, body, attachments, ct);
-            return await LogAsync(kind, EmailStatus.Sent, to, subject, error: null,
+            return await LogAsync(kind, EmailStatus.Sent, to, subject, body: body, error: null,
                 leaseId: leaseId, paymentId: paymentId, ct: ct);
         }
         catch (Exception ex)
         {
             _logger.LogError(ex, "Failed to send {Kind} email to {To}", kind, to);
-            return await LogAsync(kind, EmailStatus.Failed, to, subject, ex.Message,
+            return await LogAsync(kind, EmailStatus.Failed, to, subject, body: body, error: ex.Message,
                 leaseId: leaseId, paymentId: paymentId, ct: ct);
         }
     }
 
+    /// <summary>
+    /// Replay a previously logged send. Attachments are not reconstituted
+    /// — resend covers plain cover-email failures. A fresh EmailLog row
+    /// is created for the retry so the audit trail stays append-only.
+    /// </summary>
+    public async Task<EmailLog> ResendAsync(EmailLog original, CancellationToken ct = default)
+    {
+        if (string.IsNullOrEmpty(original.BodyHtml))
+            throw new InvalidOperationException("Original body not stored — cannot resend.");
+
+        return await TrySendAsync(original.Kind, original.ToAddress, original.Subject,
+            original.BodyHtml!, attachments: null,
+            leaseId: original.LeaseId, paymentId: original.RentPaymentId, ct: ct);
+    }
+
     private async Task<EmailLog> LogAsync(
-        EmailKind kind, EmailStatus status, string to, string subject, string? error,
+        EmailKind kind, EmailStatus status, string to, string subject,
+        string? body, string? error,
         int? leaseId = null, int? paymentId = null, CancellationToken ct = default)
     {
         var log = new EmailLog
@@ -295,6 +311,7 @@ public class MailService
             Status = status,
             ToAddress = to,
             Subject = subject,
+            BodyHtml = body,
             Error = error,
             LeaseId = leaseId,
             RentPaymentId = paymentId

@@ -29,6 +29,8 @@ public class ApplicationDbContext : IdentityDbContext<ApplicationUser>, IDataPro
     public DbSet<EmailLog> EmailLogs => Set<EmailLog>();
     public DbSet<GeneratedDocument> GeneratedDocuments => Set<GeneratedDocument>();
     public DbSet<AppSettings> AppSettings => Set<AppSettings>();
+    public DbSet<AuditEntry> AuditEntries => Set<AuditEntry>();
+    public DbSet<ScheduledTask> ScheduledTasks => Set<ScheduledTask>();
 
     protected override void OnModelCreating(ModelBuilder builder)
     {
@@ -147,5 +149,15 @@ public class ApplicationDbContext : IdentityDbContext<ApplicationUser>, IDataPro
             .WithMany()
             .HasForeignKey(u => u.TenantId)
             .OnDelete(DeleteBehavior.SetNull);
+
+        builder.Entity<AuditEntry>()
+            .HasIndex(a => a.CreatedUtc);
+        builder.Entity<AuditEntry>()
+            .HasIndex(a => new { a.EntityType, a.EntityId });
+
+        // Composite index covering the hot runner query:
+        // "give me the next Pending tasks whose RunAtUtc is in the past".
+        builder.Entity<ScheduledTask>()
+            .HasIndex(t => new { t.Status, t.RunAtUtc });
     }
 }
