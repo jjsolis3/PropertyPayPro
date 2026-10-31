@@ -272,6 +272,48 @@ public static class EmailComposer
             </p>");
     }
 
+    /// <summary>
+    /// Rich delivery wrapper for a notice *package* — the admin wrote
+    /// their own plain-text cover body in the Send composer, and we may
+    /// be shipping one or more PDF attachments. The template preserves
+    /// the admin's line breaks and renders a compact "Attachments" box
+    /// listing every file by name.
+    /// </summary>
+    public static string ComposeNoticeDelivery(
+        string baseUrl,
+        string subject,
+        string plainTextBody,
+        IEnumerable<EmailAttachment>? attachments)
+    {
+        var logoUrl = $"{baseUrl}/img/brand/PPS_Logo_Main.png";
+        var htmlBody = Esc(plainTextBody).Replace("\r\n", "\n").Replace("\n", "<br />\n");
+
+        var attachList = "";
+        if (attachments is not null)
+        {
+            var sb = new StringBuilder();
+            foreach (var a in attachments)
+            {
+                var sizeKb = a.Content.Length < 1024
+                    ? $"{a.Content.Length} B"
+                    : $"{a.Content.Length / 1024.0:N0} KB";
+                sb.Append($@"<li style=""padding:4px 0;""><strong>{Esc(a.FileName)}</strong> <span style=""color:#888;"">({sizeKb})</span></li>");
+            }
+            attachList = $@"
+                <div style=""margin-top:24px;padding:12px 16px;background:#f8f9fa;border-left:4px solid #2A6FFF;"">
+                    <p style=""margin:0 0 6px;color:#555;font-size:13px;""><strong>Attached to this email</strong></p>
+                    <ul style=""margin:0;padding-left:20px;color:#333;font-size:14px;"">{sb}</ul>
+                </div>";
+        }
+
+        return BaseTemplate(subject, logoUrl, $@"
+            <h1 style=""margin:8px 0 4px;color:#333;"">{Esc(subject)}</h1>
+            <div style=""margin-top:20px;line-height:1.6;color:#333;"">
+                {htmlBody}
+            </div>
+            {attachList}");
+    }
+
     public static string ComposeMaintenanceReminder(
         string baseUrl,
         MaintenanceSchedule schedule,

@@ -1,0 +1,67 @@
+@page "{id:int}"
+@model PropertyPayPro.Pages.Notices.EditModel
+@{
+    ViewData["Title"] = "Edit Notice";
+    var doc = Model.Notice!;
+}
+
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <div>
+        <h1 class="h3 mb-1">Edit Notice</h1>
+        <div class="text-muted">
+            @doc.Lease?.Property?.Name — @doc.Lease?.TenantNames
+            @if (doc.SentCount > 0)
+            {
+                <span class="badge bg-success ms-2">Sent @doc.SentCount × @doc.LastSentUtc?.ToLocalTime().ToString("MMM d")</span>
+            }
+        </div>
+    </div>
+    <div>
+        <a asp-page="/Documents/Preview" asp-route-id="@doc.Id" class="btn btn-outline-info">
+            <i class="las la-file-pdf"></i> Preview current PDF
+        </a>
+        <a asp-page="Index" class="btn btn-outline-secondary">Back</a>
+    </div>
+</div>
+
+@if (TempData["Info"] is string info)
+{
+    <div class="alert alert-info">@info</div>
+}
+@if (doc.SentCount > 0)
+{
+    <div class="alert alert-warning">
+        <strong>Heads up:</strong> this notice has already been emailed to a tenant.
+        Regenerating updates the server-side copy only — <em>recipients keep the
+        PDF they received</em>. If the change is material, use Send again
+        afterwards to deliver the new version.
+    </div>
+}
+
+<form method="post">
+    <input type="hidden" asp-for="Input.Id" />
+    <div class="card mb-3">
+        <div class="card-body">
+            <div class="mb-3">
+                <label asp-for="Input.Title" class="form-label"></label>
+                <input asp-for="Input.Title" class="form-control" />
+                <span asp-validation-for="Input.Title" class="text-danger"></span>
+            </div>
+            <div class="mb-3">
+                <label asp-for="Input.Body" class="form-label"></label>
+                <textarea asp-for="Input.Body" class="form-control" rows="20"
+                          style="font-family: monospace; font-size: 0.9rem;"></textarea>
+                <small class="text-muted">
+                    This text is what appears in the generated PDF. Placeholders like
+                    <code>[ENTER NEW AMOUNT]</code> need to be filled in manually.
+                </small>
+                <span asp-validation-for="Input.Body" class="text-danger"></span>
+            </div>
+            <button type="submit" class="btn btn-primary">Save + regenerate PDF</button>
+            <a asp-page="Index" class="btn btn-outline-secondary">Cancel</a>
+            <a asp-page="Send" asp-route-id="@doc.Id" class="btn btn-outline-success float-end">
+                Save, then send →
+            </a>
+        </div>
+    </div>
+</form>

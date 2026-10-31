@@ -629,11 +629,25 @@ namespace PropertyPayPro.Migrations
                         .HasMaxLength(255)
                         .HasColumnType("character varying(255)");
 
+                    b.Property<DateTime?>("LastSentUtc")
+                        .HasColumnType("timestamp with time zone");
+
                     b.Property<int>("LeaseId")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("SentCount")
                         .HasColumnType("integer");
 
                     b.Property<long>("SizeBytes")
                         .HasColumnType("bigint");
+
+                    b.Property<string>("SourceBody")
+                        .HasMaxLength(16000)
+                        .HasColumnType("character varying(16000)");
+
+                    b.Property<string>("SourceTitle")
+                        .HasMaxLength(200)
+                        .HasColumnType("character varying(200)");
 
                     b.Property<string>("StorageKey")
                         .IsRequired()
