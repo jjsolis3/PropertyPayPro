@@ -37,8 +37,10 @@
                     </select>
                 </div>
                 <div class="col-md-4">
-                    <label asp-for="Input.Template" class="form-label"></label>
-                    <select asp-for="Input.Template" asp-items="Model.TemplateOptions" class="form-select"></select>
+                    <label asp-for="Input.TemplateId" class="form-label"></label>
+                    <select asp-for="Input.TemplateId" asp-items="Model.TemplateOptions" class="form-select">
+                        <option value="">(choose a template)</option>
+                    </select>
                 </div>
                 <div class="col-md-2 d-flex align-items-end">
                     <button type="submit" formaction="?handler=Reload" class="btn btn-outline-primary w-100">

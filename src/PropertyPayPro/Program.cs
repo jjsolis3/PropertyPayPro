@@ -140,8 +140,19 @@ builder.Services.AddScoped<PropertyPayPro.Services.IAuditLog, PropertyPayPro.Ser
 // IScheduledTaskHandler so the dispatcher can discover them by Kind.
 builder.Services.AddScoped<PropertyPayPro.Services.ScheduledTasks.IScheduledTaskHandler,
     PropertyPayPro.Services.ScheduledTasks.NoticeSendHandler>();
+builder.Services.AddScoped<PropertyPayPro.Services.ScheduledTasks.IScheduledTaskHandler,
+    PropertyPayPro.Services.ScheduledTasks.LateRentReminderHandler>();
+builder.Services.AddScoped<PropertyPayPro.Services.ScheduledTasks.IScheduledTaskHandler,
+    PropertyPayPro.Services.ScheduledTasks.LeaseRenewalReminderHandler>();
+builder.Services.AddScoped<PropertyPayPro.Services.ScheduledTasks.IScheduledTaskHandler,
+    PropertyPayPro.Services.ScheduledTasks.InspectionReminderHandler>();
 builder.Services.AddScoped<PropertyPayPro.Services.ScheduledTasks.ScheduledTaskDispatcher>();
 builder.Services.AddHostedService<PropertyPayPro.Services.ScheduledTasks.ScheduledTaskRunner>();
+
+// Notice templates are DB-backed as of PR B. The seeder populates
+// shipped defaults on first start; later edits are preserved.
+builder.Services.AddScoped<PropertyPayPro.Services.NoticeTemplateService>();
+builder.Services.AddScoped<PropertyPayPro.Services.NoticeTemplateSeeder>();
 
 var app = builder.Build();
 
@@ -150,6 +161,14 @@ using (var scope = app.Services.CreateScope())
     var db = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
     db.Database.Migrate();
     await PropertyPayPro.Data.IdentitySeed.EnsureAdminAsync(scope.ServiceProvider, app.Configuration);
+
+    // Seed the notice-template catalog on first run and make sure the
+    // three daily recurring sweeps have a Pending row to pick up.
+    var templateSeeder = scope.ServiceProvider
+        .GetRequiredService<PropertyPayPro.Services.NoticeTemplateSeeder>();
+    await templateSeeder.SeedAsync();
+
+    await PropertyPayPro.Services.ScheduledTasks.RecurringJobBootstrap.EnsureEnqueuedAsync(db);
 }
 
 if (!app.Environment.IsDevelopment())

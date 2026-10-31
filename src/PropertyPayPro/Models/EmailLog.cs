@@ -12,7 +12,13 @@ public enum EmailKind
     Invite,
     Notice,
     Broadcast,
-    MaintenanceReminder
+    MaintenanceReminder,
+    // Appended for PR B. New values must be appended because the enum
+    // is stored as its underlying int in EmailLog.Kind — reordering
+    // would silently remap existing rows.
+    LateRentReminder,
+    LeaseRenewalReminder,
+    InspectionReminder,
 }
 
 public enum EmailStatus

@@ -1,0 +1,153 @@
+@page
+@model PropertyPayPro.Pages.Settings.SchedulerModel
+@using PropertyPayPro.Models
+@{
+    ViewData["Title"] = "Scheduler";
+    ViewData["SettingsTab"] = "scheduler";
+}
+
+<h1 class="h3 mb-3">Scheduler</h1>
+<partial name="_SettingsNav" />
+
+@if (TempData["Message"] is string msg)
+{
+    <div class="alert alert-success alert-dismissible fade show">@msg
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+}
+
+<div class="card mb-3">
+    <div class="card-header"><strong>Recurring daily sweeps</strong></div>
+    <div class="card-body p-0">
+        <table class="table mb-0">
+            <thead>
+                <tr>
+                    <th>Job</th>
+                    <th>Next run (local)</th>
+                    <th>Last outcome</th>
+                    <th class="text-end">Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+            @foreach (var r in Model.Recurring)
+            {
+                <tr>
+                    <td>
+                        <strong>@r.Kind</strong>
+                    </td>
+                    <td>
+                        @if (r.Next is not null)
+                        {
+                            <span>@r.Next.RunAtUtc.ToLocalTime().ToString("yyyy-MM-dd HH:mm")</span>
+                            @if (r.Next.Status == ScheduledTaskStatus.Running)
+                            {
+                                <span class="badge bg-warning ms-2">Running</span>
+                            }
+                            else
+                            {
+                                <span class="badge bg-info ms-2">Pending</span>
+                            }
+                        }
+                        else
+                        {
+                            <span class="text-danger">Not scheduled</span>
+                        }
+                    </td>
+                    <td>
+                        @if (r.LastCompleted is not null)
+                        {
+                            <small>@r.LastCompleted.CompletedUtc?.ToLocalTime().ToString("yyyy-MM-dd HH:mm")</small>
+                            @if (r.LastCompleted.Status == ScheduledTaskStatus.Completed)
+                            {
+                                <span class="badge bg-success ms-2">OK</span>
+                            }
+                            else
+                            {
+                                <span class="badge bg-danger ms-2" title="@r.LastCompleted.LastError">Failed</span>
+                            }
+                            <br /><small class="text-muted">@r.LastCompleted.Description</small>
+                        }
+                        else
+                        {
+                            <small class="text-muted">Never run</small>
+                        }
+                    </td>
+                    <td class="text-end">
+                        <form method="post" asp-page-handler="RunNow" class="d-inline"
+                              onsubmit="return confirm('Trigger @r.Kind on the next scheduler tick?');">
+                            <input type="hidden" name="kind" value="@((int)r.Kind)" />
+                            <button type="submit" class="btn btn-sm btn-outline-primary">Run now</button>
+                        </form>
+                    </td>
+                </tr>
+            }
+            </tbody>
+        </table>
+    </div>
+    <div class="card-footer small text-muted">
+        Each sweep re-enqueues the next day's run at
+        <code>@PropertyPayPro.Services.ScheduledTasks.RecurringTaskHelpers.DailyRunHourUtc:00 UTC</code>
+        after it completes. A pod restart calls <code>RecurringJobBootstrap</code>
+        to make sure none of these fell off the queue.
+    </div>
+</div>
+
+<div class="card">
+    <div class="card-header"><strong>Recent tasks</strong></div>
+    <div class="card-body p-0">
+        <table class="table table-sm table-striped mb-0">
+            <thead>
+                <tr>
+                    <th>Kind</th>
+                    <th>Status</th>
+                    <th>Run at</th>
+                    <th>Completed</th>
+                    <th>Attempts</th>
+                    <th>Description / error</th>
+                </tr>
+            </thead>
+            <tbody>
+            @foreach (var t in Model.Recent)
+            {
+                <tr>
+                    <td><small>@t.Kind</small></td>
+                    <td>
+                        @switch (t.Status)
+                        {
+                            case ScheduledTaskStatus.Pending:
+                                <span class="badge bg-info">Pending</span>
+                                break;
+                            case ScheduledTaskStatus.Running:
+                                <span class="badge bg-warning">Running</span>
+                                break;
+                            case ScheduledTaskStatus.Completed:
+                                <span class="badge bg-success">Completed</span>
+                                break;
+                            case ScheduledTaskStatus.Failed:
+                                <span class="badge bg-danger">Failed</span>
+                                break;
+                            case ScheduledTaskStatus.Cancelled:
+                                <span class="badge bg-secondary">Cancelled</span>
+                                break;
+                        }
+                    </td>
+                    <td><small>@t.RunAtUtc.ToLocalTime().ToString("yyyy-MM-dd HH:mm")</small></td>
+                    <td><small>@(t.CompletedUtc?.ToLocalTime().ToString("yyyy-MM-dd HH:mm") ?? "—")</small></td>
+                    <td><small>@t.Attempts / @t.MaxAttempts</small></td>
+                    <td>
+                        <small>@t.Description</small>
+                        @if (!string.IsNullOrEmpty(t.LastError))
+                        {
+                            <br /><small class="text-danger">@t.LastError</small>
+                        }
+                    </td>
+                </tr>
+            }
+            @if (!Model.Recent.Any())
+            {
+                <tr><td colspan="6" class="text-center text-muted py-3">No scheduled tasks yet.</td></tr>
+            }
+            </tbody>
+        </table>
+    </div>
+</div>

@@ -1,0 +1,103 @@
+@page "{id:int}"
+@model PropertyPayPro.Pages.Settings.Templates.EditModel
+@{
+    ViewData["Title"] = "Edit Template";
+    ViewData["SettingsTab"] = "templates";
+    var t = Model.Template!;
+}
+
+<h1 class="h3 mb-3">Edit Template</h1>
+<partial name="_SettingsNav" />
+
+@if (TempData["Message"] is string msg)
+{
+    <div class="alert alert-success alert-dismissible fade show">@msg
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+}
+@if (TempData["Error"] is string err)
+{
+    <div class="alert alert-danger">@err</div>
+}
+
+<div class="mb-3">
+    <span class="badge bg-info">@t.Scope</span>
+    <code class="ms-2">@t.Slug</code>
+    @if (t.IsSystem)
+    {
+        <span class="badge bg-light text-dark ms-2">System template</span>
+    }
+</div>
+
+<form method="post">
+    <input type="hidden" asp-for="Input.Id" />
+    <div class="row">
+        <div class="col-lg-8">
+            <div class="card mb-3">
+                <div class="card-body">
+                    <div class="mb-3">
+                        <label asp-for="Input.Label" class="form-label">Label (admin-facing)</label>
+                        <input asp-for="Input.Label" class="form-control" />
+                        <span asp-validation-for="Input.Label" class="text-danger"></span>
+                    </div>
+                    <div class="mb-3">
+                        <label asp-for="Input.TitleOrSubject" class="form-label">
+                            @(t.Scope == PropertyPayPro.Models.NoticeTemplateScope.PdfBody ? "PDF title" : "Email subject")
+                        </label>
+                        <input asp-for="Input.TitleOrSubject" class="form-control" />
+                        <small class="text-muted">Tokens like <code>{{PropertyName}}</code> work here too.</small>
+                    </div>
+                    <div class="mb-3">
+                        <label asp-for="Input.Body" class="form-label">Body</label>
+                        <textarea asp-for="Input.Body" class="form-control" rows="20"
+                                  style="font-family: monospace; font-size: 0.9rem;"></textarea>
+                        <span asp-validation-for="Input.Body" class="text-danger"></span>
+                    </div>
+                    <div class="form-check mb-3">
+                        <input asp-for="Input.IsActive" class="form-check-input" />
+                        <label asp-for="Input.IsActive" class="form-check-label">
+                            Active (shown in template picker)
+                        </label>
+                    </div>
+                    <button type="submit" class="btn btn-primary">Save</button>
+                    <a asp-page="Index" class="btn btn-outline-secondary">Cancel</a>
+                    @if (t.IsSystem)
+                    {
+                        <button type="submit" asp-page-handler="Reset" asp-route-id="@t.Id"
+                                class="btn btn-outline-warning float-end"
+                                onclick="return confirm('Reset this template to the shipped default? Your current changes will be lost.');">
+                            Reset to shipped default
+                        </button>
+                    }
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-4">
+            <div class="card mb-3">
+                <div class="card-header"><strong>Supported tokens</strong></div>
+                <div class="card-body">
+                    <p class="small text-muted">
+                        Tokens are replaced at render time with values from the
+                        lease/property/charge context. Unknown tokens are left
+                        in place so missing data is visible.
+                    </p>
+                    <ul class="small font-monospace">
+                        @foreach (var tok in Model.SupportedTokens)
+                        {
+                            <li>&#123;&#123;@tok&#125;&#125;</li>
+                        }
+                    </ul>
+                </div>
+            </div>
+            <div class="card mb-3">
+                <div class="card-header"><strong>Metadata</strong></div>
+                <div class="card-body small">
+                    <div>Scope: <strong>@t.Scope</strong></div>
+                    <div>Slug: <code>@t.Slug</code></div>
+                    <div>Sort order: @t.SortOrder</div>
+                    <div>Updated: @t.UpdatedUtc.ToLocalTime().ToString("yyyy-MM-dd HH:mm")</div>
+                </div>
+            </div>
+        </div>
+    </div>
+</form>
