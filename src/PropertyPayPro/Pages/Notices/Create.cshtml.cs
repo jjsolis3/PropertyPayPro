@@ -29,19 +29,22 @@ public class CreateModel : PageModel
     private readonly MailService _mail;
     private readonly IWebHostEnvironment _env;
     private readonly IAuditLog _audit;
+    private readonly NoticeTemplateService _tpl;
 
     public CreateModel(
         ApplicationDbContext db,
         IDocumentStorage storage,
         MailService mail,
         IWebHostEnvironment env,
-        IAuditLog audit)
+        IAuditLog audit,
+        NoticeTemplateService tpl)
     {
         _db = db;
         _storage = storage;
         _mail = mail;
         _env = env;
         _audit = audit;
+        _tpl = tpl;
     }
 
     [BindProperty] public InputModel Input { get; set; } = new();
@@ -56,8 +59,8 @@ public class CreateModel : PageModel
         [Required, Display(Name = "Lease")]
         public int? LeaseId { get; set; }
 
-        [Required, Display(Name = "Template")]
-        public NoticeTemplateKind Template { get; set; } = NoticeTemplateKind.Custom;
+        [Display(Name = "Template")]
+        public int? TemplateId { get; set; }
 
         [Required, StringLength(120), Display(Name = "Title")]
         public string Title { get; set; } = string.Empty;
@@ -69,14 +72,14 @@ public class CreateModel : PageModel
         public bool EmailToTenant { get; set; } = true;
     }
 
-    public async Task<IActionResult> OnGetAsync(int? leaseId, NoticeTemplateKind? template)
+    public async Task<IActionResult> OnGetAsync(int? leaseId, int? templateId)
     {
         await LoadDropdownsAsync();
 
         if (leaseId.HasValue)
         {
             Input.LeaseId = leaseId;
-            Input.Template = template ?? NoticeTemplateKind.Custom;
+            Input.TemplateId = templateId;
             await SeedFromTemplateAsync();
         }
         return Page();
@@ -199,8 +202,10 @@ public class CreateModel : PageModel
             })
             .ToListAsync();
         LeaseOptions = new SelectList(leases, "Id", "Label");
+
+        var templates = await _tpl.ListAsync(NoticeTemplateScope.PdfBody);
         TemplateOptions = new SelectList(
-            NoticeTemplateCatalog.Kinds.Select(k => new { Value = k.Kind, Text = k.Label }),
+            templates.Select(t => new { Value = t.Id, Text = t.Label }),
             "Value", "Text");
 
         if (Input.LeaseId.HasValue)
@@ -216,7 +221,7 @@ public class CreateModel : PageModel
 
     private async Task SeedFromTemplateAsync()
     {
-        if (!Input.LeaseId.HasValue) return;
+        if (!Input.LeaseId.HasValue || !Input.TemplateId.HasValue) return;
         var lease = await _db.Leases
             .Include(l => l.Property)
             .Include(l => l.Tenants)
@@ -224,10 +229,14 @@ public class CreateModel : PageModel
             .FirstOrDefaultAsync(l => l.Id == Input.LeaseId.Value);
         if (lease is null) return;
 
+        var template = await _tpl.GetAsync(Input.TemplateId.Value);
+        if (template is null) return;
+
         var outstanding = lease.Charges.Sum(c => c.Balance);
-        var t = NoticeTemplateCatalog.Build(Input.Template, lease, outstanding);
-        Input.Title = t.DefaultTitle;
-        Input.Body = t.DefaultBody;
+        var rendered = _tpl.Render(template, new TemplateContext(
+            Lease: lease, OutstandingAmount: outstanding));
+        Input.Title = rendered.TitleOrSubject;
+        Input.Body = rendered.Body;
     }
 
     private byte[]? TryLoadLogo()

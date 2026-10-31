@@ -242,6 +242,27 @@ public class MailService
     /// used by MaintenanceSchedulerService for both tenant and admin
     /// notifications when a preventive ticket is auto-generated.
     /// </summary>
+    /// <summary>
+    /// Generic templated reminder path used by the recurring reminder
+    /// handlers. The caller supplies an already-rendered subject +
+    /// plain-text body (the <see cref="NoticeTemplateService"/> does
+    /// the rendering); we wrap the body in the branded HTML template
+    /// and log the attempt.
+    /// </summary>
+    public async Task<EmailLog> SendReminderAsync(
+        string baseUrl,
+        EmailKind kind,
+        string toEmail,
+        string subject,
+        string plainTextBody,
+        int? leaseId = null,
+        CancellationToken ct = default)
+    {
+        var body = EmailComposer.ComposeNoticeDelivery(baseUrl, subject, plainTextBody, attachments: null);
+        return await TrySendAsync(kind, toEmail, subject, body,
+            attachments: null, leaseId: leaseId, ct: ct);
+    }
+
     public async Task<EmailLog> SendMaintenanceReminderAsync(
         string baseUrl,
         string toEmail,

@@ -31,6 +31,7 @@ public class ApplicationDbContext : IdentityDbContext<ApplicationUser>, IDataPro
     public DbSet<AppSettings> AppSettings => Set<AppSettings>();
     public DbSet<AuditEntry> AuditEntries => Set<AuditEntry>();
     public DbSet<ScheduledTask> ScheduledTasks => Set<ScheduledTask>();
+    public DbSet<NoticeTemplate> NoticeTemplates => Set<NoticeTemplate>();
 
     protected override void OnModelCreating(ModelBuilder builder)
     {
@@ -159,5 +160,9 @@ public class ApplicationDbContext : IdentityDbContext<ApplicationUser>, IDataPro
         // "give me the next Pending tasks whose RunAtUtc is in the past".
         builder.Entity<ScheduledTask>()
             .HasIndex(t => new { t.Status, t.RunAtUtc });
+
+        builder.Entity<NoticeTemplate>()
+            .HasIndex(t => new { t.Scope, t.Slug })
+            .IsUnique();
     }
 }

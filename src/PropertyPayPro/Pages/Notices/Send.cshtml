@@ -40,8 +40,10 @@
                 <div class="card-body">
                     <div class="row g-2 mb-3">
                         <div class="col-md-9">
-                            <label asp-for="Input.Template" class="form-label"></label>
-                            <select asp-for="Input.Template" asp-items="Model.TemplateOptions" class="form-select"></select>
+                            <label asp-for="Input.TemplateId" class="form-label"></label>
+                            <select asp-for="Input.TemplateId" asp-items="Model.TemplateOptions" class="form-select">
+                                <option value="">(custom)</option>
+                            </select>
                             <small class="text-muted">Pick a template to pre-fill subject and body. You can edit both before sending.</small>
                         </div>
                         <div class="col-md-3 d-flex align-items-end">

@@ -20,6 +20,12 @@
         <a asp-page="/Users/Index" class="nav-link @(Is("users") ? "active" : "")">Users</a>
     </li>
     <li class="nav-item">
+        <a asp-page="/Settings/Templates/Index" class="nav-link @(Is("templates") ? "active" : "")">Templates</a>
+    </li>
+    <li class="nav-item">
+        <a asp-page="/Settings/Scheduler" class="nav-link @(Is("scheduler") ? "active" : "")">Scheduler</a>
+    </li>
+    <li class="nav-item">
         <a asp-page="/Settings/EmailLogs" class="nav-link @(Is("emaillogs") ? "active" : "")">Email Logs</a>
     </li>
     <li class="nav-item">

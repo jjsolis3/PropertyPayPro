@@ -30,17 +30,20 @@ public class SendModel : PageModel
     private readonly IDocumentStorage _storage;
     private readonly MailService _mail;
     private readonly IAuditLog _audit;
+    private readonly NoticeTemplateService _tpl;
 
     public SendModel(
         ApplicationDbContext db,
         IDocumentStorage storage,
         MailService mail,
-        IAuditLog audit)
+        IAuditLog audit,
+        NoticeTemplateService tpl)
     {
         _db = db;
         _storage = storage;
         _mail = mail;
         _audit = audit;
+        _tpl = tpl;
     }
 
     public class InputModel
@@ -56,7 +59,7 @@ public class SendModel : PageModel
         public string Body { get; set; } = "";
 
         [Display(Name = "Template")]
-        public NoticeEmailTemplateKind Template { get; set; } = NoticeEmailTemplateKind.FormalNoticeDelivery;
+        public int? TemplateId { get; set; }
 
         public List<int> AttachmentIds { get; set; } = new();
         public List<string> Recipients { get; set; } = new();
@@ -92,7 +95,7 @@ public class SendModel : PageModel
             .Select(t => t.Email!.Trim())
             .ToList();
 
-        SeedFromTemplate();
+        await SeedFromTemplateAsync();
         return Page();
     }
 
@@ -100,7 +103,7 @@ public class SendModel : PageModel
     {
         if (!await LoadAsync(Input.NoticeId)) return NotFound();
         ModelState.Clear();
-        SeedFromTemplate();
+        await SeedFromTemplateAsync();
         return Page();
     }
 
@@ -261,22 +264,29 @@ public class SendModel : PageModel
             .OrderBy(t => t.RunAtUtc)
             .ToListAsync();
 
+        var templates = await _tpl.ListAsync(NoticeTemplateScope.CoverEmail);
         TemplateOptions = new SelectList(
-            NoticeEmailTemplateCatalog.Kinds.Select(k => new { Value = k.Kind, Text = k.Label }),
+            templates.Select(t => new { Value = t.Id, Text = t.Label }),
             "Value", "Text");
+
+        // Default to the first cover-email template on first GET.
+        if (!Input.TemplateId.HasValue && templates.Count > 0)
+            Input.TemplateId = templates[0].Id;
 
         return true;
     }
 
-    private void SeedFromTemplate()
+    private async Task SeedFromTemplateAsync()
     {
-        if (Notice is null) return;
-        var tpl = NoticeEmailTemplateCatalog.Build(
-            Input.Template,
-            Notice.Lease!,
-            Notice.SourceTitle ?? Notice.Description ?? Notice.FileName);
-        Input.Subject = tpl.Subject;
-        Input.Body = tpl.Body;
+        if (Notice is null || !Input.TemplateId.HasValue) return;
+        var template = await _tpl.GetAsync(Input.TemplateId.Value);
+        if (template is null) return;
+
+        var rendered = _tpl.Render(template, new TemplateContext(
+            Lease: Notice.Lease,
+            NoticeTitle: Notice.SourceTitle ?? Notice.Description ?? Notice.FileName));
+        Input.Subject = rendered.TitleOrSubject;
+        Input.Body = rendered.Body;
     }
 
     public async Task<IActionResult> OnPostCancelScheduledAsync(int taskId)
