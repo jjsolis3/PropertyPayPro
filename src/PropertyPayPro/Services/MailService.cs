@@ -323,8 +323,10 @@ public class MailService
 
     private async Task<EmailLog> LogAsync(
         EmailKind kind, EmailStatus status, string to, string subject,
-        string? body, string? error,
-        int? leaseId = null, int? paymentId = null, CancellationToken ct = default)
+        string? error,
+        int? leaseId = null, int? paymentId = null,
+        string? body = null,
+        CancellationToken ct = default)
     {
         var log = new EmailLog
         {

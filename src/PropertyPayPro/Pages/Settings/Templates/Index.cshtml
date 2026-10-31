@@ -4,6 +4,19 @@
 @{
     ViewData["Title"] = "Templates";
     ViewData["SettingsTab"] = "templates";
+
+    var groups = new (string Title, string Blurb, List<NoticeTemplate> Rows)[]
+    {
+        ("Notice PDF bodies",
+            "Used on /Notices/Create. Pick-list for the admin when generating a new notice PDF.",
+            Model.PdfBodies),
+        ("Cover email templates",
+            "Used on /Notices/Send. Pre-fills the subject and body when sending a notice package.",
+            Model.CoverEmails),
+        ("Recurring reminder emails",
+            "Used by the background scheduler for late rent, lease renewal, and inspection reminders.",
+            Model.SystemReminders),
+    };
 }
 
 <h1 class="h3 mb-3">Notice Templates</h1>
@@ -16,68 +29,58 @@
     </div>
 }
 
-@functions {
-    void RenderGroup(string title, string blurb, List<NoticeTemplate> rows)
-    {
-        <div class="card mb-3">
-            <div class="card-header">
-                <strong>@title</strong>
-                <div class="small text-muted">@blurb</div>
-            </div>
-            <div class="card-body p-0">
-                <table class="table table-sm mb-0">
-                    <thead>
-                        <tr>
-                            <th>Label</th>
-                            <th>Slug</th>
-                            <th>Title / Subject</th>
-                            <th>Type</th>
-                            <th>Updated</th>
-                            <th class="text-end"></th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                    @foreach (var t in rows)
-                    {
-                        <tr class="@(t.IsActive ? "" : "text-muted")">
-                            <td><strong>@t.Label</strong></td>
-                            <td><code class="small">@t.Slug</code></td>
-                            <td><small>@(t.TitleOrSubject ?? "—")</small></td>
-                            <td>
-                                @if (t.IsSystem)
-                                {
-                                    <span class="badge bg-info">System</span>
-                                }
-                                else
-                                {
-                                    <span class="badge bg-secondary">Custom</span>
-                                }
-                                @if (!t.IsActive)
-                                {
-                                    <span class="badge bg-light text-dark">Hidden</span>
-                                }
-                            </td>
-                            <td><small>@t.UpdatedUtc.ToLocalTime().ToString("yyyy-MM-dd")</small></td>
-                            <td class="text-end">
-                                <a asp-page="Edit" asp-route-id="@t.Id" class="btn btn-sm btn-outline-primary">Edit</a>
-                            </td>
-                        </tr>
-                    }
-                    </tbody>
-                </table>
-            </div>
+@foreach (var g in groups)
+{
+    <div class="card mb-3">
+        <div class="card-header">
+            <strong>@g.Title</strong>
+            <div class="small text-muted">@g.Blurb</div>
         </div>
-    }
-}
-
-@{
-    RenderGroup("Notice PDF bodies",
-        "Used on /Notices/Create. Pick-list for the admin when generating a new notice PDF.",
-        Model.PdfBodies);
-    RenderGroup("Cover email templates",
-        "Used on /Notices/Send. Pre-fills the subject and body when sending a notice package.",
-        Model.CoverEmails);
-    RenderGroup("Recurring reminder emails",
-        "Used by the background scheduler for late rent, lease renewal, and inspection reminders.",
-        Model.SystemReminders);
+        <div class="card-body p-0">
+            <table class="table table-sm mb-0">
+                <thead>
+                    <tr>
+                        <th>Label</th>
+                        <th>Slug</th>
+                        <th>Title / Subject</th>
+                        <th>Type</th>
+                        <th>Updated</th>
+                        <th class="text-end"></th>
+                    </tr>
+                </thead>
+                <tbody>
+                @foreach (var t in g.Rows)
+                {
+                    <tr class="@(t.IsActive ? "" : "text-muted")">
+                        <td><strong>@t.Label</strong></td>
+                        <td><code class="small">@t.Slug</code></td>
+                        <td><small>@(t.TitleOrSubject ?? "—")</small></td>
+                        <td>
+                            @if (t.IsSystem)
+                            {
+                                <span class="badge bg-info">System</span>
+                            }
+                            else
+                            {
+                                <span class="badge bg-secondary">Custom</span>
+                            }
+                            @if (!t.IsActive)
+                            {
+                                <span class="badge bg-light text-dark">Hidden</span>
+                            }
+                        </td>
+                        <td><small>@t.UpdatedUtc.ToLocalTime().ToString("yyyy-MM-dd")</small></td>
+                        <td class="text-end">
+                            <a asp-page="Edit" asp-route-id="@t.Id" class="btn btn-sm btn-outline-primary">Edit</a>
+                        </td>
+                    </tr>
+                }
+                @if (!g.Rows.Any())
+                {
+                    <tr><td colspan="6" class="text-center text-muted py-2">No templates in this group.</td></tr>
+                }
+                </tbody>
+            </table>
+        </div>
+    </div>
 }
