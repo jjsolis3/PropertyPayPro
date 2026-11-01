@@ -15,6 +15,7 @@ public class InspectionReminderHandler : IScheduledTaskHandler
     private readonly ApplicationDbContext _db;
     private readonly MailService _mail;
     private readonly NoticeTemplateService _tpl;
+    private readonly AppSettingsService _settings;
     private readonly ILogger<InspectionReminderHandler> _logger;
 
     private static readonly TimeSpan DedupeWindow = TimeSpan.FromHours(24);
@@ -24,11 +25,13 @@ public class InspectionReminderHandler : IScheduledTaskHandler
         ApplicationDbContext db,
         MailService mail,
         NoticeTemplateService tpl,
+        AppSettingsService settings,
         ILogger<InspectionReminderHandler> logger)
     {
         _db = db;
         _mail = mail;
         _tpl = tpl;
+        _settings = settings;
         _logger = logger;
     }
 
@@ -52,6 +55,7 @@ public class InspectionReminderHandler : IScheduledTaskHandler
                 return;
             }
 
+            var baseUrl = await _settings.GetPublicBaseUrlAsync(ct);
             var today = DateOnly.FromDateTime(DateTime.UtcNow);
             var window = today.AddDays(LookaheadDays);
 
@@ -86,7 +90,7 @@ public class InspectionReminderHandler : IScheduledTaskHandler
 
                 foreach (var addr in recipients)
                 {
-                    var log = await _mail.SendReminderAsync("",
+                    var log = await _mail.SendReminderAsync(baseUrl,
                         EmailKind.InspectionReminder, addr,
                         rendered.TitleOrSubject, rendered.Body,
                         leaseId: lease.Id, ct: ct);

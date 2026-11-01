@@ -118,7 +118,7 @@
                                 <input type="hidden" name="Kind" value="@Model.Kind" />
                                 <input type="hidden" name="Status" value="@Model.Status" />
                                 <input type="hidden" name="Q" value="@Model.Q" />
-                                <input type="hidden" name="Page" value="@Model.Page" />
+                                <input type="hidden" name="PageNumber" value="@Model.PageNumber" />
                                 <button type="submit" class="btn btn-sm btn-outline-primary"
                                         title="Replay with the stored body">
                                     <i class="las la-redo"></i> Resend
@@ -138,12 +138,12 @@
     @if (Model.HasPrev || Model.HasNext)
     {
         <div class="card-footer d-flex justify-content-between">
-            <div>Page @Model.Page of @((Model.Total + 99) / 100)</div>
+            <div>Page @Model.PageNumber of @((Model.Total + 99) / 100)</div>
             <div>
                 @if (Model.HasPrev)
                 {
                     <a asp-page="/Settings/EmailLogs"
-                       asp-route-page="@(Model.Page - 1)"
+                       asp-route-pageNumber="@(Model.PageNumber - 1)"
                        asp-route-kind="@Model.Kind"
                        asp-route-status="@Model.Status"
                        asp-route-q="@Model.Q"
@@ -152,7 +152,7 @@
                 @if (Model.HasNext)
                 {
                     <a asp-page="/Settings/EmailLogs"
-                       asp-route-page="@(Model.Page + 1)"
+                       asp-route-pageNumber="@(Model.PageNumber + 1)"
                        asp-route-kind="@Model.Kind"
                        asp-route-status="@Model.Status"
                        asp-route-q="@Model.Q"

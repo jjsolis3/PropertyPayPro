@@ -237,6 +237,10 @@ namespace PropertyPayPro.Migrations
                         .HasMaxLength(20)
                         .HasColumnType("character varying(20)");
 
+                    b.Property<string>("PublicBaseUrl")
+                        .HasMaxLength(200)
+                        .HasColumnType("character varying(200)");
+
                     b.Property<DateTime>("UpdatedUtc")
                         .HasColumnType("timestamp with time zone");
 

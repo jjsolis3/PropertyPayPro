@@ -34,6 +34,7 @@ public class BrandingModel : PageModel
             AccentColor = Current.AccentColor,
             LogoStorageKey = Current.LogoStorageKey,
             LogoSmallStorageKey = Current.LogoSmallStorageKey,
+            PublicBaseUrl = Current.PublicBaseUrl,
             FromEmailOverride = Current.FromEmailOverride,
             FromNameOverride = Current.FromNameOverride,
             DefaultRentDueDay = Current.DefaultRentDueDay,
@@ -54,6 +55,16 @@ public class BrandingModel : PageModel
         Input.DefaultLateFeeAmount = Current.DefaultLateFeeAmount;
         Input.LogoStorageKey = Current.LogoStorageKey;
         Input.LogoSmallStorageKey = Current.LogoSmallStorageKey;
+
+        Input.PublicBaseUrl = string.IsNullOrWhiteSpace(Input.PublicBaseUrl)
+            ? null
+            : Input.PublicBaseUrl.Trim().TrimEnd('/');
+        if (Input.PublicBaseUrl is not null
+            && !(Uri.TryCreate(Input.PublicBaseUrl, UriKind.Absolute, out var uri)
+                 && (uri.Scheme == Uri.UriSchemeHttps || uri.Scheme == Uri.UriSchemeHttp)))
+        {
+            ModelState.AddModelError("Input.PublicBaseUrl", "Enter a full URL starting with https://");
+        }
 
         if (!ModelState.IsValid) return Page();
 
