@@ -24,6 +24,12 @@ public class AppSettings
     [StringLength(500)]
     public string? LogoSmallStorageKey { get; set; }  // overrides /img/brand/PPS_Logo_SM.png
 
+    // Absolute site URL (e.g. https://app.example.com) used to build links and
+    // the logo URL in emails sent by background jobs, which have no request
+    // to derive the host from.
+    [StringLength(200)]
+    public string? PublicBaseUrl { get; set; }
+
     // Email
     [StringLength(160)]
     public string? FromEmailOverride { get; set; }

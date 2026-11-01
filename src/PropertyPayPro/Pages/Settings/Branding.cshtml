@@ -19,7 +19,7 @@
 <form method="post" enctype="multipart/form-data">
     <div class="row g-3">
         <div class="col-lg-8">
-            <div class="card mb-3">
+            <div class="card mb-3 h-auto">
                 <div class="card-header"><h4 class="card-title mb-0">Identity</h4></div>
                 <div class="card-body">
                     <div class="mb-3">
@@ -27,6 +27,15 @@
                         <input asp-for="Input.AppName" class="form-control" />
                         <small class="text-muted">Used in the browser tab title and email subjects.</small>
                         <span asp-validation-for="Input.AppName" class="text-danger"></span>
+                    </div>
+                    <div class="mb-3">
+                        <label asp-for="Input.PublicBaseUrl" class="form-label">Public site URL</label>
+                        <input asp-for="Input.PublicBaseUrl" class="form-control" placeholder="https://app.example.com" />
+                        <small class="text-muted">
+                            The address tenants use to reach this app. Automatic reminder emails use it
+                            for the logo and links. If left blank, Coolify's site URL is used when available.
+                        </small>
+                        <span asp-validation-for="Input.PublicBaseUrl" class="text-danger"></span>
                     </div>
                     <div class="row">
                         <div class="col-md-6 mb-3">
@@ -47,7 +56,7 @@
                 </div>
             </div>
 
-            <div class="card mb-3">
+            <div class="card mb-3 h-auto">
                 <div class="card-header"><h4 class="card-title mb-0">Logos</h4></div>
                 <div class="card-body">
                     <div class="row g-3">
@@ -101,7 +110,7 @@
         </div>
 
         <div class="col-lg-4">
-            <div class="card mb-3">
+            <div class="card mb-3 h-auto">
                 <div class="card-header"><h4 class="card-title mb-0">Preview</h4></div>
                 <div class="card-body">
                     <div class="mb-2">

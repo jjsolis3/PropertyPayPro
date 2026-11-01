@@ -33,14 +33,14 @@ public class EmailLogsModel : PageModel
     [BindProperty(SupportsGet = true)] public EmailKind? Kind { get; set; }
     [BindProperty(SupportsGet = true)] public EmailStatus? Status { get; set; }
     [BindProperty(SupportsGet = true)] public string? Q { get; set; }
-    [BindProperty(SupportsGet = true)] public int Page { get; set; } = 1;
+    [BindProperty(SupportsGet = true)] public int PageNumber { get; set; } = 1;
 
     public List<EmailLog> Logs { get; private set; } = new();
     public int Total { get; private set; }
     public int SentTotal { get; private set; }
     public int FailedTotal { get; private set; }
-    public bool HasPrev => Page > 1;
-    public bool HasNext => Page * PageSize < Total;
+    public bool HasPrev => PageNumber > 1;
+    public bool HasNext => PageNumber * PageSize < Total;
 
     public async Task OnGetAsync() => await LoadAsync();
 
@@ -58,12 +58,12 @@ public class EmailLogsModel : PageModel
             // kind that was never persisted. Resend would be a no-op.
             TempData["Error"] = "Original body was not stored — cannot resend. "
                 + "Re-send from the source page (e.g. the Notice's Send page).";
-            return RedirectToPage(new { Kind, Status, Q, Page });
+            return RedirectToPage(new { Kind, Status, Q, PageNumber });
         }
         if (!_mail.IsConfigured)
         {
             TempData["Error"] = "SMTP is not configured — cannot send.";
-            return RedirectToPage(new { Kind, Status, Q, Page });
+            return RedirectToPage(new { Kind, Status, Q, PageNumber });
         }
 
         var retry = await _mail.ResendAsync(original);
@@ -75,7 +75,7 @@ public class EmailLogsModel : PageModel
         TempData["Message"] = retry.Status == EmailStatus.Sent
             ? $"Resent to {original.ToAddress}."
             : $"Resend failed: {retry.Error}";
-        return RedirectToPage(new { Kind, Status, Q, Page });
+        return RedirectToPage(new { Kind, Status, Q, PageNumber });
     }
 
     private async Task LoadAsync()
@@ -96,10 +96,10 @@ public class EmailLogsModel : PageModel
         Total = await q.CountAsync();
         SentTotal = await _db.EmailLogs.CountAsync(l => l.Status == EmailStatus.Sent);
         FailedTotal = await _db.EmailLogs.CountAsync(l => l.Status == EmailStatus.Failed);
-        if (Page < 1) Page = 1;
+        if (PageNumber < 1) PageNumber = 1;
 
         Logs = await q.OrderByDescending(l => l.CreatedUtc)
-            .Skip((Page - 1) * PageSize)
+            .Skip((PageNumber - 1) * PageSize)
             .Take(PageSize)
             .ToListAsync();
     }

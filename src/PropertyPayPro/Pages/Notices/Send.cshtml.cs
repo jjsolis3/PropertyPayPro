@@ -269,9 +269,8 @@ public class SendModel : PageModel
             templates.Select(t => new { Value = t.Id, Text = t.Label }),
             "Value", "Text");
 
-        // Default to the first cover-email template on first GET.
         if (!Input.TemplateId.HasValue && templates.Count > 0)
-            Input.TemplateId = templates[0].Id;
+            Input.TemplateId = (templates.FirstOrDefault(t => t.Slug == "formal-delivery") ?? templates[0]).Id;
 
         return true;
     }

@@ -35,15 +35,13 @@
 
     <div class="row">
         <div class="col-lg-8">
-            <div class="card mb-3">
+            <div class="card mb-3 h-auto">
                 <div class="card-header"><strong>Cover email</strong></div>
                 <div class="card-body">
                     <div class="row g-2 mb-3">
                         <div class="col-md-9">
                             <label asp-for="Input.TemplateId" class="form-label"></label>
-                            <select asp-for="Input.TemplateId" asp-items="Model.TemplateOptions" class="form-select">
-                                <option value="">(custom)</option>
-                            </select>
+                            <select asp-for="Input.TemplateId" asp-items="Model.TemplateOptions" class="form-select"></select>
                             <small class="text-muted">Pick a template to pre-fill subject and body. You can edit both before sending.</small>
                         </div>
                         <div class="col-md-3 d-flex align-items-end">
@@ -69,7 +67,7 @@
         </div>
 
         <div class="col-lg-4">
-            <div class="card mb-3">
+            <div class="card mb-3 h-auto">
                 <div class="card-header"><strong>Attachments</strong></div>
                 <div class="card-body">
                     <div class="form-check mb-2">
@@ -106,7 +104,7 @@
                 </div>
             </div>
 
-            <div class="card mb-3">
+            <div class="card mb-3 h-auto">
                 <div class="card-header"><strong>Recipients</strong></div>
                 <div class="card-body">
                     @if (Model.AvailableRecipients.Any())
@@ -138,7 +136,7 @@
         </div>
     </div>
 
-    <div class="card mb-3">
+    <div class="card mb-3 h-auto">
         <div class="card-header"><strong>Delivery timing</strong></div>
         <div class="card-body">
             <div class="row g-2 align-items-end">
@@ -173,7 +171,7 @@
 
 @if (Model.PendingScheduled.Any())
 {
-    <div class="card mb-3 border-primary">
+    <div class="card mb-3 h-auto border-primary">
         <div class="card-header bg-primary text-white">
             <strong>Scheduled sends</strong>
         </div>
@@ -224,7 +222,7 @@
 
 @if (Model.RecentDeliveries.Any())
 {
-    <div class="card">
+    <div class="card h-auto">
         <div class="card-header"><strong>Delivery history for this lease</strong></div>
         <div class="card-body p-0">
             <table class="table table-sm mb-0">

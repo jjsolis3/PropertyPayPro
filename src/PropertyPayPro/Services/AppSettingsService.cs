@@ -51,6 +51,7 @@ public class AppSettingsService
             existing.AccentColor = updated.AccentColor;
             existing.LogoStorageKey = updated.LogoStorageKey;
             existing.LogoSmallStorageKey = updated.LogoSmallStorageKey;
+            existing.PublicBaseUrl = updated.PublicBaseUrl;
             existing.FromEmailOverride = updated.FromEmailOverride;
             existing.FromNameOverride = updated.FromNameOverride;
             existing.DefaultRentDueDay = updated.DefaultRentDueDay;
@@ -63,4 +64,18 @@ public class AppSettingsService
     }
 
     public void InvalidateCache() => _cache.Remove(CacheKey);
+
+    /// <summary>
+    /// Site URL for emails sent outside a web request. Uses the Branding
+    /// setting, then Coolify's injected COOLIFY_URL (first entry if it holds
+    /// several), else empty, in which case emails go out without the logo.
+    /// </summary>
+    public async Task<string> GetPublicBaseUrlAsync(CancellationToken ct = default)
+    {
+        var settings = await GetAsync(ct);
+        var url = settings.PublicBaseUrl;
+        if (string.IsNullOrWhiteSpace(url))
+            url = Environment.GetEnvironmentVariable("COOLIFY_URL")?.Split(',')[0];
+        return url?.Trim().TrimEnd('/') ?? "";
+    }
 }

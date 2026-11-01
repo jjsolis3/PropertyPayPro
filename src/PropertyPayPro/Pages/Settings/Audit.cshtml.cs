@@ -17,19 +17,19 @@ public class AuditModel : PageModel
 
     public AuditModel(ApplicationDbContext db) { _db = db; }
 
-    [BindProperty(SupportsGet = true)] public string? Action { get; set; }
-    [BindProperty(SupportsGet = true)] public string? User { get; set; }
+    [BindProperty(SupportsGet = true)] public string? ActionFilter { get; set; }
+    [BindProperty(SupportsGet = true)] public string? UserFilter { get; set; }
     [BindProperty(SupportsGet = true)] public string? EntityType { get; set; }
     [BindProperty(SupportsGet = true)] public DateTime? FromLocal { get; set; }
     [BindProperty(SupportsGet = true)] public DateTime? ToLocal { get; set; }
-    [BindProperty(SupportsGet = true)] public int Page { get; set; } = 1;
+    [BindProperty(SupportsGet = true)] public int PageNumber { get; set; } = 1;
 
     public List<AuditEntry> Entries { get; private set; } = new();
     public List<string> KnownActions { get; private set; } = new();
     public List<string> KnownEntityTypes { get; private set; } = new();
     public int Total { get; private set; }
-    public bool HasPrev => Page > 1;
-    public bool HasNext => Page * PageSize < Total;
+    public bool HasPrev => PageNumber > 1;
+    public bool HasNext => PageNumber * PageSize < Total;
 
     public async Task OnGetAsync()
     {
@@ -44,11 +44,11 @@ public class AuditModel : PageModel
             .Select(a => a.EntityType!).Distinct().OrderBy(a => a).ToListAsync();
 
         var q = _db.AuditEntries.AsQueryable();
-        if (!string.IsNullOrWhiteSpace(Action)) q = q.Where(a => a.Action == Action);
+        if (!string.IsNullOrWhiteSpace(ActionFilter)) q = q.Where(a => a.Action == ActionFilter);
         if (!string.IsNullOrWhiteSpace(EntityType)) q = q.Where(a => a.EntityType == EntityType);
-        if (!string.IsNullOrWhiteSpace(User))
+        if (!string.IsNullOrWhiteSpace(UserFilter))
         {
-            var needle = User.Trim().ToLower();
+            var needle = UserFilter.Trim().ToLower();
             q = q.Where(a => (a.UserEmail ?? "").ToLower().Contains(needle));
         }
         if (FromLocal.HasValue)
@@ -63,10 +63,10 @@ public class AuditModel : PageModel
         }
 
         Total = await q.CountAsync();
-        if (Page < 1) Page = 1;
+        if (PageNumber < 1) PageNumber = 1;
 
         Entries = await q.OrderByDescending(a => a.CreatedUtc)
-            .Skip((Page - 1) * PageSize)
+            .Skip((PageNumber - 1) * PageSize)
             .Take(PageSize)
             .ToListAsync();
     }

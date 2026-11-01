@@ -12,8 +12,8 @@
     <div class="card-body">
         <form method="get" class="row g-2 align-items-end">
             <div class="col-md-2">
-                <label asp-for="Action" class="form-label">Action</label>
-                <select asp-for="Action" class="form-select">
+                <label asp-for="ActionFilter" class="form-label">Action</label>
+                <select asp-for="ActionFilter" class="form-select">
                     <option value="">(any)</option>
                     @foreach (var a in Model.KnownActions)
                     {
@@ -32,8 +32,8 @@
                 </select>
             </div>
             <div class="col-md-2">
-                <label asp-for="User" class="form-label">User</label>
-                <input asp-for="User" class="form-control" placeholder="email..." />
+                <label asp-for="UserFilter" class="form-label">User</label>
+                <input asp-for="UserFilter" class="form-control" placeholder="email..." />
             </div>
             <div class="col-md-2">
                 <label asp-for="FromLocal" class="form-label">From</label>
@@ -95,10 +95,10 @@
                 @if (Model.HasPrev)
                 {
                     <a asp-page="/Settings/Audit"
-                       asp-route-page="@(Model.Page - 1)"
-                       asp-route-action="@Model.Action"
+                       asp-route-pageNumber="@(Model.PageNumber - 1)"
+                       asp-route-actionFilter="@Model.ActionFilter"
                        asp-route-entityType="@Model.EntityType"
-                       asp-route-user="@Model.User"
+                       asp-route-userFilter="@Model.UserFilter"
                        asp-route-fromLocal="@Model.FromLocal?.ToString("s")"
                        asp-route-toLocal="@Model.ToLocal?.ToString("s")"
                        class="btn btn-sm btn-outline-secondary">Previous</a>
@@ -106,10 +106,10 @@
                 @if (Model.HasNext)
                 {
                     <a asp-page="/Settings/Audit"
-                       asp-route-page="@(Model.Page + 1)"
-                       asp-route-action="@Model.Action"
+                       asp-route-pageNumber="@(Model.PageNumber + 1)"
+                       asp-route-actionFilter="@Model.ActionFilter"
                        asp-route-entityType="@Model.EntityType"
-                       asp-route-user="@Model.User"
+                       asp-route-userFilter="@Model.UserFilter"
                        asp-route-fromLocal="@Model.FromLocal?.ToString("s")"
                        asp-route-toLocal="@Model.ToLocal?.ToString("s")"
                        class="btn btn-sm btn-outline-secondary">Next</a>

@@ -18,6 +18,7 @@ public class LateRentReminderHandler : IScheduledTaskHandler
     private readonly ApplicationDbContext _db;
     private readonly MailService _mail;
     private readonly NoticeTemplateService _tpl;
+    private readonly AppSettingsService _settings;
     private readonly ILogger<LateRentReminderHandler> _logger;
 
     private static readonly TimeSpan DedupeWindow = TimeSpan.FromDays(7);
@@ -26,11 +27,13 @@ public class LateRentReminderHandler : IScheduledTaskHandler
         ApplicationDbContext db,
         MailService mail,
         NoticeTemplateService tpl,
+        AppSettingsService settings,
         ILogger<LateRentReminderHandler> logger)
     {
         _db = db;
         _mail = mail;
         _tpl = tpl;
+        _settings = settings;
         _logger = logger;
     }
 
@@ -55,6 +58,7 @@ public class LateRentReminderHandler : IScheduledTaskHandler
                 return;
             }
 
+            var baseUrl = await _settings.GetPublicBaseUrlAsync(ct);
             var today = DateOnly.FromDateTime(DateTime.UtcNow);
 
             // Pull leases with unpaid rent/late-fee charges past their
@@ -89,7 +93,6 @@ public class LateRentReminderHandler : IScheduledTaskHandler
                 var rendered = _tpl.Render(template, new TemplateContext(
                     Lease: lease, OutstandingAmount: outstanding));
 
-                var baseUrl = ""; // Scheduler has no HTTP context; the composer tolerates an empty baseUrl (logo links break but body renders).
                 foreach (var addr in recipients)
                 {
                     var log = await _mail.SendReminderAsync(baseUrl,
