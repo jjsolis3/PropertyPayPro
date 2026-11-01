@@ -41,6 +41,7 @@ public class SchedulerModel : PageModel
             ScheduledTaskKind.LateRentReminder,
             ScheduledTaskKind.LeaseRenewalReminder,
             ScheduledTaskKind.InspectionReminder,
+            ScheduledTaskKind.BillingSweep,
         };
         foreach (var kind in kinds)
         {

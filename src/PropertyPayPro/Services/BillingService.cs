@@ -6,8 +6,6 @@ namespace PropertyPayPro.Services;
 
 public class BillingService
 {
-    public const int DueDayOfMonth = 15;
-
     private readonly ApplicationDbContext _db;
     private readonly PdfService _pdf;
 
@@ -17,11 +15,16 @@ public class BillingService
         _pdf = pdf;
     }
 
-    public async Task<int> GenerateChargesForPeriodAsync(int year, int month)
+    /// <summary>
+    /// Creates the month's rent bill for every active lease that doesn't
+    /// have one yet, due on the lease's own due day (clamped to the month's
+    /// length). Returns the bills created.
+    /// </summary>
+    public async Task<List<RentalCharge>> GenerateChargesForPeriodAsync(int year, int month)
     {
         var periodStart = new DateOnly(year, month, 1);
-        var periodEnd = new DateOnly(year, month, DateTime.DaysInMonth(year, month));
-        var dueDate = new DateOnly(year, month, Math.Min(DueDayOfMonth, DateTime.DaysInMonth(year, month)));
+        var daysInMonth = DateTime.DaysInMonth(year, month);
+        var periodEnd = new DateOnly(year, month, daysInMonth);
 
         // A lease is billable for the period if it has started by the end of the period
         // AND either it's month-to-month (rolls forever) or its term overlaps the period.
@@ -45,7 +48,7 @@ public class BillingService
                 LeaseId = lease.Id,
                 Kind = ChargeKind.Rent,
                 BillingPeriodStart = periodStart,
-                DueDate = dueDate,
+                DueDate = new DateOnly(year, month, Math.Clamp(lease.RentDueDay, 1, daysInMonth)),
                 AmountDue = lease.MonthlyRent
             };
             _db.RentalCharges.Add(charge);
@@ -60,7 +63,7 @@ public class BillingService
             catch { /* don't fail the whole generation if a PDF fails */ }
         }
 
-        return newCharges.Count;
+        return newCharges;
     }
 
     public async Task<List<RentalCharge>> GetLateFeeCandidatesAsync()
@@ -109,6 +112,18 @@ public class BillingService
         _db.RentalCharges.Add(lateFee);
         await _db.SaveChangesAsync();
         return lateFee;
+    }
+
+    /// <summary>Applies a late fee to every current candidate. Returns the fees created.</summary>
+    public async Task<List<RentalCharge>> ApplyAllLateFeesAsync()
+    {
+        var applied = new List<RentalCharge>();
+        foreach (var candidate in await GetLateFeeCandidatesAsync())
+        {
+            var fee = await ApplyLateFeeAsync(candidate.Id);
+            if (fee is not null) applied.Add(fee);
+        }
+        return applied;
     }
 
     public async Task<List<PaymentAllocation>> SuggestAllocationsAsync(int leaseId, decimal amount)

@@ -48,5 +48,17 @@ public class AppSettings
     [Column(TypeName = "numeric(10,2)")]
     public decimal DefaultLateFeeAmount { get; set; } = 0m;
 
+    // Billing automation, run by the daily billing sweep. All off by default.
+    public bool AutoGenerateCharges { get; set; }
+
+    // Day of the month from which the sweep creates that month's rent bills.
+    // Capped at 28 so it is reached in every month.
+    [Range(1, 28)]
+    public int AutoBillingDayOfMonth { get; set; } = 1;
+
+    public bool AutoApplyLateFees { get; set; }
+    public bool AutoEmailStatements { get; set; }
+    public bool AutoEmailAdminSummary { get; set; }
+
     public DateTime UpdatedUtc { get; set; } = DateTime.UtcNow;
 }
