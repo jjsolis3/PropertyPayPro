@@ -15,6 +15,9 @@ public enum ScheduledTaskKind
 
     /// <summary>Daily sweep for upcoming inspections.</summary>
     InspectionReminder = 3,
+
+    /// <summary>Daily sweep that creates rent bills and applies late fees.</summary>
+    BillingSweep = 4,
 }
 
 public enum ScheduledTaskStatus

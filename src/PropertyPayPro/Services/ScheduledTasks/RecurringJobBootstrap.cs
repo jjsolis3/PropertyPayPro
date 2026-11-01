@@ -18,6 +18,7 @@ public static class RecurringJobBootstrap
         (ScheduledTaskKind.LateRentReminder, "Daily late-rent reminder sweep"),
         (ScheduledTaskKind.LeaseRenewalReminder, "Daily lease-renewal reminder sweep"),
         (ScheduledTaskKind.InspectionReminder, "Daily inspection reminder sweep"),
+        (ScheduledTaskKind.BillingSweep, "Daily billing sweep"),
     };
 
     public static async Task EnsureEnqueuedAsync(ApplicationDbContext db, CancellationToken ct = default)
