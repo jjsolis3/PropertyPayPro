@@ -42,7 +42,7 @@
                         </td>
                         <td><span class="badge bg-@typeColor">@typeLabel</span></td>
                         <td>@d.Lease?.Property?.Name</td>
-                        <td>@d.UploadedOn.ToString("yyyy-MM-dd")</td>
+                        <td>@d.UploadedOn.ToLocalTime().ToString("yyyy-MM-dd")</td>
                         <td>
                             @if (!string.IsNullOrEmpty(status.label))
                             {

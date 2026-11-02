@@ -15,7 +15,7 @@ public class AnnualPnLModel : PageModel
     public AnnualPnLModel(ApplicationDbContext db) => _db = db;
 
     [BindProperty(SupportsGet = true)]
-    public int Year { get; set; } = DateTime.UtcNow.Year;
+    public int Year { get; set; } = DateTime.Now.Year;
 
     [BindProperty(SupportsGet = true)]
     public int? PropertyId { get; set; }

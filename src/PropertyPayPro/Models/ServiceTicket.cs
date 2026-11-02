@@ -55,7 +55,7 @@ public class ServiceTicket
     public string? VendorPhone { get; set; }
 
     [DataType(DataType.Date)]
-    public DateOnly ReportedOn { get; set; } = DateOnly.FromDateTime(DateTime.UtcNow);
+    public DateOnly ReportedOn { get; set; } = DateOnly.FromDateTime(DateTime.Now);
 
     [DataType(DataType.Date)]
     public DateOnly? ScheduledFor { get; set; }

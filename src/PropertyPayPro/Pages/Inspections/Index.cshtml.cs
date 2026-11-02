@@ -45,7 +45,7 @@ public class IndexModel : PageModel
 
         TotalCount = await _db.Inspections.CountAsync();
         DraftCount = await _db.Inspections.CountAsync(i => i.Status == InspectionStatus.Draft);
-        var yearStart = new DateOnly(DateTime.UtcNow.Year, 1, 1);
+        var yearStart = new DateOnly(DateTime.Now.Year, 1, 1);
         CompletedThisYearCount = await _db.Inspections
             .CountAsync(i => i.CompletedOn.HasValue && i.CompletedOn.Value >= yearStart);
     }

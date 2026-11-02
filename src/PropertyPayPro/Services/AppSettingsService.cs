@@ -52,6 +52,7 @@ public class AppSettingsService
             existing.LogoStorageKey = updated.LogoStorageKey;
             existing.LogoSmallStorageKey = updated.LogoSmallStorageKey;
             existing.PublicBaseUrl = updated.PublicBaseUrl;
+            existing.TimeZoneId = updated.TimeZoneId;
             existing.FromEmailOverride = updated.FromEmailOverride;
             existing.FromNameOverride = updated.FromNameOverride;
             existing.DefaultRentDueDay = updated.DefaultRentDueDay;

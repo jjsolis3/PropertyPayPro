@@ -109,7 +109,7 @@
                         <tbody>
                         @foreach (var l in Model.Leases)
                         {
-                            var today = DateOnly.FromDateTime(DateTime.UtcNow);
+                            var today = DateOnly.FromDateTime(DateTime.Now);
                             var isActive = l.StartDate <= today && (l.IsMonthToMonth || l.EndDate >= today);
                             <tr>
                                 <td>@l.TenantNames</td>

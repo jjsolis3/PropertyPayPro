@@ -68,7 +68,7 @@ public class BillingService
 
     public async Task<List<RentalCharge>> GetLateFeeCandidatesAsync()
     {
-        var today = DateOnly.FromDateTime(DateTime.UtcNow);
+        var today = DateOnly.FromDateTime(DateTime.Now);
         var rentCharges = await _db.RentalCharges
             .Where(c => c.Kind == ChargeKind.Rent)
             .Include(c => c.Lease).ThenInclude(l => l!.Tenants)
@@ -105,7 +105,7 @@ public class BillingService
             LeaseId = rentCharge.LeaseId,
             Kind = ChargeKind.LateFee,
             BillingPeriodStart = rentCharge.BillingPeriodStart,
-            DueDate = DateOnly.FromDateTime(DateTime.UtcNow),
+            DueDate = DateOnly.FromDateTime(DateTime.Now),
             AmountDue = rentCharge.Lease.LateFeeAmount,
             Notes = $"Late fee applied for {rentCharge.BillingPeriodStart:MMMM yyyy} rent."
         };

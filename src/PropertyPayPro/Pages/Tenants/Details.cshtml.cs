@@ -37,7 +37,7 @@ public class DetailsModel : PageModel
         if (Tenant is null) return NotFound();
 
         Leases = Tenant.Leases.OrderByDescending(l => l.StartDate).ToList();
-        var today = DateOnly.FromDateTime(DateTime.UtcNow);
+        var today = DateOnly.FromDateTime(DateTime.Now);
         ActiveLeases = Leases.Where(l => l.StartDate <= today && (l.IsMonthToMonth || l.EndDate >= today)).ToList();
         PrimaryLease = ActiveLeases.FirstOrDefault() ?? Leases.FirstOrDefault();
         var leaseIds = Leases.Select(l => l.Id).ToList();

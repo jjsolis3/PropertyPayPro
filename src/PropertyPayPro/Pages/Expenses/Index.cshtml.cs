@@ -26,7 +26,7 @@ public class IndexModel : PageModel
 
     public async Task OnGetAsync()
     {
-        var today = DateOnly.FromDateTime(DateTime.UtcNow);
+        var today = DateOnly.FromDateTime(DateTime.Now);
         var firstOfMonth = new DateOnly(today.Year, today.Month, 1);
         var firstOfYear = new DateOnly(today.Year, 1, 1);
 
@@ -69,7 +69,7 @@ public class IndexModel : PageModel
     {
         var e = await _db.PropertyExpenses.FindAsync(id);
         if (e is null) return NotFound();
-        e.ReimbursedOn = DateOnly.FromDateTime(DateTime.UtcNow);
+        e.ReimbursedOn = DateOnly.FromDateTime(DateTime.Now);
         e.ReimbursedAmount = e.AmountDue;
         await _db.SaveChangesAsync();
         TempData["Message"] = $"Marked reimbursed: {e.Category} — {e.Vendor}.";
@@ -84,7 +84,7 @@ public class IndexModel : PageModel
             return RedirectToPage();
         }
 
-        var today = DateOnly.FromDateTime(DateTime.UtcNow);
+        var today = DateOnly.FromDateTime(DateTime.Now);
         var expenses = await _db.PropertyExpenses
             .Where(e => selectedIds.Contains(e.Id) && e.PassThroughToTenant && e.ReimbursedOn == null)
             .ToListAsync();

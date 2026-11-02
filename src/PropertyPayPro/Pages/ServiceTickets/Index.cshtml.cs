@@ -21,7 +21,7 @@ public class IndexModel : PageModel
 
     public async Task OnGetAsync()
     {
-        var today = DateOnly.FromDateTime(DateTime.UtcNow);
+        var today = DateOnly.FromDateTime(DateTime.Now);
         var weekEnd = today.AddDays(7);
         var firstOfMonth = new DateOnly(today.Year, today.Month, 1);
         var ninetyDaysAgo = today.AddDays(-90);

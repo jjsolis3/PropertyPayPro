@@ -67,7 +67,7 @@
 @if (Model.PrimaryLease is not null)
 {
     var l = Model.PrimaryLease;
-    var today = DateOnly.FromDateTime(DateTime.UtcNow);
+    var today = DateOnly.FromDateTime(DateTime.Now);
     var isActive = l.StartDate <= today && (l.IsMonthToMonth || l.EndDate >= today);
     var term = l.IsMonthToMonth ? "M2M" : $"{l.StartDate:yyyy-MM-dd} → {l.EndDate:yyyy-MM-dd}";
     <div class="card mb-3">

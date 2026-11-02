@@ -78,7 +78,7 @@ public class EmailModel : PageModel
             var body = $@"<html><body style=""font-family:sans-serif;padding:24px;"">
                 <h2 style=""color:#1f3a8a;"">PropertyPayPro — SMTP test</h2>
                 <p>If you're reading this, SMTP is working correctly.</p>
-                <p style=""color:#666;"">Sent at {DateTime.UtcNow:yyyy-MM-dd HH:mm:ss} UTC.</p>
+                <p style=""color:#666;"">Sent at {DateTime.Now:yyyy-MM-dd h:mm:ss tt} ({TimeZoneInfo.Local.Id}).</p>
                 </body></html>";
             await _sender.SendAsync(TestRecipient, "PropertyPayPro test email", body);
             TempData["Message"] = $"Test email sent to {TestRecipient}.";

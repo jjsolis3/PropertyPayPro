@@ -97,7 +97,7 @@
                             <small class="text-muted">@d.Lease?.TenantNames</small>
                         </td>
                         <td>@(d.EffectiveDate?.ToString("yyyy-MM-dd") ?? "—")</td>
-                        <td>@d.UploadedOn.ToString("yyyy-MM-dd")</td>
+                        <td>@d.UploadedOn.ToLocalTime().ToString("yyyy-MM-dd")</td>
                         <td>
                             @if (d.SentCount > 0)
                             {

@@ -118,7 +118,7 @@ public class CreateModel : PageModel
         var pdfBytes = NoticePdfBuilder.Build(Input.Title, Input.Body, lease, logo);
 
         // Store it under notices/{leaseId}/ and attach as a LeaseDocument.
-        var today = DateOnly.FromDateTime(DateTime.UtcNow);
+        var today = DateOnly.FromDateTime(DateTime.Now);
         var safeTitle = string.Join('-',
             Input.Title.Trim().Split(Path.GetInvalidFileNameChars()));
         if (safeTitle.Length > 60) safeTitle = safeTitle[..60];
@@ -188,7 +188,7 @@ public class CreateModel : PageModel
 
     private async Task LoadDropdownsAsync()
     {
-        var today = DateOnly.FromDateTime(DateTime.UtcNow);
+        var today = DateOnly.FromDateTime(DateTime.Now);
         var leases = await _db.Leases
             .Include(l => l.Property)
             .Include(l => l.Tenants)

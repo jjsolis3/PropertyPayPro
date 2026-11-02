@@ -21,7 +21,7 @@ public class CreateModel : PageModel
         [Required] public int? LeaseId { get; set; }
         [Required] public InspectionKind Kind { get; set; } = InspectionKind.MoveIn;
         [Required, DataType(DataType.Date)]
-        public DateOnly ScheduledFor { get; set; } = DateOnly.FromDateTime(DateTime.UtcNow);
+        public DateOnly ScheduledFor { get; set; } = DateOnly.FromDateTime(DateTime.Now);
         [StringLength(120)] public string? ConductedBy { get; set; }
         public bool TenantPresent { get; set; } = true;
         [Display(Name = "Seed with standard room / item checklist")]
@@ -93,7 +93,7 @@ public class CreateModel : PageModel
 
     private async Task LoadAsync()
     {
-        var today = DateOnly.FromDateTime(DateTime.UtcNow);
+        var today = DateOnly.FromDateTime(DateTime.Now);
         var leases = await _db.Leases
             .Include(l => l.Property)
             .Include(l => l.Tenants)

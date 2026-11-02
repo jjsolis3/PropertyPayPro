@@ -20,7 +20,7 @@
                 {
                     <span class="badge bg-@status.color me-1">@status.label</span>
                 }
-                <span class="text-muted small">Uploaded @d.UploadedOn.ToString("yyyy-MM-dd")</span>
+                <span class="text-muted small">Uploaded @d.UploadedOn.ToLocalTime().ToString("yyyy-MM-dd")</span>
                 @if (d.EffectiveDate.HasValue)
                 {
                     <span class="text-muted small ms-2">• Effective @d.EffectiveDate.Value.ToString("yyyy-MM-dd")</span>

@@ -28,7 +28,7 @@ public class CreateModel : PageModel
     [BindProperty]
     public RentPayment Payment { get; set; } = new()
     {
-        PaidOn = DateOnly.FromDateTime(DateTime.UtcNow)
+        PaidOn = DateOnly.FromDateTime(DateTime.Now)
     };
 
     [BindProperty]

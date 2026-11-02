@@ -49,7 +49,7 @@ public abstract class PortalPageBase : PageModel
         if (CurrentTenant is null) return Forbid();
 
         AllLeases = CurrentTenant.Leases.OrderByDescending(l => l.StartDate).ToList();
-        var today = DateOnly.FromDateTime(DateTime.UtcNow);
+        var today = DateOnly.FromDateTime(DateTime.Now);
         ActiveLeases = AllLeases
             .Where(l => l.StartDate <= today && (l.IsMonthToMonth || l.EndDate >= today))
             .ToList();

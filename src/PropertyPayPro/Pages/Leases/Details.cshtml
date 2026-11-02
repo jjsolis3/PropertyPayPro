@@ -3,7 +3,7 @@
 @using PropertyPayPro.Pages.Shared
 @{
     ViewData["Title"] = "Lease";
-    var today = DateOnly.FromDateTime(DateTime.UtcNow);
+    var today = DateOnly.FromDateTime(DateTime.Now);
     var isActive = Model.Lease!.StartDate <= today && (Model.Lease.IsMonthToMonth || Model.Lease.EndDate >= today);
     var badges = new List<DetailHeaderBadge>();
     badges.Add(isActive
@@ -347,7 +347,7 @@
                                             <span class="text-muted small">—</span>
                                         }
                                     </td>
-                                    <td>@d.UploadedOn.ToString("yyyy-MM-dd")</td>
+                                    <td>@d.UploadedOn.ToLocalTime().ToString("yyyy-MM-dd")</td>
                                     <td class="text-end">
                                         @if (previewable)
                                         {

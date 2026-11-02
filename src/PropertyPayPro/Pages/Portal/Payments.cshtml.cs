@@ -30,7 +30,7 @@ public class PaymentsModel : PortalPageBase
         LifetimePaid = Payments.Sum(p => p.Amount);
         PaymentCount = Payments.Count;
 
-        var yearStart = new DateOnly(DateTime.UtcNow.Year, 1, 1);
+        var yearStart = new DateOnly(DateTime.Now.Year, 1, 1);
         PaidThisYear = Payments.Where(p => p.PaidOn >= yearStart).Sum(p => p.Amount);
 
         return Page();

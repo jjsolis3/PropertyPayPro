@@ -47,7 +47,7 @@ public class MailService
 
         var unpaid = lease.Charges.Where(c => c.Balance > 0).ToList();
         var subject = $"Rental Statement — {lease.Property!.Name}";
-        var body = EmailComposer.ComposeStatement(baseUrl, lease, unpaid, DateOnly.FromDateTime(DateTime.UtcNow));
+        var body = EmailComposer.ComposeStatement(baseUrl, lease, unpaid, DateOnly.FromDateTime(DateTime.Now));
 
         var pdfDoc = await _pdf.GenerateUnpaidStatementAsync(leaseId, ct);
         var attachments = await LoadAttachmentsAsync(pdfDoc, ct);

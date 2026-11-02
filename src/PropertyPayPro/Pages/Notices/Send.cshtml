@@ -150,8 +150,8 @@
                 </div>
                 <div class="col-md-7">
                     <small class="text-muted">
-                        Times are in your local timezone. UTC now:
-                        <code>@DateTime.UtcNow.ToString("yyyy-MM-dd HH:mm")</code>
+                        Times are in @TimeZoneInfo.Local.Id (set under Settings &gt; Branding). Now:
+                        <code>@DateTime.Now.ToString("yyyy-MM-dd h:mm tt")</code>
                     </small>
                 </div>
             </div>

@@ -67,7 +67,7 @@ public class MaintenanceSchedule
     public string? Notes { get; set; }
 
     [NotMapped]
-    public int DaysUntilDue => NextDueDate.DayNumber - DateOnly.FromDateTime(DateTime.UtcNow).DayNumber;
+    public int DaysUntilDue => NextDueDate.DayNumber - DateOnly.FromDateTime(DateTime.Now).DayNumber;
 
     [NotMapped]
     public bool IsDueNow => Active && DaysUntilDue <= LeadDays;

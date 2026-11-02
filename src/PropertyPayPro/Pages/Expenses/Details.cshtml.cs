@@ -27,7 +27,7 @@ public class DetailsModel : PageModel
     {
         var e = await _db.PropertyExpenses.FindAsync(id);
         if (e is null) return NotFound();
-        e.ReimbursedOn = DateOnly.FromDateTime(DateTime.UtcNow);
+        e.ReimbursedOn = DateOnly.FromDateTime(DateTime.Now);
         e.ReimbursedAmount = e.AmountDue;
         await _db.SaveChangesAsync();
         TempData["Message"] = "Marked as reimbursed in full.";
