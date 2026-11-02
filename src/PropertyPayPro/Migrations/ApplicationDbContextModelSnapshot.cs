@@ -207,6 +207,21 @@ namespace PropertyPayPro.Migrations
                         .HasMaxLength(80)
                         .HasColumnType("character varying(80)");
 
+                    b.Property<bool>("AutoApplyLateFees")
+                        .HasColumnType("boolean");
+
+                    b.Property<int>("AutoBillingDayOfMonth")
+                        .HasColumnType("integer");
+
+                    b.Property<bool>("AutoEmailAdminSummary")
+                        .HasColumnType("boolean");
+
+                    b.Property<bool>("AutoEmailStatements")
+                        .HasColumnType("boolean");
+
+                    b.Property<bool>("AutoGenerateCharges")
+                        .HasColumnType("boolean");
+
                     b.Property<decimal>("DefaultLateFeeAmount")
                         .HasColumnType("numeric(10,2)");
 
@@ -722,6 +737,124 @@ namespace PropertyPayPro.Migrations
                     b.ToTable("LeaseDocuments");
                 });
 
+            modelBuilder.Entity("PropertyPayPro.Models.MaintenanceSchedule", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<bool>("Active")
+                        .HasColumnType("boolean");
+
+                    b.Property<int>("Category")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("Description")
+                        .HasMaxLength(2000)
+                        .HasColumnType("character varying(2000)");
+
+                    b.Property<DateOnly?>("LastGeneratedOn")
+                        .HasColumnType("date");
+
+                    b.Property<int?>("LastServiceTicketId")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("LeadDays")
+                        .HasColumnType("integer");
+
+                    b.Property<DateOnly>("NextDueDate")
+                        .HasColumnType("date");
+
+                    b.Property<string>("Notes")
+                        .HasMaxLength(500)
+                        .HasColumnType("character varying(500)");
+
+                    b.Property<bool>("NotifyAdmins")
+                        .HasColumnType("boolean");
+
+                    b.Property<bool>("NotifyTenants")
+                        .HasColumnType("boolean");
+
+                    b.Property<int>("PropertyId")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("RecurrenceMonths")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("Title")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("character varying(200)");
+
+                    b.Property<string>("Vendor")
+                        .HasMaxLength(120)
+                        .HasColumnType("character varying(120)");
+
+                    b.Property<string>("VendorPhone")
+                        .HasMaxLength(30)
+                        .HasColumnType("character varying(30)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("PropertyId");
+
+                    b.ToTable("MaintenanceSchedules");
+                });
+
+            modelBuilder.Entity("PropertyPayPro.Models.NoticeTemplate", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Body")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<DateTime>("CreatedUtc")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("boolean");
+
+                    b.Property<bool>("IsSystem")
+                        .HasColumnType("boolean");
+
+                    b.Property<string>("Label")
+                        .IsRequired()
+                        .HasMaxLength(120)
+                        .HasColumnType("character varying(120)");
+
+                    b.Property<int>("Scope")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("Slug")
+                        .IsRequired()
+                        .HasMaxLength(64)
+                        .HasColumnType("character varying(64)");
+
+                    b.Property<int>("SortOrder")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("TitleOrSubject")
+                        .HasMaxLength(300)
+                        .HasColumnType("character varying(300)");
+
+                    b.Property<DateTime>("UpdatedUtc")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("Scope", "Slug")
+                        .IsUnique();
+
+                    b.ToTable("NoticeTemplates");
+                });
+
             modelBuilder.Entity("PropertyPayPro.Models.PaymentAllocation", b =>
                 {
                     b.Property<int>("Id")
@@ -919,124 +1052,6 @@ namespace PropertyPayPro.Migrations
                         .IsUnique();
 
                     b.ToTable("RentalCharges");
-                });
-
-            modelBuilder.Entity("PropertyPayPro.Models.MaintenanceSchedule", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("integer");
-
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
-
-                    b.Property<bool>("Active")
-                        .HasColumnType("boolean");
-
-                    b.Property<int>("Category")
-                        .HasColumnType("integer");
-
-                    b.Property<string>("Description")
-                        .HasMaxLength(2000)
-                        .HasColumnType("character varying(2000)");
-
-                    b.Property<DateOnly?>("LastGeneratedOn")
-                        .HasColumnType("date");
-
-                    b.Property<int?>("LastServiceTicketId")
-                        .HasColumnType("integer");
-
-                    b.Property<int>("LeadDays")
-                        .HasColumnType("integer");
-
-                    b.Property<DateOnly>("NextDueDate")
-                        .HasColumnType("date");
-
-                    b.Property<string>("Notes")
-                        .HasMaxLength(500)
-                        .HasColumnType("character varying(500)");
-
-                    b.Property<bool>("NotifyAdmins")
-                        .HasColumnType("boolean");
-
-                    b.Property<bool>("NotifyTenants")
-                        .HasColumnType("boolean");
-
-                    b.Property<int>("PropertyId")
-                        .HasColumnType("integer");
-
-                    b.Property<int>("RecurrenceMonths")
-                        .HasColumnType("integer");
-
-                    b.Property<string>("Title")
-                        .IsRequired()
-                        .HasMaxLength(200)
-                        .HasColumnType("character varying(200)");
-
-                    b.Property<string>("Vendor")
-                        .HasMaxLength(120)
-                        .HasColumnType("character varying(120)");
-
-                    b.Property<string>("VendorPhone")
-                        .HasMaxLength(30)
-                        .HasColumnType("character varying(30)");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("PropertyId");
-
-                    b.ToTable("MaintenanceSchedules");
-                });
-
-            modelBuilder.Entity("PropertyPayPro.Models.NoticeTemplate", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("integer");
-
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
-
-                    b.Property<string>("Body")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.Property<DateTime>("CreatedUtc")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.Property<bool>("IsActive")
-                        .HasColumnType("boolean");
-
-                    b.Property<bool>("IsSystem")
-                        .HasColumnType("boolean");
-
-                    b.Property<string>("Label")
-                        .IsRequired()
-                        .HasMaxLength(120)
-                        .HasColumnType("character varying(120)");
-
-                    b.Property<int>("Scope")
-                        .HasColumnType("integer");
-
-                    b.Property<string>("Slug")
-                        .IsRequired()
-                        .HasMaxLength(64)
-                        .HasColumnType("character varying(64)");
-
-                    b.Property<int>("SortOrder")
-                        .HasColumnType("integer");
-
-                    b.Property<string>("TitleOrSubject")
-                        .HasMaxLength(300)
-                        .HasColumnType("character varying(300)");
-
-                    b.Property<DateTime>("UpdatedUtc")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("Scope", "Slug")
-                        .IsUnique();
-
-                    b.ToTable("NoticeTemplates");
                 });
 
             modelBuilder.Entity("PropertyPayPro.Models.ScheduledTask", b =>
@@ -1369,6 +1384,17 @@ namespace PropertyPayPro.Migrations
                     b.Navigation("Lease");
                 });
 
+            modelBuilder.Entity("PropertyPayPro.Models.MaintenanceSchedule", b =>
+                {
+                    b.HasOne("PropertyPayPro.Models.Property", "Property")
+                        .WithMany()
+                        .HasForeignKey("PropertyId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Property");
+                });
+
             modelBuilder.Entity("PropertyPayPro.Models.PaymentAllocation", b =>
                 {
                     b.HasOne("PropertyPayPro.Models.RentPayment", "Payment")
@@ -1426,17 +1452,6 @@ namespace PropertyPayPro.Migrations
                         .IsRequired();
 
                     b.Navigation("Lease");
-                });
-
-            modelBuilder.Entity("PropertyPayPro.Models.MaintenanceSchedule", b =>
-                {
-                    b.HasOne("PropertyPayPro.Models.Property", "Property")
-                        .WithMany()
-                        .HasForeignKey("PropertyId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Property");
                 });
 
             modelBuilder.Entity("PropertyPayPro.Models.ServiceTicket", b =>

@@ -57,6 +57,11 @@ public class AppSettingsService
             existing.DefaultRentDueDay = updated.DefaultRentDueDay;
             existing.DefaultLateFeeGraceDays = updated.DefaultLateFeeGraceDays;
             existing.DefaultLateFeeAmount = updated.DefaultLateFeeAmount;
+            existing.AutoGenerateCharges = updated.AutoGenerateCharges;
+            existing.AutoBillingDayOfMonth = updated.AutoBillingDayOfMonth;
+            existing.AutoApplyLateFees = updated.AutoApplyLateFees;
+            existing.AutoEmailStatements = updated.AutoEmailStatements;
+            existing.AutoEmailAdminSummary = updated.AutoEmailAdminSummary;
             existing.UpdatedUtc = DateTime.UtcNow;
         }
         await _db.SaveChangesAsync(ct);

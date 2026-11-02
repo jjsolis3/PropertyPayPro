@@ -55,7 +55,7 @@ public class IndexModel : PageModel
             return RedirectToPage();
         }
 
-        var created = await _billing.GenerateChargesForPeriodAsync(GenerateYear, GenerateMonth);
+        var created = (await _billing.GenerateChargesForPeriodAsync(GenerateYear, GenerateMonth)).Count;
         var periodLabel = new DateOnly(GenerateYear, GenerateMonth, 1).ToString("MMMM yyyy");
         TempData["GenerateMessage"] = created == 0
             ? $"No new bills generated for {periodLabel} (existing bills were skipped)."

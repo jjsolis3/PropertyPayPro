@@ -19,6 +19,7 @@ public enum EmailKind
     LateRentReminder,
     LeaseRenewalReminder,
     InspectionReminder,
+    BillingSummary,
 }
 
 public enum EmailStatus

@@ -53,6 +53,11 @@ public class BrandingModel : PageModel
         Input.DefaultRentDueDay = Current.DefaultRentDueDay;
         Input.DefaultLateFeeGraceDays = Current.DefaultLateFeeGraceDays;
         Input.DefaultLateFeeAmount = Current.DefaultLateFeeAmount;
+        Input.AutoGenerateCharges = Current.AutoGenerateCharges;
+        Input.AutoBillingDayOfMonth = Current.AutoBillingDayOfMonth;
+        Input.AutoApplyLateFees = Current.AutoApplyLateFees;
+        Input.AutoEmailStatements = Current.AutoEmailStatements;
+        Input.AutoEmailAdminSummary = Current.AutoEmailAdminSummary;
         Input.LogoStorageKey = Current.LogoStorageKey;
         Input.LogoSmallStorageKey = Current.LogoSmallStorageKey;
 

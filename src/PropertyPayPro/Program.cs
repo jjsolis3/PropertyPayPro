@@ -146,6 +146,8 @@ builder.Services.AddScoped<PropertyPayPro.Services.ScheduledTasks.IScheduledTask
     PropertyPayPro.Services.ScheduledTasks.LeaseRenewalReminderHandler>();
 builder.Services.AddScoped<PropertyPayPro.Services.ScheduledTasks.IScheduledTaskHandler,
     PropertyPayPro.Services.ScheduledTasks.InspectionReminderHandler>();
+builder.Services.AddScoped<PropertyPayPro.Services.ScheduledTasks.IScheduledTaskHandler,
+    PropertyPayPro.Services.ScheduledTasks.BillingSweepHandler>();
 builder.Services.AddScoped<PropertyPayPro.Services.ScheduledTasks.ScheduledTaskDispatcher>();
 builder.Services.AddHostedService<PropertyPayPro.Services.ScheduledTasks.ScheduledTaskRunner>();
 
@@ -261,7 +263,7 @@ app.MapPost("/api/jobs/generate-monthly-charges", async (
     var y = year ?? now.Year;
     var m = month ?? now.Month;
 
-    var created = await billing.GenerateChargesForPeriodAsync(y, m);
+    var created = (await billing.GenerateChargesForPeriodAsync(y, m)).Count;
     return Results.Ok(new { year = y, month = m, created });
 }).AllowAnonymous();
 

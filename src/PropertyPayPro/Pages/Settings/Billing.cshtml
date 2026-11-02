@@ -1,5 +1,6 @@
 @page
 @model PropertyPayPro.Pages.Settings.BillingModel
+@using PropertyPayPro.Models
 @{
     ViewData["Title"] = "Settings — Billing";
     ViewData["SettingsTab"] = "billing";
@@ -18,7 +19,7 @@
 <form method="post">
     <div class="row g-3">
         <div class="col-lg-8">
-            <div class="card mb-3">
+            <div class="card mb-3 h-auto">
                 <div class="card-header"><h4 class="card-title mb-0">Default Lease Terms</h4></div>
                 <div class="card-body">
                     <p class="text-muted small mb-3">
@@ -46,22 +47,102 @@
                     </div>
                 </div>
             </div>
+
+            <div class="card mb-3 h-auto">
+                <div class="card-header"><h4 class="card-title mb-0">Automation</h4></div>
+                <div class="card-body">
+                    <p class="text-muted small mb-3">
+                        A billing sweep runs once a day at 15:00 UTC. Everything it does is skipped
+                        if already done, so it never double-bills and the manual buttons on the
+                        Bills pages keep working alongside it.
+                    </p>
+
+                    <div class="form-check form-switch mb-2">
+                        <input asp-for="AutoGenerateCharges" class="form-check-input" role="switch" />
+                        <label asp-for="AutoGenerateCharges" class="form-check-label fw-semibold">Create monthly rent bills</label>
+                    </div>
+                    <div class="ms-4 mb-3">
+                        <div class="d-flex align-items-center gap-2">
+                            <span class="small">Starting on day</span>
+                            <input asp-for="AutoBillingDayOfMonth" type="number" min="1" max="28" class="form-control form-control-sm" style="width: 5rem;" />
+                            <span class="small">of each month</span>
+                        </div>
+                        <small class="text-muted d-block">
+                            Creates that month's bill for every active lease, due on each lease's own due day.
+                            Leases added later in the month are billed on the next day's run.
+                        </small>
+                        <span asp-validation-for="AutoBillingDayOfMonth" class="text-danger"></span>
+                    </div>
+
+                    <div class="form-check form-switch mb-2">
+                        <input asp-for="AutoApplyLateFees" class="form-check-input" role="switch" />
+                        <label asp-for="AutoApplyLateFees" class="form-check-label fw-semibold">Apply late fees</label>
+                    </div>
+                    <small class="text-muted d-block ms-4 mb-3">
+                        Adds the lease's late fee to a rent bill still unpaid after its grace days, once per bill.
+                        Leases with a $0 late fee are never charged.
+                    </small>
+
+                    <div class="form-check form-switch mb-2">
+                        <input asp-for="AutoEmailStatements" class="form-check-input" role="switch" />
+                        <label asp-for="AutoEmailStatements" class="form-check-label fw-semibold">Email statements to tenants</label>
+                    </div>
+                    <small class="text-muted d-block ms-4 mb-3">
+                        When new bills are created, emails each lease's tenant a statement of what they owe.
+                        Tenants with reminders turned off or no email are skipped.
+                    </small>
+
+                    <div class="form-check form-switch mb-2">
+                        <input asp-for="AutoEmailAdminSummary" class="form-check-input" role="switch" />
+                        <label asp-for="AutoEmailAdminSummary" class="form-check-label fw-semibold">Email admins a summary</label>
+                    </div>
+                    <small class="text-muted d-block ms-4">
+                        After a run that creates bills or applies late fees, emails every Admin user the list.
+                    </small>
+
+                    @if (!Model.MailConfigured && (Model.AutoEmailStatements || Model.AutoEmailAdminSummary))
+                    {
+                        <div class="alert alert-warning small mt-3 mb-0">
+                            Email is not configured, so the email options above will be skipped until it is.
+                        </div>
+                    }
+                </div>
+            </div>
         </div>
 
         <div class="col-lg-4">
-            <div class="card mb-3">
-                <div class="card-header"><h4 class="card-title mb-0">Notes</h4></div>
+            <div class="card mb-3 h-auto">
+                <div class="card-header"><h4 class="card-title mb-0">Billing sweep</h4></div>
                 <div class="card-body small">
-                    <p>Bills are generated on the rent due day for each active lease.</p>
-                    <p>If a lease has a non-zero late fee and the bill remains unpaid past the grace days, the late-fee charge is added automatically.</p>
-                    <p class="mb-0 text-muted">Last saved: @Model.Current.UpdatedUtc.ToLocalTime().ToString("yyyy-MM-dd HH:mm")</p>
+                    <dl class="mb-2">
+                        <dt>Next run</dt>
+                        <dd>@(Model.NextSweep?.RunAtUtc.ToString("yyyy-MM-dd HH:mm 'UTC'") ?? "Not scheduled")</dd>
+                        <dt>Last run</dt>
+                        <dd>
+                            @if (Model.LastSweep is null)
+                            {
+                                <span class="text-muted">Never</span>
+                            }
+                            else
+                            {
+                                @Model.LastSweep.CompletedUtc?.ToString("yyyy-MM-dd HH:mm 'UTC'")
+                                @if (Model.LastSweep.Status == ScheduledTaskStatus.Failed)
+                                {
+                                    <span class="badge bg-danger ms-1" title="@Model.LastSweep.LastError">Failed</span>
+                                }
+                                <div class="text-muted">@Model.LastSweep.Description</div>
+                            }
+                        </dd>
+                    </dl>
+                    <a asp-page="/Settings/Scheduler">Run now or view history on the Scheduler page</a>
+                    <p class="mb-0 mt-3 text-muted">Last saved: @Model.Current.UpdatedUtc.ToLocalTime().ToString("yyyy-MM-dd HH:mm")</p>
                 </div>
             </div>
         </div>
     </div>
 
     <div class="d-flex gap-2">
-        <button type="submit" class="btn btn-primary">Save Defaults</button>
+        <button type="submit" class="btn btn-primary">Save</button>
         <a asp-page="Billing" class="btn btn-outline-secondary">Cancel</a>
     </div>
 </form>
