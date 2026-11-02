@@ -2,9 +2,12 @@
 @model PropertyPayPro.Pages.Users.InviteModel
 @{
     ViewData["Title"] = "Invite User";
+    ViewData["SettingsTab"] = "users";
 }
 
-<h1 class="h3 mb-3">Invite User</h1>
+<h1 class="h3 mb-3">Settings</h1>
+<partial name="/Pages/Settings/_SettingsNav.cshtml" />
+<h2 class="h5 mb-3">Invite User</h2>
 
 <div class="row">
     <div class="col-md-8">
