@@ -36,6 +36,7 @@ public class IndexModel : PageModel
         ActiveCount = activeTenantIds.Count;
 
         var overdueLeaseIds = await _db.RentalCharges
+            .Include(c => c.Lease)
             .Include(c => c.Allocations)
             .ToListAsync();
         var overdueIds = overdueLeaseIds

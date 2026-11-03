@@ -101,12 +101,12 @@
                                 <div class="mt-2 ms-1">
                                     <div class="form-check form-switch mb-1">
                                         <input asp-for="AutoGenerateCharges" class="form-check-input" role="switch" />
-                                        <label asp-for="AutoGenerateCharges" class="form-check-label">Create monthly rent bills</label>
-                                        <span class="small ms-1">from day</span>
-                                        <input asp-for="AutoBillingDayOfMonth" type="number" min="1" max="28"
+                                        <label asp-for="AutoGenerateCharges" class="form-check-label">Create next month's rent bills</label>
+                                        <span class="small ms-1">on day</span>
+                                        <input asp-for="BillIssueDay" type="number" min="1" max="28"
                                                class="form-control form-control-sm d-inline-block mx-1" style="width: 4.5rem;" />
-                                        <span class="small">of the month, due on each lease's due day</span>
-                                        <span asp-validation-for="AutoBillingDayOfMonth" class="text-danger small d-block"></span>
+                                        <span class="small">of the month before (16 = November's bills go out Oct 16), due on each lease's due day</span>
+                                        <span asp-validation-for="BillIssueDay" class="text-danger small d-block"></span>
                                     </div>
                                     <div class="form-check form-switch mb-1">
                                         <input asp-for="AutoApplyLateFees" class="form-check-input" role="switch" />

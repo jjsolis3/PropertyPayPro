@@ -56,10 +56,11 @@ public class AppSettings
     // Billing automation, run by the daily billing sweep. All off by default.
     public bool AutoGenerateCharges { get; set; }
 
-    // Day of the month from which the sweep creates that month's rent bills.
+    // Day of the month on which the sweep creates (and emails) the NEXT
+    // month's rent bills, e.g. 16 => November's bills go out Oct 16.
     // Capped at 28 so it is reached in every month.
     [Range(1, 28)]
-    public int AutoBillingDayOfMonth { get; set; } = 1;
+    public int BillIssueDay { get; set; } = 16;
 
     public bool AutoApplyLateFees { get; set; }
     public bool AutoEmailStatements { get; set; }

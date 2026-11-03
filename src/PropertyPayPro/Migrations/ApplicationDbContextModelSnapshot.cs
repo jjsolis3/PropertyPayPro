@@ -210,9 +210,6 @@ namespace PropertyPayPro.Migrations
                     b.Property<bool>("AutoApplyLateFees")
                         .HasColumnType("boolean");
 
-                    b.Property<int>("AutoBillingDayOfMonth")
-                        .HasColumnType("integer");
-
                     b.Property<bool>("AutoEmailAdminSummary")
                         .HasColumnType("boolean");
 
@@ -230,6 +227,9 @@ namespace PropertyPayPro.Migrations
 
                     b.Property<bool>("AutoLeaseRenewalReminders")
                         .HasColumnType("boolean");
+
+                    b.Property<int>("BillIssueDay")
+                        .HasColumnType("integer");
 
                     b.Property<decimal>("DefaultLateFeeAmount")
                         .HasColumnType("numeric(10,2)");

@@ -25,7 +25,7 @@ public static class EmailComposer
                 <tr>
                     <td style=""padding:8px;border:1px solid #dee2e6;"">{c.Id:D8}</td>
                     <td style=""padding:8px;border:1px solid #dee2e6;"">{c.BillingPeriodStart:MMM yyyy}</td>
-                    <td style=""padding:8px;border:1px solid #dee2e6;"">{c.DueDate:yyyy-MM-dd}</td>
+                    <td style=""padding:8px;border:1px solid #dee2e6;"">{c.DueDate:MMM d, yyyy}{(c.LateAfter > c.DueDate ? $"<br/><span style=\"color:#666;font-size:12px;\">Pay by {c.LateAfter:MMM d}</span>" : "")}</td>
                     <td style=""padding:8px;border:1px solid #dee2e6;text-align:right;"">{c.AmountDue:C}</td>
                     <td style=""padding:8px;border:1px solid #dee2e6;text-align:right;"">{c.AmountPaid:C}</td>
                     <td style=""padding:8px;border:1px solid #dee2e6;text-align:right;font-weight:bold;"">{c.Balance:C}</td>
@@ -67,7 +67,7 @@ public static class EmailComposer
                     <tr>
                         <th style=""padding:8px;border:1px solid #dee2e6;text-align:left;"">Invoice #</th>
                         <th style=""padding:8px;border:1px solid #dee2e6;text-align:left;"">Period</th>
-                        <th style=""padding:8px;border:1px solid #dee2e6;text-align:left;"">Due Date</th>
+                        <th style=""padding:8px;border:1px solid #dee2e6;text-align:left;"">Due</th>
                         <th style=""padding:8px;border:1px solid #dee2e6;text-align:right;"">Amount Due</th>
                         <th style=""padding:8px;border:1px solid #dee2e6;text-align:right;"">Paid</th>
                         <th style=""padding:8px;border:1px solid #dee2e6;text-align:right;"">Balance</th>
@@ -87,7 +87,7 @@ public static class EmailComposer
             </table>
 
             <p style=""margin-top:24px;color:#555;"">
-                Please remit payment for any outstanding balance at your earliest convenience.
+                Please pay each invoice by the date shown{(lease.LateFeeAmount > 0 ? $"; a late fee of {lease.LateFeeAmount:C} is added to rent that is still unpaid after that date" : "")}.
                 If you've already paid, please disregard this statement.
             </p>");
     }

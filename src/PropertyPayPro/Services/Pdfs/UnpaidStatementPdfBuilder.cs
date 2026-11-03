@@ -85,7 +85,7 @@ public static class UnpaidStatementPdfBuilder
             {
                 h.Cell().Background(PdfBrand.HeaderBg).Padding(6).Text("Invoice #").Bold();
                 h.Cell().Background(PdfBrand.HeaderBg).Padding(6).Text("Period").Bold();
-                h.Cell().Background(PdfBrand.HeaderBg).Padding(6).Text("Due date").Bold();
+                h.Cell().Background(PdfBrand.HeaderBg).Padding(6).Text("Due").Bold();
                 h.Cell().Background(PdfBrand.HeaderBg).Padding(6).AlignRight().Text("Amount due").Bold();
                 h.Cell().Background(PdfBrand.HeaderBg).Padding(6).AlignRight().Text("Paid").Bold();
                 h.Cell().Background(PdfBrand.HeaderBg).Padding(6).AlignRight().Text("Balance").Bold();
@@ -106,7 +106,9 @@ public static class UnpaidStatementPdfBuilder
 
                 t.Cell().Background(bg).Padding(6).Text(c.Id.ToString("D8"));
                 t.Cell().Background(bg).Padding(6).Text(c.BillingPeriodStart.ToString("MMM yyyy"));
-                t.Cell().Background(bg).Padding(6).Text(c.DueDate.ToString("yyyy-MM-dd"));
+                t.Cell().Background(bg).Padding(6).Text(c.LateAfter > c.DueDate
+                    ? $"{c.DueDate:MMM d, yyyy}\nPay by {c.LateAfter:MMM d}"
+                    : c.DueDate.ToString("MMM d, yyyy"));
                 t.Cell().Background(bg).Padding(6).AlignRight().Text(c.AmountDue.ToString("C"));
                 t.Cell().Background(bg).Padding(6).AlignRight().Text(c.AmountPaid.ToString("C"));
                 t.Cell().Background(bg).Padding(6).AlignRight().Text(c.Balance.ToString("C")).Bold();
