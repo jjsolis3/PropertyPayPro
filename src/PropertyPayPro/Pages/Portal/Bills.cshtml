@@ -64,7 +64,7 @@
                             {
                                 <span class="badge bg-warning text-dark">Partial</span>
                             }
-                            else if (c.DueDate < DateOnly.FromDateTime(DateTime.Now))
+                            else if (c.LateAfter < DateOnly.FromDateTime(DateTime.Now))
                             {
                                 <span class="badge bg-danger">Overdue</span>
                             }

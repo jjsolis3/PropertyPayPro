@@ -55,8 +55,8 @@
                 <div class="card-header"><h4 class="card-title mb-0">Billing automation</h4></div>
                 <div class="card-body small">
                     <dl class="row mb-2">
-                        <dt class="col-8 fw-normal">Create monthly rent bills</dt>
-                        <dd class="col-4 mb-1">@OnOff(s.AutoGenerateCharges)@(s.AutoGenerateCharges ? $" (day {s.AutoBillingDayOfMonth})" : "")</dd>
+                        <dt class="col-8 fw-normal">Create next month's rent bills</dt>
+                        <dd class="col-4 mb-1">@OnOff(s.AutoGenerateCharges)@(s.AutoGenerateCharges ? $" (day {s.BillIssueDay} of prior month)" : "")</dd>
                         <dt class="col-8 fw-normal">Apply late fees</dt>
                         <dd class="col-4 mb-1">@OnOff(s.AutoApplyLateFees)</dd>
                         <dt class="col-8 fw-normal">Email tenants a statement</dt>

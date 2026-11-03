@@ -32,7 +32,7 @@ public class SchedulerModel : PageModel
     [BindProperty] public bool AutoLeaseRenewalReminders { get; set; }
     [BindProperty] public bool AutoInspectionReminders { get; set; }
     [BindProperty] public bool AutoGenerateCharges { get; set; }
-    [BindProperty, Range(1, 28)] public int AutoBillingDayOfMonth { get; set; } = 1;
+    [BindProperty, Range(1, 28)] public int BillIssueDay { get; set; } = 16;
     [BindProperty] public bool AutoApplyLateFees { get; set; }
     [BindProperty] public bool AutoEmailStatements { get; set; }
     [BindProperty] public bool AutoEmailAdminSummary { get; set; }
@@ -61,7 +61,7 @@ public class SchedulerModel : PageModel
         AutoLeaseRenewalReminders = s.AutoLeaseRenewalReminders;
         AutoInspectionReminders = s.AutoInspectionReminders;
         AutoGenerateCharges = s.AutoGenerateCharges;
-        AutoBillingDayOfMonth = s.AutoBillingDayOfMonth;
+        BillIssueDay = s.BillIssueDay;
         AutoApplyLateFees = s.AutoApplyLateFees;
         AutoEmailStatements = s.AutoEmailStatements;
         AutoEmailAdminSummary = s.AutoEmailAdminSummary;
@@ -82,7 +82,7 @@ public class SchedulerModel : PageModel
         s.AutoLeaseRenewalReminders = AutoLeaseRenewalReminders;
         s.AutoInspectionReminders = AutoInspectionReminders;
         s.AutoGenerateCharges = AutoGenerateCharges;
-        s.AutoBillingDayOfMonth = AutoBillingDayOfMonth;
+        s.BillIssueDay = BillIssueDay;
         s.AutoApplyLateFees = AutoApplyLateFees;
         s.AutoEmailStatements = AutoEmailStatements;
         s.AutoEmailAdminSummary = AutoEmailAdminSummary;
@@ -150,7 +150,7 @@ public class SchedulerModel : PageModel
     private static string Describe(AppSettings s) =>
         $"lateRent={OnOff(s.AutoLateRentReminders)}, renewal={OnOff(s.AutoLeaseRenewalReminders)}, " +
         $"inspection={OnOff(s.AutoInspectionReminders)}, " +
-        $"bills={(s.AutoGenerateCharges ? $"on (day {s.AutoBillingDayOfMonth})" : "off")}, " +
+        $"bills={(s.AutoGenerateCharges ? $"on (issued day {s.BillIssueDay} of prior month)" : "off")}, " +
         $"lateFees={OnOff(s.AutoApplyLateFees)}, statements={OnOff(s.AutoEmailStatements)}, " +
         $"adminSummary={OnOff(s.AutoEmailAdminSummary)}";
 

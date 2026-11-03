@@ -34,8 +34,17 @@ public static class BillPdfBuilder
 
                 col.Item().Element(c => BrandedDocumentLayout.SectionHeading(c, "Charge Details"));
                 col.Item().Element(c => BrandedDocumentLayout.LabelValueRow(c, "Billing period", charge.BillingPeriodStart.ToString("MMMM yyyy")));
-                col.Item().Element(c => BrandedDocumentLayout.LabelValueRow(c, "Issued", DateTime.UtcNow.ToString("MMMM d, yyyy")));
+                col.Item().Element(c => BrandedDocumentLayout.LabelValueRow(c, "Issued", DateTime.Now.ToString("MMMM d, yyyy")));
                 col.Item().Element(c => BrandedDocumentLayout.LabelValueRow(c, "Due date", charge.DueDate.ToString("MMMM d, yyyy")));
+                if (charge.LateAfter > charge.DueDate)
+                {
+                    col.Item().Element(c => BrandedDocumentLayout.LabelValueRow(c, "Pay by (no late fee)", charge.LateAfter.ToString("MMMM d, yyyy")));
+                }
+                if (charge.Kind == ChargeKind.Rent && lease.LateFeeAmount > 0)
+                {
+                    col.Item().Element(c => BrandedDocumentLayout.LabelValueRow(c, "Late fee",
+                        $"{lease.LateFeeAmount:C} if unpaid after {charge.LateAfter:MMMM d}"));
+                }
                 col.Item().Element(c => BrandedDocumentLayout.LabelValueRow(c, "Type", charge.Kind == ChargeKind.LateFee ? "Late Fee" : "Monthly Rent"));
 
                 col.Item().PaddingTop(16).Border(1).BorderColor(PdfBrand.Primary).Padding(16).Row(row =>
@@ -56,7 +65,7 @@ public static class BillPdfBuilder
                 }
 
                 col.Item().PaddingTop(20).Text(
-                    "Please remit payment by the due date. If you've already paid, please disregard this invoice.")
+                    $"Please remit payment by {charge.LateAfter:MMMM d, yyyy}. If you've already paid, please disregard this invoice.")
                     .FontColor(PdfBrand.TextMuted).Italic();
             });
         });

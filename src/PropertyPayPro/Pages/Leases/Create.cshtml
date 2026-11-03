@@ -50,6 +50,8 @@
                 <div class="col mb-3">
                     <label asp-for="Lease.LateFeeGraceDays" class="form-label">Grace days</label>
                     <input asp-for="Lease.LateFeeGraceDays" class="form-control" />
+                    <small class="text-muted">Days after the due date the tenant can still pay without a late fee
+                        (due day 1 + 14 grace days = late after the 15th).</small>
                 </div>
                 <div class="col mb-3 align-self-end">
                     <div class="form-check">

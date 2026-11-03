@@ -47,6 +47,15 @@ public class RentalCharge
     [NotMapped]
     public decimal Balance => AmountDue - AmountPaid;
 
+    /// <summary>
+    /// Last day a rent bill can be paid without being late: the due date plus
+    /// the lease's grace days. Requires Lease to be loaded; late fees have no grace.
+    /// </summary>
+    [NotMapped]
+    public DateOnly LateAfter => Kind == ChargeKind.Rent && Lease is not null
+        ? DueDate.AddDays(Lease.LateFeeGraceDays)
+        : DueDate;
+
     [NotMapped]
     public ChargeStatus Status
     {
@@ -54,7 +63,7 @@ public class RentalCharge
         {
             if (AmountPaid >= AmountDue) return ChargeStatus.Paid;
             if (AmountPaid > 0) return ChargeStatus.PartiallyPaid;
-            if (DueDate < DateOnly.FromDateTime(DateTime.Now)) return ChargeStatus.Overdue;
+            if (LateAfter < DateOnly.FromDateTime(DateTime.Now)) return ChargeStatus.Overdue;
             return ChargeStatus.Unpaid;
         }
     }

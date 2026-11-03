@@ -59,7 +59,7 @@ public class AppSettingsService
             existing.DefaultLateFeeGraceDays = updated.DefaultLateFeeGraceDays;
             existing.DefaultLateFeeAmount = updated.DefaultLateFeeAmount;
             existing.AutoGenerateCharges = updated.AutoGenerateCharges;
-            existing.AutoBillingDayOfMonth = updated.AutoBillingDayOfMonth;
+            existing.BillIssueDay = updated.BillIssueDay;
             existing.AutoApplyLateFees = updated.AutoApplyLateFees;
             existing.AutoEmailStatements = updated.AutoEmailStatements;
             existing.AutoEmailAdminSummary = updated.AutoEmailAdminSummary;
