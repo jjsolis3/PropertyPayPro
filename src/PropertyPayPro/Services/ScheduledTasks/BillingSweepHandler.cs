@@ -7,7 +7,7 @@ using PropertyPayPro.Models;
 namespace PropertyPayPro.Services.ScheduledTasks;
 
 /// <summary>
-/// Daily billing automation, driven by the switches in Settings > Billing.
+/// Daily billing automation, driven by the switches in Settings > Automation.
 /// Creating bills and applying late fees are both idempotent (existing
 /// bills and fees are skipped), so a re-run or a manual Generate on the
 /// same day never double-bills.
@@ -49,7 +49,7 @@ public class BillingSweepHandler : IScheduledTaskHandler
             var s = await _settings.GetAsync(ct);
             if (!s.AutoGenerateCharges && !s.AutoApplyLateFees)
             {
-                task.Description = "Billing automation is off (Settings > Billing).";
+                task.Description = "Billing automation is switched off (Settings > Automation).";
                 return;
             }
 

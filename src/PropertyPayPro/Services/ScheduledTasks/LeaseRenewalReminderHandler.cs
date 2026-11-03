@@ -40,9 +40,14 @@ public class LeaseRenewalReminderHandler : IScheduledTaskHandler
     {
         try
         {
+            if (!(await _settings.GetAsync(ct)).AutoLeaseRenewalReminders)
+            {
+                task.Description = "Lease renewal reminders are switched off (Settings > Automation).";
+                return;
+            }
             if (!_mail.IsConfigured)
             {
-                _logger.LogInformation("Lease renewal reminder: SMTP not configured — skipping.");
+                task.Description = "Lease renewal: email is not configured; nothing sent.";
                 return;
             }
             var template = await _tpl.GetBySlugAsync(
@@ -71,7 +76,7 @@ public class LeaseRenewalReminderHandler : IScheduledTaskHandler
             foreach (var lease in leases)
             {
                 var recipients = lease.Tenants
-                    .Where(t => !string.IsNullOrWhiteSpace(t.Email))
+                    .Where(t => t.ReceiveReminders && !string.IsNullOrWhiteSpace(t.Email))
                     .Select(t => t.Email!.Trim())
                     .Distinct(StringComparer.OrdinalIgnoreCase)
                     .ToList();

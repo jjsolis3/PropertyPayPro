@@ -43,9 +43,14 @@ public class LateRentReminderHandler : IScheduledTaskHandler
     {
         try
         {
+            if (!(await _settings.GetAsync(ct)).AutoLateRentReminders)
+            {
+                task.Description = "Late rent reminders are switched off (Settings > Automation).";
+                return;
+            }
             if (!_mail.IsConfigured)
             {
-                _logger.LogInformation("Late rent reminder: SMTP not configured — skipping.");
+                task.Description = "Late rent: email is not configured; nothing sent.";
                 return;
             }
 
@@ -82,7 +87,7 @@ public class LateRentReminderHandler : IScheduledTaskHandler
                 if (outstanding <= 0) { skipped++; continue; }
 
                 var recipients = lease.Tenants
-                    .Where(t => !string.IsNullOrWhiteSpace(t.Email))
+                    .Where(t => t.ReceiveReminders && !string.IsNullOrWhiteSpace(t.Email))
                     .Select(t => t.Email!.Trim())
                     .Distinct(StringComparer.OrdinalIgnoreCase)
                     .ToList();

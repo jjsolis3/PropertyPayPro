@@ -58,19 +58,6 @@ public class BrandingModel : PageModel
     public async Task<IActionResult> OnPostAsync(IFormFile? logoMain, IFormFile? logoSmall)
     {
         Current = await _settings.GetAsync();
-        // Preserve fields not on this form
-        Input.FromEmailOverride = Current.FromEmailOverride;
-        Input.FromNameOverride = Current.FromNameOverride;
-        Input.DefaultRentDueDay = Current.DefaultRentDueDay;
-        Input.DefaultLateFeeGraceDays = Current.DefaultLateFeeGraceDays;
-        Input.DefaultLateFeeAmount = Current.DefaultLateFeeAmount;
-        Input.AutoGenerateCharges = Current.AutoGenerateCharges;
-        Input.AutoBillingDayOfMonth = Current.AutoBillingDayOfMonth;
-        Input.AutoApplyLateFees = Current.AutoApplyLateFees;
-        Input.AutoEmailStatements = Current.AutoEmailStatements;
-        Input.AutoEmailAdminSummary = Current.AutoEmailAdminSummary;
-        Input.LogoStorageKey = Current.LogoStorageKey;
-        Input.LogoSmallStorageKey = Current.LogoSmallStorageKey;
 
         Input.PublicBaseUrl = string.IsNullOrWhiteSpace(Input.PublicBaseUrl)
             ? null
@@ -89,16 +76,23 @@ public class BrandingModel : PageModel
         if (!ModelState.IsValid) return Page();
         var previousZone = Current.TimeZoneId;
 
+        // Update only the fields this page owns, so saving Branding never
+        // resets settings that live on other pages.
+        Current.AppName = Input.AppName;
+        Current.PrimaryColor = Input.PrimaryColor;
+        Current.AccentColor = Input.AccentColor;
+        Current.PublicBaseUrl = Input.PublicBaseUrl;
+        Current.TimeZoneId = Input.TimeZoneId;
         if (logoMain is { Length: > 0 })
         {
-            Input.LogoStorageKey = await SaveLogoAsync(logoMain, "main");
+            Current.LogoStorageKey = await SaveLogoAsync(logoMain, "main");
         }
         if (logoSmall is { Length: > 0 })
         {
-            Input.LogoSmallStorageKey = await SaveLogoAsync(logoSmall, "small");
+            Current.LogoSmallStorageKey = await SaveLogoAsync(logoSmall, "small");
         }
 
-        await _settings.SaveAsync(Input);
+        await _settings.SaveAsync(Current);
 
         if (Input.TimeZoneId != previousZone)
         {

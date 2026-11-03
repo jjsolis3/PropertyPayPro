@@ -6,9 +6,9 @@ namespace PropertyPayPro.Services.ScheduledTasks;
 
 /// <summary>
 /// Daily sweep: send a reminder for any inspection scheduled in the
-/// next 48 hours that isn't already Completed. Dedupe window: 24 hours
-/// per inspection, keyed on the inspection's LeaseId since EmailLog
-/// doesn't carry an InspectionId column (keeping the schema minimal).
+/// next 48 hours that isn't already Completed. A lease is reminded at most
+/// once per lookahead window, so the same inspection isn't emailed on both
+/// days before it (keyed on LeaseId; EmailLog has no InspectionId).
 /// </summary>
 public class InspectionReminderHandler : IScheduledTaskHandler
 {
@@ -18,8 +18,8 @@ public class InspectionReminderHandler : IScheduledTaskHandler
     private readonly AppSettingsService _settings;
     private readonly ILogger<InspectionReminderHandler> _logger;
 
-    private static readonly TimeSpan DedupeWindow = TimeSpan.FromHours(24);
     private const int LookaheadDays = 2;
+    private static readonly TimeSpan DedupeWindow = TimeSpan.FromDays(LookaheadDays + 1);
 
     public InspectionReminderHandler(
         ApplicationDbContext db,
@@ -41,9 +41,14 @@ public class InspectionReminderHandler : IScheduledTaskHandler
     {
         try
         {
+            if (!(await _settings.GetAsync(ct)).AutoInspectionReminders)
+            {
+                task.Description = "Inspection reminders are switched off (Settings > Automation).";
+                return;
+            }
             if (!_mail.IsConfigured)
             {
-                _logger.LogInformation("Inspection reminder: SMTP not configured — skipping.");
+                task.Description = "Inspection reminder: email is not configured; nothing sent.";
                 return;
             }
             var template = await _tpl.GetBySlugAsync(
@@ -75,7 +80,7 @@ public class InspectionReminderHandler : IScheduledTaskHandler
                 if (lease is null) { skipped++; continue; }
 
                 var recipients = lease.Tenants
-                    .Where(t => !string.IsNullOrWhiteSpace(t.Email))
+                    .Where(t => t.ReceiveReminders && !string.IsNullOrWhiteSpace(t.Email))
                     .Select(t => t.Email!.Trim())
                     .Distinct(StringComparer.OrdinalIgnoreCase)
                     .ToList();
