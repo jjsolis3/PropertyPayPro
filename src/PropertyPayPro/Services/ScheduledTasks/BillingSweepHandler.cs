@@ -53,7 +53,7 @@ public class BillingSweepHandler : IScheduledTaskHandler
                 return;
             }
 
-            var today = DateOnly.FromDateTime(DateTime.UtcNow);
+            var today = DateOnly.FromDateTime(DateTime.Now);
             var parts = new List<string>();
 
             var newBills = new List<RentalCharge>();

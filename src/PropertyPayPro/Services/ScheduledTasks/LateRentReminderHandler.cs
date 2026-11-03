@@ -59,7 +59,7 @@ public class LateRentReminderHandler : IScheduledTaskHandler
             }
 
             var baseUrl = await _settings.GetPublicBaseUrlAsync(ct);
-            var today = DateOnly.FromDateTime(DateTime.UtcNow);
+            var today = DateOnly.FromDateTime(DateTime.Now);
 
             // Pull leases with unpaid rent/late-fee charges past their
             // grace window. We filter in memory for `Balance > 0`

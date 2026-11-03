@@ -49,7 +49,7 @@ public static class LeaseDocumentDisplay
     public static ExpirationStatus Status(DateOnly? expiresOn, int expiringSoonDays = 30)
     {
         if (!expiresOn.HasValue) return ExpirationStatus.NoExpiry;
-        var today = DateOnly.FromDateTime(DateTime.UtcNow);
+        var today = DateOnly.FromDateTime(DateTime.Now);
         var days = expiresOn.Value.DayNumber - today.DayNumber;
         if (days < 0) return ExpirationStatus.Expired;
         if (days <= expiringSoonDays) return ExpirationStatus.ExpiringSoon;
@@ -59,7 +59,7 @@ public static class LeaseDocumentDisplay
     public static (string label, string color) StatusBadge(DateOnly? expiresOn, int expiringSoonDays = 30)
     {
         if (!expiresOn.HasValue) return ("", "");
-        var today = DateOnly.FromDateTime(DateTime.UtcNow);
+        var today = DateOnly.FromDateTime(DateTime.Now);
         var days = expiresOn.Value.DayNumber - today.DayNumber;
         if (days < 0) return ($"Expired {-days}d ago", "danger");
         if (days == 0) return ("Expires today", "danger");

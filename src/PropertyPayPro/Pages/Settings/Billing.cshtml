@@ -52,7 +52,9 @@
                 <div class="card-header"><h4 class="card-title mb-0">Automation</h4></div>
                 <div class="card-body">
                     <p class="text-muted small mb-3">
-                        A billing sweep runs once a day at 15:00 UTC. Everything it does is skipped
+                        A billing sweep runs once a day at
+                        @PropertyPayPro.Services.ScheduledTasks.RecurringTaskHelpers.DailyRunHourLocal:00 AM
+                        (@TimeZoneInfo.Local.Id). Everything it does is skipped
                         if already done, so it never double-bills and the manual buttons on the
                         Bills pages keep working alongside it.
                     </p>
@@ -116,7 +118,7 @@
                 <div class="card-body small">
                     <dl class="mb-2">
                         <dt>Next run</dt>
-                        <dd>@(Model.NextSweep?.RunAtUtc.ToString("yyyy-MM-dd HH:mm 'UTC'") ?? "Not scheduled")</dd>
+                        <dd>@(Model.NextSweep?.RunAtUtc.ToLocalTime().ToString("yyyy-MM-dd h:mm tt") ?? "Not scheduled")</dd>
                         <dt>Last run</dt>
                         <dd>
                             @if (Model.LastSweep is null)
@@ -125,7 +127,7 @@
                             }
                             else
                             {
-                                @Model.LastSweep.CompletedUtc?.ToString("yyyy-MM-dd HH:mm 'UTC'")
+                                @Model.LastSweep.CompletedUtc?.ToLocalTime().ToString("yyyy-MM-dd h:mm tt")
                                 @if (Model.LastSweep.Status == ScheduledTaskStatus.Failed)
                                 {
                                     <span class="badge bg-danger ms-1" title="@Model.LastSweep.LastError">Failed</span>

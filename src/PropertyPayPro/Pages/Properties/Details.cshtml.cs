@@ -31,7 +31,7 @@ public class DetailsModel : PageModel
         Property = await _db.Properties.FirstOrDefaultAsync(p => p.Id == id);
         if (Property is null) return NotFound();
 
-        var today = DateOnly.FromDateTime(DateTime.UtcNow);
+        var today = DateOnly.FromDateTime(DateTime.Now);
         var firstOfYear = new DateOnly(today.Year, 1, 1);
 
         Leases = await _db.Leases

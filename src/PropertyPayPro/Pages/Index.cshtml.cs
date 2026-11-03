@@ -29,7 +29,7 @@ public class IndexModel : PageModel
 
     public async Task OnGetAsync()
     {
-        var today = DateOnly.FromDateTime(DateTime.UtcNow);
+        var today = DateOnly.FromDateTime(DateTime.Now);
         var firstOfMonth = new DateOnly(today.Year, today.Month, 1);
         var soonCutoff = today.AddDays(30);
 

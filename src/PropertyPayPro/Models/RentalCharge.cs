@@ -54,7 +54,7 @@ public class RentalCharge
         {
             if (AmountPaid >= AmountDue) return ChargeStatus.Paid;
             if (AmountPaid > 0) return ChargeStatus.PartiallyPaid;
-            if (DueDate < DateOnly.FromDateTime(DateTime.UtcNow)) return ChargeStatus.Overdue;
+            if (DueDate < DateOnly.FromDateTime(DateTime.Now)) return ChargeStatus.Overdue;
             return ChargeStatus.Unpaid;
         }
     }

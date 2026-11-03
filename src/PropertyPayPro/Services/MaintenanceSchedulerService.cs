@@ -44,7 +44,7 @@ public class MaintenanceSchedulerService
         string baseUrl,
         CancellationToken ct = default)
     {
-        var today = DateOnly.FromDateTime(DateTime.UtcNow);
+        var today = DateOnly.FromDateTime(DateTime.Now);
 
         var due = await _db.MaintenanceSchedules
             .Include(s => s.Property)
@@ -108,7 +108,7 @@ public class MaintenanceSchedulerService
 
         if (schedule.NotifyTenants)
         {
-            var today = DateOnly.FromDateTime(DateTime.UtcNow);
+            var today = DateOnly.FromDateTime(DateTime.Now);
             var tenantEmails = await _db.Leases
                 .Where(l => l.PropertyId == schedule.PropertyId
                     && l.StartDate <= today

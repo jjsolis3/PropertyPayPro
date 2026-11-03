@@ -21,7 +21,7 @@ public class IndexModel : PageModel
 
     public async Task OnGetAsync()
     {
-        var today = DateOnly.FromDateTime(DateTime.UtcNow);
+        var today = DateOnly.FromDateTime(DateTime.Now);
         var soon = today.AddDays(30);
 
         Leases = await _db.Leases

@@ -106,7 +106,7 @@ public class BroadcastModel : PageModel
         var properties = await _db.Properties.OrderBy(p => p.Name).ToListAsync();
         PropertyOptions = new SelectList(properties, "Id", "Name");
 
-        var today = DateOnly.FromDateTime(DateTime.UtcNow);
+        var today = DateOnly.FromDateTime(DateTime.Now);
         var leases = await _db.Leases
             .Include(l => l.Tenants)
             .ToListAsync();
@@ -144,7 +144,7 @@ public class BroadcastModel : PageModel
 
     private async Task<List<string>> ResolveRecipientsAsync(RecipientScope scope, int? propertyId)
     {
-        var today = DateOnly.FromDateTime(DateTime.UtcNow);
+        var today = DateOnly.FromDateTime(DateTime.Now);
         var q = _db.Leases.Include(l => l.Tenants).AsQueryable();
 
         if (scope == RecipientScope.ActiveLeasesOnly || scope == RecipientScope.SpecificProperty)

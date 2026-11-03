@@ -3,7 +3,7 @@
 @{
     ViewData["Title"] = "Ticket";
     var t = Model.Ticket!;
-    var today = DateOnly.FromDateTime(DateTime.UtcNow);
+    var today = DateOnly.FromDateTime(DateTime.Now);
 
     string priorityBadge(PropertyPayPro.Models.ServicePriority p) => p switch
     {

@@ -30,6 +30,11 @@ public class AppSettings
     [StringLength(200)]
     public string? PublicBaseUrl { get; set; }
 
+    // IANA time zone (e.g. America/Los_Angeles) applied as the app's local
+    // time zone at startup and on save. See AppTimeZone.
+    [Required, StringLength(64)]
+    public string TimeZoneId { get; set; } = Services.AppTimeZone.DefaultId;
+
     // Email
     [StringLength(160)]
     public string? FromEmailOverride { get; set; }

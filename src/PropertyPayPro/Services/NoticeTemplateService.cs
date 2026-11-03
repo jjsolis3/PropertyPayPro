@@ -57,7 +57,7 @@ public class NoticeTemplateService
     {
         var map = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase)
         {
-            ["TodayDate"] = DateOnly.FromDateTime(DateTime.UtcNow).ToString("MMMM d, yyyy"),
+            ["TodayDate"] = DateOnly.FromDateTime(DateTime.Now).ToString("MMMM d, yyyy"),
         };
 
         if (ctx.Lease is Lease lease)

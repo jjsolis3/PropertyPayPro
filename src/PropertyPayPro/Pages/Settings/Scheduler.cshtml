@@ -85,10 +85,11 @@
         </table>
     </div>
     <div class="card-footer small text-muted">
-        Each sweep re-enqueues the next day's run at
-        <code>@PropertyPayPro.Services.ScheduledTasks.RecurringTaskHelpers.DailyRunHourUtc:00 UTC</code>
-        after it completes. A pod restart calls <code>RecurringJobBootstrap</code>
-        to make sure none of these fell off the queue.
+        Each sweep runs daily at
+        @PropertyPayPro.Services.ScheduledTasks.RecurringTaskHelpers.DailyRunHourLocal:00 AM
+        (@TimeZoneInfo.Local.Id) and queues the next day's run when it finishes.
+        Restarting the app re-queues any sweep that is missing. Times on this page are in
+        @TimeZoneInfo.Local.Id; change it under Settings &gt; Branding.
     </div>
 </div>
 

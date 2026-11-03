@@ -12,7 +12,7 @@
 <div class="row">
     <partial name="_KpiCard" model="@(new KpiCardModel {
         Label = "Paid This Year", Value = Model.PaidThisYear.ToString("C"),
-        SubText = $"Since Jan 1, {DateTime.UtcNow.Year}",
+        SubText = $"Since Jan 1, {DateTime.Now.Year}",
         Color = "success", Icon = "las la-dollar-sign" })" />
     <partial name="_KpiCard" model="@(new KpiCardModel {
         Label = "Lifetime Paid", Value = Model.LifetimePaid.ToString("C"),

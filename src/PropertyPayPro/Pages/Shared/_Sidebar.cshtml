@@ -134,13 +134,17 @@
                             <li><a asp-page="/Settings/Email">Email</a></li>
                             <li><a asp-page="/Settings/Billing">Billing</a></li>
                             <li><a asp-page="/Users/Index">Users</a></li>
+                            <li><a asp-page="/Settings/Templates/Index">Templates</a></li>
+                            <li><a asp-page="/Settings/Scheduler">Scheduler</a></li>
+                            <li><a asp-page="/Settings/EmailLogs">Email Logs</a></li>
+                            <li><a asp-page="/Settings/Audit">Audit Log</a></li>
                         </ul>
                     </li>
                 }
             }
         </ul>
         <div class="copyright">
-            <p><strong>@appSettings.AppName</strong> © @DateTime.UtcNow.Year</p>
+            <p><strong>@appSettings.AppName</strong> © @DateTime.Now.Year</p>
         </div>
     </div>
 </div>

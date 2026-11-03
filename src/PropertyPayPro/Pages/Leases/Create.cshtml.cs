@@ -24,7 +24,7 @@ public class CreateModel : PageModel
     [BindProperty]
     public Lease Lease { get; set; } = new()
     {
-        StartDate = DateOnly.FromDateTime(DateTime.UtcNow),
+        StartDate = DateOnly.FromDateTime(DateTime.Now),
         EndDate = DateOnly.FromDateTime(DateTime.UtcNow.AddYears(1))
     };
 

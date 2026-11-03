@@ -56,7 +56,7 @@ public class InspectionReminderHandler : IScheduledTaskHandler
             }
 
             var baseUrl = await _settings.GetPublicBaseUrlAsync(ct);
-            var today = DateOnly.FromDateTime(DateTime.UtcNow);
+            var today = DateOnly.FromDateTime(DateTime.Now);
             var window = today.AddDays(LookaheadDays);
 
             var inspections = await _db.Inspections

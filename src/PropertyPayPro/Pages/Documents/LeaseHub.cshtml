@@ -140,7 +140,7 @@
                                 <span class="text-muted small">—</span>
                             }
                         </td>
-                        <td>@d.UploadedOn.ToString("yyyy-MM-dd")</td>
+                        <td>@d.UploadedOn.ToLocalTime().ToString("yyyy-MM-dd")</td>
                         <td class="text-end">
                             @if (previewable)
                             {

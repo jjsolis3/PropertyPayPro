@@ -80,7 +80,7 @@ public class UnpaidBillsModel : PageModel
             .Include(l => l.Charges).ThenInclude(c => c.Allocations)
             .ToListAsync();
 
-        var today = DateOnly.FromDateTime(DateTime.UtcNow);
+        var today = DateOnly.FromDateTime(DateTime.Now);
 
         var lastStatementByLease = await _db.EmailLogs
             .Where(e => e.Kind == EmailKind.Statement && e.Status == EmailStatus.Sent && e.LeaseId != null)

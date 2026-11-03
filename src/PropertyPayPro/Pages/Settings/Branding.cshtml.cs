@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
+using Microsoft.EntityFrameworkCore;
 using PropertyPayPro.Data;
 using PropertyPayPro.Models;
 using PropertyPayPro.Services;
@@ -12,17 +13,26 @@ public class BrandingModel : PageModel
 {
     private readonly AppSettingsService _settings;
     private readonly IDocumentStorage _storage;
+    private readonly ApplicationDbContext _db;
+    private readonly IAuditLog _audit;
 
-    public BrandingModel(AppSettingsService settings, IDocumentStorage storage)
+    public BrandingModel(AppSettingsService settings, IDocumentStorage storage,
+        ApplicationDbContext db, IAuditLog audit)
     {
         _settings = settings;
         _storage = storage;
+        _db = db;
+        _audit = audit;
     }
 
     [BindProperty]
     public AppSettings Input { get; set; } = new();
 
     public AppSettings Current { get; private set; } = new();
+
+    public IReadOnlyList<(string Id, string Label)> CommonZones => AppTimeZone.Common;
+    public IEnumerable<string> OtherZones =>
+        AppTimeZone.AllIds().Except(AppTimeZone.Common.Select(z => z.Id));
 
     public async Task<IActionResult> OnGetAsync()
     {
@@ -35,6 +45,7 @@ public class BrandingModel : PageModel
             LogoStorageKey = Current.LogoStorageKey,
             LogoSmallStorageKey = Current.LogoSmallStorageKey,
             PublicBaseUrl = Current.PublicBaseUrl,
+            TimeZoneId = Current.TimeZoneId,
             FromEmailOverride = Current.FromEmailOverride,
             FromNameOverride = Current.FromNameOverride,
             DefaultRentDueDay = Current.DefaultRentDueDay,
@@ -70,8 +81,13 @@ public class BrandingModel : PageModel
         {
             ModelState.AddModelError("Input.PublicBaseUrl", "Enter a full URL starting with https://");
         }
+        if (!AppTimeZone.IsValid(Input.TimeZoneId))
+        {
+            ModelState.AddModelError("Input.TimeZoneId", "Pick a time zone from the list.");
+        }
 
         if (!ModelState.IsValid) return Page();
+        var previousZone = Current.TimeZoneId;
 
         if (logoMain is { Length: > 0 })
         {
@@ -83,6 +99,20 @@ public class BrandingModel : PageModel
         }
 
         await _settings.SaveAsync(Input);
+
+        if (Input.TimeZoneId != previousZone)
+        {
+            AppTimeZone.Apply(Input.TimeZoneId);
+            // Re-time queued daily sweeps so they fire at the run hour in the new zone.
+            var nextRun = Services.ScheduledTasks.RecurringTaskHelpers.NextDailyRunUtc(DateTime.UtcNow);
+            var kinds = Services.ScheduledTasks.RecurringTaskHelpers.RecurringKinds;
+            await _db.ScheduledTasks
+                .Where(t => kinds.Contains(t.Kind) && t.Status == ScheduledTaskStatus.Pending && t.RunAtUtc > DateTime.UtcNow)
+                .ExecuteUpdateAsync(s => s.SetProperty(t => t.RunAtUtc, nextRun));
+            await _audit.WriteAsync("TimeZoneChanged", nameof(AppSettings), AppSettingsService.SingletonId,
+                $"{previousZone} -> {Input.TimeZoneId}");
+        }
+
         TempData["Message"] = "Branding saved.";
         return RedirectToPage();
     }

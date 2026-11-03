@@ -16,7 +16,7 @@ public class CreateModel : PageModel
 
     [BindProperty] public MaintenanceSchedule Schedule { get; set; } = new()
     {
-        NextDueDate = DateOnly.FromDateTime(DateTime.UtcNow).AddMonths(1),
+        NextDueDate = DateOnly.FromDateTime(DateTime.Now).AddMonths(1),
         RecurrenceMonths = 6,
         LeadDays = 14,
         Active = true,

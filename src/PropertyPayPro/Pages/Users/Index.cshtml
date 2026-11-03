@@ -2,12 +2,14 @@
 @model PropertyPayPro.Pages.Users.IndexModel
 @{
     ViewData["Title"] = "Users";
+    ViewData["SettingsTab"] = "users";
 }
 
 <div class="d-flex justify-content-between align-items-center mb-3">
-    <h1 class="h3 mb-0">Users</h1>
+    <h1 class="h3 mb-0">Settings</h1>
     <a asp-page="Invite" class="btn btn-success">Invite User</a>
 </div>
+<partial name="/Pages/Settings/_SettingsNav.cshtml" />
 
 @if (TempData["Message"] is string msg)
 {

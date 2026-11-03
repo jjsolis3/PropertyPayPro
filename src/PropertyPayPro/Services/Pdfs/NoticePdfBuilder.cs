@@ -13,7 +13,7 @@ public static class NoticePdfBuilder
         byte[]? logo)
     {
         var property = lease.Property!;
-        var reference = $"{property.Name}  •  {DateOnly.FromDateTime(DateTime.UtcNow):MMMM d, yyyy}";
+        var reference = $"{property.Name}  •  {DateOnly.FromDateTime(DateTime.Now):MMMM d, yyyy}";
 
         return BrandedDocumentLayout.BuildLetterDocument(title, reference, logo, content =>
         {

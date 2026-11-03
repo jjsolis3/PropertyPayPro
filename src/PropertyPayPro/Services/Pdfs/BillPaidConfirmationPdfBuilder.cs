@@ -11,7 +11,7 @@ public static class BillPaidConfirmationPdfBuilder
         var lease = charge.Lease!;
         var property = lease.Property!;
         var reference = $"Invoice #{charge.Id:D8}  •  {charge.BillingPeriodStart:MMMM yyyy}";
-        var lastPaidOn = allocations.Max(a => a.Payment?.PaidOn) ?? DateOnly.FromDateTime(DateTime.UtcNow);
+        var lastPaidOn = allocations.Max(a => a.Payment?.PaidOn) ?? DateOnly.FromDateTime(DateTime.Now);
 
         return BrandedDocumentLayout.BuildLetterDocument("Bill Paid in Full", reference, logo, content =>
         {

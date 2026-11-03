@@ -170,6 +170,14 @@ using (var scope = app.Services.CreateScope())
         .GetRequiredService<PropertyPayPro.Services.NoticeTemplateSeeder>();
     await templateSeeder.SeedAsync();
 
+    var appSettings = await scope.ServiceProvider
+        .GetRequiredService<PropertyPayPro.Services.AppSettingsService>().GetAsync();
+    if (!PropertyPayPro.Services.AppTimeZone.Apply(appSettings.TimeZoneId))
+    {
+        app.Logger.LogWarning("Time zone '{TimeZone}' not found on this server; using the server's zone.",
+            appSettings.TimeZoneId);
+    }
+
     await PropertyPayPro.Services.ScheduledTasks.RecurringJobBootstrap.EnsureEnqueuedAsync(db);
 }
 

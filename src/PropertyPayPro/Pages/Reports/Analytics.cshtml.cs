@@ -76,7 +76,7 @@ public class AnalyticsModel : PageModel
 
     public async Task OnGetAsync()
     {
-        var today = DateOnly.FromDateTime(DateTime.UtcNow);
+        var today = DateOnly.FromDateTime(DateTime.Now);
         var startOfMonth = new DateOnly(today.Year, today.Month, 1);
         // 12-month window ends on last day of the current month, starts
         // on the 1st of that month 11 months ago.

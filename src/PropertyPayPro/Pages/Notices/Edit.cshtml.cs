@@ -83,7 +83,7 @@ public class EditModel : PageModel
         var logo = TryLoadLogo();
         var pdfBytes = NoticePdfBuilder.Build(Input.Title, Input.Body, doc.Lease!, logo);
 
-        var today = DateOnly.FromDateTime(DateTime.UtcNow);
+        var today = DateOnly.FromDateTime(DateTime.Now);
         var safeTitle = string.Join('-',
             Input.Title.Trim().Split(Path.GetInvalidFileNameChars()));
         if (safeTitle.Length > 60) safeTitle = safeTitle[..60];

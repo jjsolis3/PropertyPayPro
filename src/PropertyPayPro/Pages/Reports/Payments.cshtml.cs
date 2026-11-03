@@ -52,7 +52,7 @@ public class PaymentsReportModel : PageModel
 
     private async Task LoadAsync()
     {
-        var today = DateOnly.FromDateTime(DateTime.UtcNow);
+        var today = DateOnly.FromDateTime(DateTime.Now);
         FromDate ??= new DateOnly(today.Year, 1, 1);
         ToDate ??= today;
 

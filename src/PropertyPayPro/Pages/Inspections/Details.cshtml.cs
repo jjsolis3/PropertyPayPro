@@ -233,7 +233,7 @@ public class DetailsModel : PageModel
 
         i.GeneratedDocumentId = doc.Id;
         i.Status = InspectionStatus.Completed;
-        i.CompletedOn = DateOnly.FromDateTime(DateTime.UtcNow);
+        i.CompletedOn = DateOnly.FromDateTime(DateTime.Now);
         await _db.SaveChangesAsync();
 
         TempData["Message"] = "Inspection completed. Report attached to the lease.";

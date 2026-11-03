@@ -66,7 +66,7 @@ public class PdfService
             ?? throw new InvalidOperationException($"Lease {leaseId} not found.");
 
         var unpaid = lease.Charges.Where(c => c.Balance > 0).OrderBy(c => c.DueDate).ToList();
-        var bytes = UnpaidStatementPdfBuilder.Build(lease, unpaid, DateOnly.FromDateTime(DateTime.UtcNow), GetLogoBytes());
+        var bytes = UnpaidStatementPdfBuilder.Build(lease, unpaid, DateOnly.FromDateTime(DateTime.Now), GetLogoBytes());
         var fileName = $"Statement_{DateTime.UtcNow:yyyyMMdd}_Lease{lease.Id:D6}.pdf";
         return await PersistAsync(GeneratedDocumentKind.UnpaidStatement, bytes, fileName, "pdfs/statements",
             leaseId: lease.Id, ct: ct);

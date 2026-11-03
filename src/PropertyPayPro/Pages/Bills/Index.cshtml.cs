@@ -28,10 +28,10 @@ public class IndexModel : PageModel
     public ChargeStatus? StatusFilter { get; set; }
 
     [BindProperty]
-    public int GenerateYear { get; set; } = DateTime.UtcNow.Year;
+    public int GenerateYear { get; set; } = DateTime.Now.Year;
 
     [BindProperty]
-    public int GenerateMonth { get; set; } = DateTime.UtcNow.Month;
+    public int GenerateMonth { get; set; } = DateTime.Now.Month;
 
     public IList<RentalCharge> Charges { get; private set; } = new List<RentalCharge>();
 
@@ -91,7 +91,7 @@ public class IndexModel : PageModel
 
     private async Task LoadChargesAsync()
     {
-        var today = DateOnly.FromDateTime(DateTime.UtcNow);
+        var today = DateOnly.FromDateTime(DateTime.Now);
         var firstOfMonth = new DateOnly(today.Year, today.Month, 1);
 
         var allCharges = await _db.RentalCharges

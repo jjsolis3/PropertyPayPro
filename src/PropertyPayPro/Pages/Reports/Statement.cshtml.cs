@@ -24,7 +24,7 @@ public class StatementModel : PageModel
 
     public Lease? Lease { get; private set; }
     public List<RentalCharge> UnpaidCharges { get; private set; } = new();
-    public DateOnly ReportDate { get; private set; } = DateOnly.FromDateTime(DateTime.UtcNow);
+    public DateOnly ReportDate { get; private set; } = DateOnly.FromDateTime(DateTime.Now);
     public bool MailConfigured => _mail.IsConfigured;
     public GeneratedDocument? LatestStatementPdf { get; private set; }
 

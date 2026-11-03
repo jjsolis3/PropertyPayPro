@@ -9,20 +9,25 @@ namespace PropertyPayPro.Services.ScheduledTasks;
 /// </summary>
 internal static class RecurringTaskHelpers
 {
-    /// <summary>
-    /// Fixed time-of-day in UTC that recurring daily jobs fire.
-    /// 15:00 UTC ≈ 10:00 Eastern / 07:00 Pacific — early enough to be
-    /// in the mailbox by the start of the business day in US timezones.
-    /// </summary>
-    public const int DailyRunHourUtc = 15;
+    /// <summary>Hour, in the app's time zone, that recurring daily jobs fire.</summary>
+    public const int DailyRunHourLocal = 7;
 
-    /// <summary>Next 15:00 UTC strictly in the future.</summary>
+    /// <summary>Recurring job kinds, as opposed to one-off scheduled sends.</summary>
+    public static readonly ScheduledTaskKind[] RecurringKinds =
+    {
+        ScheduledTaskKind.LateRentReminder,
+        ScheduledTaskKind.LeaseRenewalReminder,
+        ScheduledTaskKind.InspectionReminder,
+        ScheduledTaskKind.BillingSweep,
+    };
+
+    /// <summary>Next 7:00 AM in the app's time zone strictly in the future, as UTC.</summary>
     public static DateTime NextDailyRunUtc(DateTime nowUtc)
     {
-        var target = new DateTime(nowUtc.Year, nowUtc.Month, nowUtc.Day,
-            DailyRunHourUtc, 0, 0, DateTimeKind.Utc);
-        if (target <= nowUtc) target = target.AddDays(1);
-        return target;
+        var local = TimeZoneInfo.ConvertTimeFromUtc(nowUtc, TimeZoneInfo.Local);
+        var target = local.Date.AddHours(DailyRunHourLocal);
+        if (target <= local) target = target.AddDays(1);
+        return TimeZoneInfo.ConvertTimeToUtc(DateTime.SpecifyKind(target, DateTimeKind.Unspecified), TimeZoneInfo.Local);
     }
 
     /// <summary>

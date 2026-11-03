@@ -61,7 +61,7 @@ public class LeaseHubModel : PageModel
         if (TypeFilter.HasValue) q = q.Where(d => d.Type == TypeFilter.Value);
         if (PropertyFilter.HasValue) q = q.Where(d => d.Lease!.PropertyId == PropertyFilter.Value);
 
-        var today = DateOnly.FromDateTime(DateTime.UtcNow);
+        var today = DateOnly.FromDateTime(DateTime.Now);
         var soonCutoff = today.AddDays(30);
         if (Status == "expiring")
         {
