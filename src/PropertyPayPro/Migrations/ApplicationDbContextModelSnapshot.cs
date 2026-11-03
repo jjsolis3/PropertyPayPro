@@ -222,6 +222,15 @@ namespace PropertyPayPro.Migrations
                     b.Property<bool>("AutoGenerateCharges")
                         .HasColumnType("boolean");
 
+                    b.Property<bool>("AutoInspectionReminders")
+                        .HasColumnType("boolean");
+
+                    b.Property<bool>("AutoLateRentReminders")
+                        .HasColumnType("boolean");
+
+                    b.Property<bool>("AutoLeaseRenewalReminders")
+                        .HasColumnType("boolean");
+
                     b.Property<decimal>("DefaultLateFeeAmount")
                         .HasColumnType("numeric(10,2)");
 

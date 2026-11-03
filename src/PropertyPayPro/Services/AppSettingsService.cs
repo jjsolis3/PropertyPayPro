@@ -63,6 +63,9 @@ public class AppSettingsService
             existing.AutoApplyLateFees = updated.AutoApplyLateFees;
             existing.AutoEmailStatements = updated.AutoEmailStatements;
             existing.AutoEmailAdminSummary = updated.AutoEmailAdminSummary;
+            existing.AutoLateRentReminders = updated.AutoLateRentReminders;
+            existing.AutoLeaseRenewalReminders = updated.AutoLeaseRenewalReminders;
+            existing.AutoInspectionReminders = updated.AutoInspectionReminders;
             existing.UpdatedUtc = DateTime.UtcNow;
         }
         await _db.SaveChangesAsync(ct);

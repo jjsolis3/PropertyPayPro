@@ -65,5 +65,10 @@ public class AppSettings
     public bool AutoEmailStatements { get; set; }
     public bool AutoEmailAdminSummary { get; set; }
 
+    // Daily tenant reminder emails. All off by default.
+    public bool AutoLateRentReminders { get; set; }
+    public bool AutoLeaseRenewalReminders { get; set; }
+    public bool AutoInspectionReminders { get; set; }
+
     public DateTime UpdatedUtc { get; set; } = DateTime.UtcNow;
 }

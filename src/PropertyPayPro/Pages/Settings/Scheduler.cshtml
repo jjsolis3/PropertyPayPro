@@ -1,12 +1,14 @@
 @page
 @model PropertyPayPro.Pages.Settings.SchedulerModel
 @using PropertyPayPro.Models
+@using PropertyPayPro.Pages.Settings
 @{
-    ViewData["Title"] = "Scheduler";
+    ViewData["Title"] = "Automation";
     ViewData["SettingsTab"] = "scheduler";
+    var runHour = PropertyPayPro.Services.ScheduledTasks.RecurringTaskHelpers.DailyRunHourLocal;
 }
 
-<h1 class="h3 mb-3">Scheduler</h1>
+<h1 class="h3 mb-3">Settings</h1>
 <partial name="_SettingsNav" />
 
 @if (TempData["Message"] is string msg)
@@ -15,114 +17,210 @@
         <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
     </div>
 }
+@if (TempData["Error"] is string err)
+{
+    <div class="alert alert-danger alert-dismissible fade show">@err
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+}
 
-<div class="card mb-3">
-    <div class="card-header"><strong>Recurring daily sweeps</strong></div>
+<form method="post" asp-page-handler="Save">
+    <div class="card mb-3 h-auto">
+        <div class="card-header">
+            <h4 class="card-title mb-0">Automatic emails and tasks</h4>
+        </div>
+        <div class="card-body pb-0">
+            <p class="text-muted small mb-0">
+                Each item below is a background job that checks once a day at @(runHour):00 AM
+                (@TimeZoneInfo.Local.Id). It only does something when its switch is on <em>and</em>
+                something qualifies, so most days it sends nothing. Tenants with
+                <strong>Receive reminders</strong> turned off on their profile never get these emails,
+                and every email sent is listed under <a asp-page="/Settings/EmailLogs">Email Logs</a>.
+            </p>
+            @if (!Model.MailConfigured)
+            {
+                <div class="alert alert-warning small mt-3 mb-0">
+                    Email is not configured, so no automatic emails can be sent until it is (Settings &gt; Email).
+                </div>
+            }
+        </div>
+        <div class="card-body p-0">
+            <div class="table-responsive"><table class="table mb-0 align-middle">
+                <thead>
+                    <tr>
+                        <th style="width: 4.5rem;">On</th>
+                        <th>What it does</th>
+                        <th style="width: 12rem;">Next check</th>
+                        <th style="width: 22rem;">Last result</th>
+                        <th class="text-end" style="width: 7rem;"></th>
+                    </tr>
+                </thead>
+                <tbody>
+                @foreach (var j in Model.Jobs)
+                {
+                    <tr>
+                        <td>
+                            @if (j.Kind != ScheduledTaskKind.BillingSweep)
+                            {
+                                <div class="form-check form-switch m-0">
+                                    <input class="form-check-input" type="checkbox" role="switch" id="@j.SwitchName"
+                                           name="@j.SwitchName" value="true" aria-label="@j.Name"
+                                           checked="@(j.Kind switch {
+                                               ScheduledTaskKind.LateRentReminder => Model.AutoLateRentReminders,
+                                               ScheduledTaskKind.LeaseRenewalReminder => Model.AutoLeaseRenewalReminders,
+                                               _ => Model.AutoInspectionReminders })" />
+                                    <input type="hidden" name="@j.SwitchName" value="false" />
+                                </div>
+                            }
+                            else
+                            {
+                                <span class="badge @(j.Enabled ? "bg-success" : "bg-light text-dark")">@(j.Enabled ? "On" : "Off")</span>
+                            }
+                        </td>
+                        <td class="text-wrap">
+                            <strong>@j.Name</strong>
+                            <div class="small text-muted">
+                                @switch (j.Kind)
+                                {
+                                    case ScheduledTaskKind.LateRentReminder:
+                                        @:Emails tenants whose rent is still unpaid after the lease's grace days. At most once every 7 days per lease.
+                                        break;
+                                    case ScheduledTaskKind.LeaseRenewalReminder:
+                                        @:Emails tenants whose fixed-term lease ends within 60 days (not month-to-month). At most once every 30 days per lease.
+                                        break;
+                                    case ScheduledTaskKind.InspectionReminder:
+                                        @:Emails tenants once, up to 2 days before a scheduled inspection.
+                                        break;
+                                    case ScheduledTaskKind.BillingSweep:
+                                        @:Creates rent bills and applies late fees, with optional emails. Turn on the parts you want:
+                                        break;
+                                }
+                            </div>
+                            @if (j.Kind == ScheduledTaskKind.BillingSweep)
+                            {
+                                <div class="mt-2 ms-1">
+                                    <div class="form-check form-switch mb-1">
+                                        <input asp-for="AutoGenerateCharges" class="form-check-input" role="switch" />
+                                        <label asp-for="AutoGenerateCharges" class="form-check-label">Create monthly rent bills</label>
+                                        <span class="small ms-1">from day</span>
+                                        <input asp-for="AutoBillingDayOfMonth" type="number" min="1" max="28"
+                                               class="form-control form-control-sm d-inline-block mx-1" style="width: 4.5rem;" />
+                                        <span class="small">of the month, due on each lease's due day</span>
+                                        <span asp-validation-for="AutoBillingDayOfMonth" class="text-danger small d-block"></span>
+                                    </div>
+                                    <div class="form-check form-switch mb-1">
+                                        <input asp-for="AutoApplyLateFees" class="form-check-input" role="switch" />
+                                        <label asp-for="AutoApplyLateFees" class="form-check-label">Apply late fees</label>
+                                        <span class="small text-muted">to rent bills unpaid past their grace days, once per bill</span>
+                                    </div>
+                                    <div class="form-check form-switch mb-1">
+                                        <input asp-for="AutoEmailStatements" class="form-check-input" role="switch" />
+                                        <label asp-for="AutoEmailStatements" class="form-check-label">Email tenants a statement</label>
+                                        <span class="small text-muted">when new bills are created</span>
+                                    </div>
+                                    <div class="form-check form-switch mb-0">
+                                        <input asp-for="AutoEmailAdminSummary" class="form-check-input" role="switch" />
+                                        <label asp-for="AutoEmailAdminSummary" class="form-check-label">Email admins a summary</label>
+                                        <span class="small text-muted">after a run that creates bills or fees</span>
+                                    </div>
+                                </div>
+                            }
+                        </td>
+                        <td class="text-wrap">
+                            @if (!j.Enabled)
+                            {
+                                <span class="text-muted small">Off — nothing will be sent</span>
+                            }
+                            else if (j.Next is not null)
+                            {
+                                <span class="small">@j.Next.RunAtUtc.ToLocalTime().ToString("MMM d, h:mm tt")</span>
+                                @if (j.Next.Status == ScheduledTaskStatus.Running)
+                                {
+                                    <span class="badge bg-warning ms-1">Running</span>
+                                }
+                            }
+                            else
+                            {
+                                <span class="text-danger small">Not scheduled (restart the app)</span>
+                            }
+                        </td>
+                        <td class="text-wrap">
+                            @if (j.Last is not null)
+                            {
+                                <small>@j.Last.CompletedUtc?.ToLocalTime().ToString("MMM d, h:mm tt")</small>
+                                @if (j.Last.Status == ScheduledTaskStatus.Failed)
+                                {
+                                    <span class="badge bg-danger ms-1" title="@j.Last.LastError">Failed</span>
+                                }
+                                <div class="small text-muted">@j.Last.Description</div>
+                            }
+                            else
+                            {
+                                <small class="text-muted">Never run</small>
+                            }
+                        </td>
+                        <td class="text-end">
+                            @if (j.Enabled)
+                            {
+                                <button type="submit" class="btn btn-sm btn-outline-primary" formnovalidate
+                                        formaction="?handler=RunNow&kind=@((int)j.Kind)"
+                                        onclick="return confirm('Run @j.Name now? It may send emails.');">
+                                    Run now
+                                </button>
+                            }
+                            else
+                            {
+                                <span class="small text-muted">Switch on and save to run</span>
+                            }
+                        </td>
+                    </tr>
+                }
+                </tbody>
+            </table></div>
+        </div>
+    </div>
+
+    <div class="d-flex gap-2 mb-4">
+        <button type="submit" class="btn btn-primary">Save</button>
+        <a asp-page="/Settings/Scheduler" class="btn btn-outline-secondary">Cancel</a>
+    </div>
+</form>
+
+<div class="card h-auto">
+    <div class="card-header">
+        <strong>History</strong>
+        <div class="small text-muted">
+            Recent runs of the jobs above, plus notices you scheduled from a notice's Send page.
+            "Scheduled" means waiting for its time; it is not an email waiting to go out.
+        </div>
+    </div>
     <div class="card-body p-0">
-        <table class="table mb-0">
+        <div class="table-responsive"><table class="table table-sm table-striped mb-0">
             <thead>
                 <tr>
                     <th>Job</th>
-                    <th>Next run (local)</th>
-                    <th>Last outcome</th>
-                    <th class="text-end">Actions</th>
-                </tr>
-            </thead>
-            <tbody>
-            @foreach (var r in Model.Recurring)
-            {
-                <tr>
-                    <td>
-                        <strong>@r.Kind</strong>
-                    </td>
-                    <td>
-                        @if (r.Next is not null)
-                        {
-                            <span>@r.Next.RunAtUtc.ToLocalTime().ToString("yyyy-MM-dd HH:mm")</span>
-                            @if (r.Next.Status == ScheduledTaskStatus.Running)
-                            {
-                                <span class="badge bg-warning ms-2">Running</span>
-                            }
-                            else
-                            {
-                                <span class="badge bg-info ms-2">Pending</span>
-                            }
-                        }
-                        else
-                        {
-                            <span class="text-danger">Not scheduled</span>
-                        }
-                    </td>
-                    <td>
-                        @if (r.LastCompleted is not null)
-                        {
-                            <small>@r.LastCompleted.CompletedUtc?.ToLocalTime().ToString("yyyy-MM-dd HH:mm")</small>
-                            @if (r.LastCompleted.Status == ScheduledTaskStatus.Completed)
-                            {
-                                <span class="badge bg-success ms-2">OK</span>
-                            }
-                            else
-                            {
-                                <span class="badge bg-danger ms-2" title="@r.LastCompleted.LastError">Failed</span>
-                            }
-                            <br /><small class="text-muted">@r.LastCompleted.Description</small>
-                        }
-                        else
-                        {
-                            <small class="text-muted">Never run</small>
-                        }
-                    </td>
-                    <td class="text-end">
-                        <form method="post" asp-page-handler="RunNow" class="d-inline"
-                              onsubmit="return confirm('Trigger @r.Kind on the next scheduler tick?');">
-                            <input type="hidden" name="kind" value="@((int)r.Kind)" />
-                            <button type="submit" class="btn btn-sm btn-outline-primary">Run now</button>
-                        </form>
-                    </td>
-                </tr>
-            }
-            </tbody>
-        </table>
-    </div>
-    <div class="card-footer small text-muted">
-        Each sweep runs daily at
-        @PropertyPayPro.Services.ScheduledTasks.RecurringTaskHelpers.DailyRunHourLocal:00 AM
-        (@TimeZoneInfo.Local.Id) and queues the next day's run when it finishes.
-        Restarting the app re-queues any sweep that is missing. Times on this page are in
-        @TimeZoneInfo.Local.Id; change it under Settings &gt; Branding.
-    </div>
-</div>
-
-<div class="card">
-    <div class="card-header"><strong>Recent tasks</strong></div>
-    <div class="card-body p-0">
-        <table class="table table-sm table-striped mb-0">
-            <thead>
-                <tr>
-                    <th>Kind</th>
                     <th>Status</th>
-                    <th>Run at</th>
-                    <th>Completed</th>
-                    <th>Attempts</th>
-                    <th>Description / error</th>
+                    <th>Runs at</th>
+                    <th>Finished</th>
+                    <th>Result</th>
                 </tr>
             </thead>
             <tbody>
             @foreach (var t in Model.Recent)
             {
                 <tr>
-                    <td><small>@t.Kind</small></td>
+                    <td><small>@SchedulerModel.Label(t.Kind)</small></td>
                     <td>
                         @switch (t.Status)
                         {
                             case ScheduledTaskStatus.Pending:
-                                <span class="badge bg-info">Pending</span>
+                                <span class="badge bg-light text-dark">Scheduled</span>
                                 break;
                             case ScheduledTaskStatus.Running:
                                 <span class="badge bg-warning">Running</span>
                                 break;
                             case ScheduledTaskStatus.Completed:
-                                <span class="badge bg-success">Completed</span>
+                                <span class="badge bg-success">Done</span>
                                 break;
                             case ScheduledTaskStatus.Failed:
                                 <span class="badge bg-danger">Failed</span>
@@ -132,10 +230,9 @@
                                 break;
                         }
                     </td>
-                    <td><small>@t.RunAtUtc.ToLocalTime().ToString("yyyy-MM-dd HH:mm")</small></td>
-                    <td><small>@(t.CompletedUtc?.ToLocalTime().ToString("yyyy-MM-dd HH:mm") ?? "—")</small></td>
-                    <td><small>@t.Attempts / @t.MaxAttempts</small></td>
-                    <td>
+                    <td><small>@t.RunAtUtc.ToLocalTime().ToString("MMM d, h:mm tt")</small></td>
+                    <td><small>@(t.CompletedUtc?.ToLocalTime().ToString("MMM d, h:mm tt") ?? "—")</small></td>
+                    <td class="text-wrap">
                         <small>@t.Description</small>
                         @if (!string.IsNullOrEmpty(t.LastError))
                         {
@@ -146,9 +243,11 @@
             }
             @if (!Model.Recent.Any())
             {
-                <tr><td colspan="6" class="text-center text-muted py-3">No scheduled tasks yet.</td></tr>
+                <tr><td colspan="5" class="text-center text-muted py-3">Nothing has run yet.</td></tr>
             }
             </tbody>
-        </table>
+        </table></div>
     </div>
 </div>
+
+@section Scripts { <partial name="_ValidationScriptsPartial" /> }
