@@ -46,5 +46,8 @@ else
 }
 
 <a asp-page="/Receipts/Show" asp-route-id="@Model.Payment.Id" class="btn btn-success">View Receipt</a>
-<a asp-page="Edit" asp-route-id="@Model.Payment.Id" class="btn btn-primary">Edit</a>
+@if (User.IsInRole(IdentitySeed.AdminRole))
+{
+    <a asp-page="Edit" asp-route-id="@Model.Payment.Id" class="btn btn-primary">Edit</a>
+}
 <a asp-page="Index" class="btn btn-outline-secondary">Back</a>

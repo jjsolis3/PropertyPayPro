@@ -67,6 +67,8 @@ public class IndexModel : PageModel
 
     public async Task<IActionResult> OnPostMarkReimbursedAsync(int id)
     {
+        // Managers can view this page but only Admins may change data.
+        if (!User.IsInRole(IdentitySeed.AdminRole)) return Forbid();
         var e = await _db.PropertyExpenses.FindAsync(id);
         if (e is null) return NotFound();
         e.ReimbursedOn = DateOnly.FromDateTime(DateTime.Now);
@@ -78,6 +80,8 @@ public class IndexModel : PageModel
 
     public async Task<IActionResult> OnPostMarkSelectedReimbursedAsync(int[] selectedIds)
     {
+        // Managers can view this page but only Admins may change data.
+        if (!User.IsInRole(IdentitySeed.AdminRole)) return Forbid();
         if (selectedIds is null || selectedIds.Length == 0)
         {
             TempData["Error"] = "No expenses selected.";

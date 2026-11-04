@@ -54,8 +54,11 @@
                     <td class="text-end">
                         <a asp-page="/Receipts/Show" asp-route-id="@p.Id" class="btn btn-sm btn-outline-success">Receipt</a>
                         <a asp-page="Details" asp-route-id="@p.Id" class="btn btn-sm btn-outline-secondary">Details</a>
-                        <a asp-page="Edit" asp-route-id="@p.Id" class="btn btn-sm btn-outline-primary">Edit</a>
-                        <a asp-page="Delete" asp-route-id="@p.Id" class="btn btn-sm btn-outline-danger">Delete</a>
+                        @if (User.IsInRole(IdentitySeed.AdminRole))
+                        {
+                            <a asp-page="Edit" asp-route-id="@p.Id" class="btn btn-sm btn-outline-primary">Edit</a>
+                            <a asp-page="Delete" asp-route-id="@p.Id" class="btn btn-sm btn-outline-danger">Delete</a>
+                        }
                     </td>
                 </tr>
             }

@@ -64,17 +64,17 @@
         <div class="card">
             <div class="card-header"><h4 class="card-title mb-0">Revenue vs Expenses — trailing 12 months</h4></div>
             <div class="card-body">
-                <canvas id="revenueExpensesChart" height="120"></canvas>
+                <div class="chart-box" style="height: 320px;"><canvas id="revenueExpensesChart"></canvas></div>
             </div>
         </div>
     </div>
     <div class="col-xl-4">
-        <div class="card h-100">
+        <div class="card">
             <div class="card-header"><h4 class="card-title mb-0">Expenses by category</h4></div>
             <div class="card-body">
                 @if (Model.CategoryLabels.Any())
                 {
-                    <canvas id="expenseCategoryChart" height="200"></canvas>
+                    <div class="chart-box" style="height: 320px;"><canvas id="expenseCategoryChart"></canvas></div>
                 }
                 else
                 {
@@ -92,7 +92,7 @@
             <div class="card-body">
                 @if (Model.PropertyLabels.Any())
                 {
-                    <canvas id="perPropertyChart" height="180"></canvas>
+                    <div class="chart-box" style="height: 300px;"><canvas id="perPropertyChart"></canvas></div>
                 }
                 else
                 {
