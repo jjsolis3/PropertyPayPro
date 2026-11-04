@@ -78,3 +78,15 @@ table.dataTable thead th.no-sort { background-image: none !important; cursor: de
     font-size: .8rem;
 }
 .form-select[multiple], .form-select[size]:not([size="1"]) { height: auto; }
+
+/* Chart.js charts use responsive + maintainAspectRatio:false, which sizes the
+   canvas to its parent. Give that parent a fixed height (set inline per chart)
+   so the chart can't feed back into its own container: without it the theme's
+   stretched cards made the Analytics charts grow taller forever. */
+.chart-box { position: relative; width: 100%; }
+
+/* The shared script (datatables-init.js) wraps each DataTables table in a
+   .table-responsive scroller. DataTables floats "Show N" left and "Search"
+   right above it; clear those floats so the table uses the full card width
+   instead of being squeezed into the gap between them. */
+.dataTables_wrapper > .table-responsive { clear: both; width: 100%; }

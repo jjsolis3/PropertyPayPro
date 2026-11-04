@@ -53,10 +53,13 @@
                 <div class="text-muted small">
                     Tick pass-through expenses to reimburse in bulk.
                 </div>
-                <button type="submit" id="bulkReimburseBtn" class="btn btn-sm btn-success" disabled
-                        onclick="return confirm('Mark ' + document.querySelectorAll('.expense-check:checked').length + ' selected expense(s) reimbursed today, at their full amount?');">
-                    Mark Selected Reimbursed <span class="badge bg-light text-success ms-1" id="bulkReimburseCount">0</span>
-                </button>
+                @if (User.IsInRole(IdentitySeed.AdminRole))
+                {
+                    <button type="submit" id="bulkReimburseBtn" class="btn btn-sm btn-success" disabled
+                            onclick="return confirm('Mark ' + document.querySelectorAll('.expense-check:checked').length + ' selected expense(s) reimbursed today, at their full amount?');">
+                        Mark Selected Reimbursed <span class="badge bg-light text-success ms-1" id="bulkReimburseCount">0</span>
+                    </button>
+                }
             </div>
 
             <table class="table table-striped mb-0 js-datatable" data-order='[[5,"desc"]]'>
@@ -127,7 +130,7 @@
                             }
                         </td>
                         <td class="text-end">
-                            @if (eligible)
+                            @if (eligible && User.IsInRole(IdentitySeed.AdminRole))
                             {
                                 <button type="submit" formaction="@Url.Page("Index", "MarkReimbursed", new { id = e.Id })"
                                         class="btn btn-sm btn-outline-success"
@@ -137,8 +140,11 @@
                                 </button>
                             }
                             <a asp-page="Details" asp-route-id="@e.Id" class="btn btn-sm btn-outline-secondary">Details</a>
-                            <a asp-page="Edit" asp-route-id="@e.Id" class="btn btn-sm btn-outline-primary">Edit</a>
-                            <a asp-page="Delete" asp-route-id="@e.Id" class="btn btn-sm btn-outline-danger">Delete</a>
+                            @if (User.IsInRole(IdentitySeed.AdminRole))
+                            {
+                                <a asp-page="Edit" asp-route-id="@e.Id" class="btn btn-sm btn-outline-primary">Edit</a>
+                                <a asp-page="Delete" asp-route-id="@e.Id" class="btn btn-sm btn-outline-danger">Delete</a>
+                            }
                         </td>
                     </tr>
                 }
@@ -158,6 +164,7 @@
         var selectAll = document.getElementById('expenseSelectAll');
         var bulkBtn = document.getElementById('bulkReimburseBtn');
         var bulkCount = document.getElementById('bulkReimburseCount');
+        if (!bulkBtn) return; // Managers don't get the bulk-reimburse button.
 
         function refreshBulkState() {
             var checked = document.querySelectorAll('.expense-check:checked').length;

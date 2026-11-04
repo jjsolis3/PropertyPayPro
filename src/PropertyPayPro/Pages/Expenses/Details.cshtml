@@ -25,7 +25,10 @@
                 </button>
             </form>
         }
-        <a asp-page="Edit" asp-route-id="@Model.Expense.Id" class="btn btn-primary">Edit</a>
+        @if (User.IsInRole(IdentitySeed.AdminRole))
+        {
+            <a asp-page="Edit" asp-route-id="@Model.Expense.Id" class="btn btn-primary">Edit</a>
+        }
         <a asp-page="Index" class="btn btn-outline-secondary">Back</a>
     </div>
 </div>
