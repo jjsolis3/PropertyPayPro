@@ -165,13 +165,6 @@
 @section Scripts {
     <partial name="_ValidationScriptsPartial" />
     <script>
-        // The theme turns every <select> into a bootstrap-select dropdown on window load;
-        // that plugin mis-renders this 400+ option list, so keep it a native select.
-        $(window).on('load', function () {
-            setTimeout(function () { $('#Input_TimeZoneId').selectpicker('destroy'); }, 0);
-        });
-    </script>
-    <script>
         (function () {
             const pColor = document.querySelectorAll('input[name="Input.PrimaryColor"]');
             const aColor = document.querySelectorAll('input[name="Input.AccentColor"]');

@@ -18,6 +18,13 @@
 
     function isMobile() { return window.innerWidth < MOBILE_BREAKPOINT; }
 
+    // Below 768px the theme uses its "overlay" sidebar, where .menu-toggle
+    // means the menu is OPEN (the opposite of the desktop meaning). On a
+    // phone the menu always starts closed and the burger opens it over the
+    // page; that open/closed state is not saved.
+    var OVERLAY_BREAKPOINT = 768;
+    function isOverlay() { return window.innerWidth < OVERLAY_BREAKPOINT; }
+
     function setCollapsed(collapsed) {
         var wrapper = document.getElementById('main-wrapper');
         if (!wrapper) return;
@@ -30,6 +37,7 @@
 
     function applyInitial() {
         try {
+            if (isOverlay()) { setCollapsed(false); return; }
             var stored = localStorage.getItem(KEY);
             var collapsed;
             if (stored === '1') collapsed = true;
@@ -50,7 +58,7 @@
     // sync so the head-inline restore script gets it right next load.
     document.addEventListener('click', function (e) {
         var trigger = e.target && e.target.closest && e.target.closest('.nav-control');
-        if (!trigger) return;
+        if (!trigger || isOverlay()) return;
         setTimeout(function () {
             try {
                 var wrapper = document.getElementById('main-wrapper');

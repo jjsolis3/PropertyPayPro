@@ -37,8 +37,11 @@
                 Badges = headerBadges
             })" />
         </div>
-        <div class="flex-shrink-0">
-            <a asp-page="Edit" asp-route-id="@Model.Tenant.Id" class="btn btn-primary">Edit</a>
+        <div class="d-flex flex-wrap gap-2">
+            @if (User.IsInRole(IdentitySeed.AdminRole))
+            {
+                <a asp-page="Edit" asp-route-id="@Model.Tenant.Id" class="btn btn-primary">Edit</a>
+            }
             <a asp-page="Index" class="btn btn-outline-secondary">Back</a>
         </div>
     </div>
@@ -94,9 +97,12 @@
                     <span class="badge bg-info ms-1" title="Tenants on this lease">@l.Tenants.Count tenants</span>
                 }
             </div>
-            <div class="flex-shrink-0">
+            <div class="d-flex flex-wrap gap-2">
                 <a asp-page="/Leases/Details" asp-route-id="@l.Id" class="btn btn-sm btn-outline-secondary">View Lease</a>
-                <a asp-page="/Payments/Create" asp-route-leaseId="@l.Id" class="btn btn-sm btn-success">Record Payment</a>
+                @if (User.IsInRole(IdentitySeed.AdminRole))
+                {
+                    <a asp-page="/Payments/Create" asp-route-leaseId="@l.Id" class="btn btn-sm btn-success">Record Payment</a>
+                }
             </div>
         </div>
     </div>

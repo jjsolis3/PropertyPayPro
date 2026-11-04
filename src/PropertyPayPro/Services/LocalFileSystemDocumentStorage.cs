@@ -27,8 +27,15 @@ public class LocalFileSystemDocumentStorage : IDocumentStorage
     public Task<Stream> OpenReadAsync(string storageKey, CancellationToken ct = default)
     {
         var fullPath = ResolveAndValidate(storageKey);
+        if (!File.Exists(fullPath)) throw new StoredFileMissingException(storageKey);
         Stream stream = File.OpenRead(fullPath);
         return Task.FromResult(stream);
+    }
+
+    public Task<bool> ExistsAsync(string storageKey, CancellationToken ct = default)
+    {
+        if (string.IsNullOrEmpty(storageKey)) return Task.FromResult(false);
+        return Task.FromResult(File.Exists(ResolveAndValidate(storageKey)));
     }
 
     public Task DeleteAsync(string storageKey, CancellationToken ct = default)

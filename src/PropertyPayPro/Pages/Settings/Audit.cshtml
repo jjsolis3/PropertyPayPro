@@ -51,7 +51,7 @@
 </div>
 
 <div class="card">
-    <div class="card-body p-0">
+    <div class="card-body p-0 table-responsive">
         <table class="table table-sm table-striped mb-0">
             <thead>
                 <tr>
@@ -68,7 +68,7 @@
             {
                 <tr>
                     <td><small>@a.CreatedUtc.ToLocalTime().ToString("yyyy-MM-dd HH:mm:ss")</small></td>
-                    <td><small>@(a.UserEmail ?? "—")</small></td>
+                    <td class="text-wrap text-break" style="min-width: 9rem;"><small>@(a.UserEmail ?? "—")</small></td>
                     <td><span class="badge bg-light text-dark">@a.Action</span></td>
                     <td>
                         @if (a.EntityType is not null)
@@ -76,7 +76,7 @@
                             <small>@a.EntityType@(a.EntityId.HasValue ? "#" + a.EntityId : "")</small>
                         }
                     </td>
-                    <td><small style="white-space: pre-wrap;">@a.Details</small></td>
+                    <td class="text-break" style="min-width: 16rem;"><small style="white-space: pre-wrap;">@a.Details</small></td>
                     <td><small class="text-muted">@a.IpAddress</small></td>
                 </tr>
             }

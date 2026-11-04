@@ -121,7 +121,10 @@
                         </td>
                         <td class="text-end">
                             <a asp-page="Details" asp-route-id="@c.Id" class="btn btn-sm btn-outline-secondary">Details</a>
-                            <a asp-page="Edit" asp-route-id="@c.Id" class="btn btn-sm btn-outline-primary">Edit</a>
+                            @if (User.IsInRole(IdentitySeed.AdminRole))
+                            {
+                                <a asp-page="Edit" asp-route-id="@c.Id" class="btn btn-sm btn-outline-primary">Edit</a>
+                            }
                         </td>
                     </tr>
                 }

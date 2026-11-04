@@ -12,9 +12,12 @@
         <div class="text-muted">Every formal notice generated across all leases.</div>
     </div>
     <div>
-        <a asp-page="Broadcast" class="btn btn-outline-info">
-            <i class="las la-bullhorn"></i> Broadcast
-        </a>
+        @if (isAdmin)
+        {
+            <a asp-page="Broadcast" class="btn btn-outline-info">
+                <i class="las la-bullhorn"></i> Broadcast
+            </a>
+        }
         @if (isAdmin)
         {
             <a asp-page="Create" class="btn btn-success">

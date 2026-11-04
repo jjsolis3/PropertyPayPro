@@ -70,7 +70,7 @@
 </div>
 
 <div class="card">
-    <div class="card-body p-0">
+    <div class="card-body p-0 table-responsive">
         <table class="table table-sm table-striped mb-0">
             <thead>
                 <tr>
@@ -89,8 +89,8 @@
                 <tr>
                     <td><small>@l.CreatedUtc.ToLocalTime().ToString("yyyy-MM-dd HH:mm")</small></td>
                     <td><span class="badge bg-light text-dark">@l.Kind</span></td>
-                    <td><small>@l.ToAddress</small></td>
-                    <td><small>@l.Subject</small></td>
+                    <td class="text-wrap text-break" style="min-width: 10rem;"><small>@l.ToAddress</small></td>
+                    <td class="text-wrap" style="min-width: 14rem;"><small>@l.Subject</small></td>
                     <td>
                         @if (l.Status == EmailStatus.Sent)
                         {
@@ -101,7 +101,7 @@
                             <span class="badge bg-danger">Failed</span>
                         }
                     </td>
-                    <td>
+                    <td class="text-wrap text-break" style="min-width: 12rem;">
                         @if (l.Status == EmailStatus.Failed && !string.IsNullOrEmpty(l.Error))
                         {
                             <small class="text-danger" title="@l.Error">

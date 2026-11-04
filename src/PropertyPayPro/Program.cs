@@ -108,7 +108,10 @@ builder.Services
 
         // Tenant portal.
         options.Conventions.AuthorizeFolder("/Portal", "TenantOnly");
-    });
+    })
+    // A document whose file is gone from storage shows "File not found" (404)
+    // instead of the generic error page.
+    .AddMvcOptions(o => o.Filters.Add<PropertyPayPro.Infrastructure.StoredFileMissingFilter>());
 
 builder.Services.AddMemoryCache();
 builder.Services.AddScoped<PropertyPayPro.Services.AppSettingsService>();
@@ -216,8 +219,16 @@ app.MapGet("/branding/logo/{which}", async (
     var s = await settings.GetAsync();
     var key = which == "small" ? s.LogoSmallStorageKey : s.LogoStorageKey;
     if (string.IsNullOrEmpty(key)) return Results.NotFound();
-    var stream = await storage.OpenReadAsync(key);
-    return Results.File(stream, "image/png");
+    try
+    {
+        var stream = await storage.OpenReadAsync(key);
+        return Results.File(stream, "image/png");
+    }
+    catch (PropertyPayPro.Services.StoredFileMissingException)
+    {
+        // The uploaded logo's file was lost: show the built-in logo instead of a broken image.
+        return Results.Redirect(which == "small" ? "/img/brand/PPS_Logo_SM.png" : "/img/brand/PPS_Logo_Main.png");
+    }
 }).AllowAnonymous();
 
 app.MapGet("/api/leases/{leaseId:int}/outstanding-charges", async (

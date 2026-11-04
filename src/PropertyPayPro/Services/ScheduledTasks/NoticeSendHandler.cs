@@ -56,6 +56,18 @@ public class NoticeSendHandler : IScheduledTaskHandler
         if (docs.Count == 0)
             throw new InvalidOperationException("Attachments no longer exist (deleted before send?).");
 
+        // Check every file first so a lost attachment fails the task with a clear
+        // reason (shown on Settings > Automation) instead of a raw I/O error.
+        var missing = new List<string>();
+        foreach (var d in docs)
+        {
+            if (!await _storage.ExistsAsync(d.StorageKey, ct)) missing.Add(d.FileName);
+        }
+        if (missing.Count > 0)
+            throw new PermanentTaskFailureException(
+                $"Not sent: attachment file(s) missing from storage: {string.Join(", ", missing)}. " +
+                "Upload them again and reschedule the notice.");
+
         var attachments = new List<EmailAttachment>();
         foreach (var d in docs)
         {

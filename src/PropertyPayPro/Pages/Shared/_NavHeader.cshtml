@@ -9,7 +9,8 @@
         : "/branding/logo/main";
 }
 <div class="nav-header">
-    <a asp-page="/Index" class="brand-logo">
+    @* Tenants can't open the staff dashboard, so their logo goes to the portal home. *@
+    <a asp-page="@(User.IsInRole(PropertyPayPro.Data.IdentitySeed.TenantRole) ? "/Portal/Index" : "/Index")" class="brand-logo">
         <img class="logo-abbr" src="@smallLogoSrc" alt="@s.AppName" />
         <img class="brand-title" src="@mainLogoSrc" alt="@s.AppName" />
     </a>

@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.EntityFrameworkCore;
 using PropertyPayPro.Data;
+using PropertyPayPro.Infrastructure;
 using PropertyPayPro.Models;
 using PropertyPayPro.Services;
 
@@ -45,6 +46,8 @@ public class DetailsModel : PageModel
         DateOnly? effectiveDate,
         DateOnly? expiresOn)
     {
+        // Managers can view this page but only Admins may change data.
+        if (!User.IsInRole(IdentitySeed.AdminRole)) return Forbid();
         var lease = await _db.Leases.FindAsync(leaseId);
         if (lease is null) return NotFound();
 
@@ -120,13 +123,32 @@ public class DetailsModel : PageModel
         using (var zip = new ZipArchive(ms, ZipArchiveMode.Create, leaveOpen: true))
         {
             var used = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+            var missing = new List<string>();
             foreach (var d in lease.Documents.OrderBy(d => d.Type).ThenBy(d => d.UploadedOn))
             {
+                // A lost file shouldn't sink the whole download: skip it and list it.
+                if (!await _storage.ExistsAsync(d.StorageKey))
+                {
+                    missing.Add($"{d.Type}: {d.FileName}");
+                    continue;
+                }
                 var name = MakeUniqueEntryName(d, used);
                 var entry = zip.CreateEntry(name, CompressionLevel.Fastest);
                 await using var entryStream = entry.Open();
                 await using var srcStream = await _storage.OpenReadAsync(d.StorageKey);
                 await srcStream.CopyToAsync(entryStream);
+            }
+
+            if (missing.Count > 0)
+            {
+                if (missing.Count == lease.Documents.Count) return StoredFileMissingFilter.FileMissingResult();
+                var note = zip.CreateEntry("MISSING-FILES.txt");
+                await using var noteStream = note.Open();
+                await using var writer = new StreamWriter(noteStream);
+                await writer.WriteAsync(
+                    "These documents are listed on the lease but their files are no longer in storage,\n" +
+                    "so they are not in this download. Upload them again from the lease page.\n\n" +
+                    string.Join("\n", missing) + "\n");
             }
         }
         ms.Position = 0;
@@ -154,6 +176,8 @@ public class DetailsModel : PageModel
 
     public async Task<IActionResult> OnPostDeleteDocumentAsync(int id, int documentId)
     {
+        // Managers can view this page but only Admins may change data.
+        if (!User.IsInRole(IdentitySeed.AdminRole)) return Forbid();
         var doc = await _db.LeaseDocuments
             .FirstOrDefaultAsync(d => d.Id == documentId && d.LeaseId == id);
         if (doc is null) return RedirectToPage(new { id });

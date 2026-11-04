@@ -214,7 +214,7 @@
                         }
                         else
                         {
-                            <p class="text-muted mb-0">No payments recorded yet. <a asp-page="/Payments/Create">Record one</a>.</p>
+                            <p class="text-muted mb-0">No payments recorded yet.@if (User.IsInRole(IdentitySeed.AdminRole)) { <text> <a asp-page="/Payments/Create">Record one</a>.</text> }</p>
                         }
                     </div>
                 </div>

@@ -1,6 +1,8 @@
 // Auto-enhance any <table class="js-datatable"> with search, sort, pagination.
 // Opt out of sorting on a column by adding class="no-sort" to its <th>.
 // Override the default order by adding data-order='[[colIndex, "asc|desc"]]' on the <table>.
+// Hide the built-in search box with data-searching="false" (for pages whose own
+// filter form already has a search field).
 (function () {
     if (typeof jQuery === 'undefined' || typeof jQuery.fn === 'undefined' || typeof jQuery.fn.DataTable === 'undefined') {
         return;
@@ -57,6 +59,7 @@
                 pageLength: parseInt($t.data('page-length') || '25', 10),
                 lengthMenu: [[10, 25, 50, 100, -1], [10, 25, 50, 100, 'All']],
                 order: order || [],
+                searching: $t.data('searching') !== false,
                 columnDefs: columnDefs,
                 language: {
                     search: 'Search:',
@@ -68,6 +71,18 @@
                     paginate: { first: '«', previous: '‹', next: '›', last: '»' }
                 }
             });
+        });
+
+        // Wide tables must scroll inside their card, not push the whole page
+        // sideways (the theme sets td { white-space: nowrap }, so on a phone
+        // almost every table is wider than the screen). Wrap any content
+        // table that isn't already in a scroll container. For DataTables
+        // only the table itself is wrapped, so the search box, page size and
+        // pager stay put while the rows scroll.
+        $('.content-body table').each(function () {
+            var $t = $(this);
+            if ($t.closest('.table-responsive').length) return;
+            $t.wrap('<div class="table-responsive"></div>');
         });
 
         // Tables initialized inside a hidden Bootstrap tab compute zero column
