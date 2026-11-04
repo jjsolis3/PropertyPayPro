@@ -81,6 +81,11 @@ public class ScheduledTaskDispatcher
                 details: $"{task.Kind}: {task.Description}",
                 overrideActor: "scheduler", ct: ct);
         }
+        catch (PermanentTaskFailureException ex)
+        {
+            _logger.LogWarning("ScheduledTask {Id} ({Kind}) failed permanently: {Message}", task.Id, task.Kind, ex.Message);
+            await FailAsync(task, ex.Message, retry: false, ct);
+        }
         catch (Exception ex)
         {
             _logger.LogError(ex, "ScheduledTask {Id} ({Kind}) failed", task.Id, task.Kind);

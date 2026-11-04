@@ -84,6 +84,9 @@ else
     </table>
 }
 
-<a asp-page="/Payments/Create" asp-route-leaseId="@Model.Charge.LeaseId" class="btn btn-success">Record Payment</a>
-<a asp-page="Edit" asp-route-id="@Model.Charge.Id" class="btn btn-primary">Edit</a>
+@if (User.IsInRole(IdentitySeed.AdminRole))
+{
+    <a asp-page="/Payments/Create" asp-route-leaseId="@Model.Charge.LeaseId" class="btn btn-success">Record Payment</a>
+    <a asp-page="Edit" asp-route-id="@Model.Charge.Id" class="btn btn-primary">Edit</a>
+}
 <a asp-page="Index" class="btn btn-outline-secondary">Back</a>

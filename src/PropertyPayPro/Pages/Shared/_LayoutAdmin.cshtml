@@ -19,11 +19,10 @@
     <link rel="apple-touch-icon" sizes="180x180" href="/img/brand/favicon/apple-touch-icon.png">
     <link rel="manifest" href="/img/brand/favicon/site.webmanifest">
 
-    <link href="~/mophy/admin/vendor/bootstrap-select/dist/css/bootstrap-select.min.css" rel="stylesheet">
     <link href="~/mophy/admin/vendor/datatables/css/jquery.dataTables.min.css" rel="stylesheet">
     @RenderSection("Styles", false)
     <link class="main-css" href="~/mophy/admin/css/style.css" rel="stylesheet">
-    <link href="~/css/site.css" rel="stylesheet">
+    <link href="~/css/site.css" rel="stylesheet" asp-append-version="true">
     <style>
         :root {
             --pps-primary: @appSettings.PrimaryColor;
@@ -34,10 +33,13 @@
         // Restore sidebar collapsed state before the sidebar renders,
         // otherwise the icon strip vs full-text flashes on every load.
         // If the user has no stored preference yet, default to
-        // collapsed on mobile so a 16.5rem sidebar doesn't crush the
-        // content column on a phone.
+        // collapsed on tablets so a 16.5rem sidebar doesn't crush the
+        // content column.
+        // Below 768px the theme switches the sidebar to "overlay" mode, where
+        // .menu-toggle means OPEN, so phones always start with it closed.
         (function () {
             try {
+                if (window.innerWidth < 768) return;
                 var stored = localStorage.getItem('pps-sidebar-collapsed');
                 var collapsed;
                 if (stored === '1') collapsed = true;
@@ -77,14 +79,21 @@
     </div>
 
     <script src="~/mophy/admin/vendor/global/global.min.js"></script>
-    <script src="~/mophy/admin/vendor/bootstrap-select/dist/js/bootstrap-select.min.js"></script>
+    <script>
+        // The theme turns every <select> into a bootstrap-select widget, which
+        // drew each dropdown twice (an outer box plus a cut-off inner button)
+        // and didn't pick up options changed by page scripts. We use plain
+        // Bootstrap .form-select dropdowns instead (native pickers on phones),
+        // so the theme's selectpicker() calls become a harmless no-op.
+        jQuery.fn.selectpicker = function () { return this; };
+    </script>
     <script src="~/mophy/admin/vendor/chart-js/chart.bundle.min.js"></script>
     <script src="~/mophy/admin/vendor/datatables/js/jquery.dataTables.min.js"></script>
     <script src="~/mophy/admin/js/custom.min.js"></script>
     <script src="~/mophy/admin/js/deznav-init.js"></script>
-    <script src="~/js/toasts.js"></script>
-    <script src="~/js/datatables-init.js"></script>
-    <script src="~/js/sidebar-persist.js"></script>
+    <script src="~/js/toasts.js" asp-append-version="true"></script>
+    <script src="~/js/datatables-init.js" asp-append-version="true"></script>
+    <script src="~/js/sidebar-persist.js" asp-append-version="true"></script>
     <script src="~/js/sidebar-active.js" asp-append-version="true"></script>
     @RenderSection("Scripts", false)
 </body>

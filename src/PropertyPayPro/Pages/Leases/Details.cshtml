@@ -31,7 +31,7 @@
                 Badges = badges
             })" />
         </div>
-        <div class="flex-shrink-0">
+        <div class="d-flex flex-wrap gap-2">
             <a asp-page="/Reports/Statement" asp-route-leaseId="@Model.Lease.Id" class="btn btn-outline-info">View Statement</a>
             @if (User.IsInRole(IdentitySeed.AdminRole))
             {
@@ -39,8 +39,11 @@
                     <i class="las la-file-alt"></i> New Notice
                 </a>
             }
-            <a asp-page="/Payments/Create" asp-route-leaseId="@Model.Lease.Id" class="btn btn-success">Record Payment</a>
-            <a asp-page="Edit" asp-route-id="@Model.Lease.Id" class="btn btn-primary">Edit</a>
+            @if (User.IsInRole(IdentitySeed.AdminRole))
+            {
+                <a asp-page="/Payments/Create" asp-route-leaseId="@Model.Lease.Id" class="btn btn-success">Record Payment</a>
+                <a asp-page="Edit" asp-route-id="@Model.Lease.Id" class="btn btn-primary">Edit</a>
+            }
             <a asp-page="Index" class="btn btn-outline-secondary">Back</a>
         </div>
     </div>
@@ -273,40 +276,43 @@
                     }
                 </div>
 
-                <form method="post" enctype="multipart/form-data" asp-page-handler="Upload" class="card border mb-3">
-                    <input type="hidden" name="leaseId" value="@Model.Lease.Id" />
-                    <div class="card-body">
-                        <div class="row g-2">
-                            <div class="col-md-4">
-                                <label class="form-label small">Files (multiple allowed)</label>
-                                <input type="file" name="files" class="form-control" multiple required />
-                            </div>
-                            <div class="col-md-3">
-                                <label class="form-label small">Type</label>
-                                <select name="type" class="form-select"
-                                        asp-items="Html.GetEnumSelectList<PropertyPayPro.Models.LeaseDocumentType>()"></select>
-                            </div>
-                            <div class="col-md-5">
-                                <label class="form-label small">Description (optional)</label>
-                                <input type="text" name="description" class="form-control" maxlength="255" />
-                            </div>
-                            <div class="col-md-3">
-                                <label class="form-label small">Effective date (optional)</label>
-                                <input type="date" name="effectiveDate" class="form-control" />
-                            </div>
-                            <div class="col-md-3">
-                                <label class="form-label small">Expires on (optional)</label>
-                                <input type="date" name="expiresOn" class="form-control" />
-                            </div>
-                            <div class="col-md-6 d-flex align-items-end">
-                                <button type="submit" class="btn btn-primary">Upload</button>
-                                <small class="text-muted ms-3">
-                                    Type + expiration surface documents on the "expiring soon" dashboard.
-                                </small>
+                @if (User.IsInRole(IdentitySeed.AdminRole))
+                {
+                    <form method="post" enctype="multipart/form-data" asp-page-handler="Upload" class="card border mb-3">
+                        <input type="hidden" name="leaseId" value="@Model.Lease.Id" />
+                        <div class="card-body">
+                            <div class="row g-2">
+                                <div class="col-md-4">
+                                    <label class="form-label small">Files (multiple allowed)</label>
+                                    <input type="file" name="files" class="form-control" multiple required />
+                                </div>
+                                <div class="col-md-3">
+                                    <label class="form-label small">Type</label>
+                                    <select name="type" class="form-select"
+                                            asp-items="Html.GetEnumSelectList<PropertyPayPro.Models.LeaseDocumentType>()"></select>
+                                </div>
+                                <div class="col-md-5">
+                                    <label class="form-label small">Description (optional)</label>
+                                    <input type="text" name="description" class="form-control" maxlength="255" />
+                                </div>
+                                <div class="col-md-3">
+                                    <label class="form-label small">Effective date (optional)</label>
+                                    <input type="date" name="effectiveDate" class="form-control" />
+                                </div>
+                                <div class="col-md-3">
+                                    <label class="form-label small">Expires on (optional)</label>
+                                    <input type="date" name="expiresOn" class="form-control" />
+                                </div>
+                                <div class="col-md-6 d-flex align-items-end">
+                                    <button type="submit" class="btn btn-primary">Upload</button>
+                                    <small class="text-muted ms-3">
+                                        Type + expiration surface documents on the "expiring soon" dashboard.
+                                    </small>
+                                </div>
                             </div>
                         </div>
-                    </div>
-                </form>
+                    </form>
+                }
 
                 @if (Model.Lease.Documents.Any())
                 {
@@ -356,11 +362,14 @@
                                         }
                                         <a asp-page-handler="Download" asp-route-documentId="@d.Id"
                                            class="btn btn-sm btn-outline-secondary">Download</a>
-                                        <form method="post" asp-page-handler="DeleteDocument" class="d-inline">
-                                            <input type="hidden" name="documentId" value="@d.Id" />
-                                            <button type="submit" class="btn btn-sm btn-outline-danger"
-                                                    onclick="return confirm('Delete this document?')">Delete</button>
-                                        </form>
+                                        @if (User.IsInRole(IdentitySeed.AdminRole))
+                                        {
+                                            <form method="post" asp-page-handler="DeleteDocument" class="d-inline">
+                                                <input type="hidden" name="documentId" value="@d.Id" />
+                                                <button type="submit" class="btn btn-sm btn-outline-danger"
+                                                        onclick="return confirm('Delete this document?')">Delete</button>
+                                            </form>
+                                        }
                                     </td>
                                 </tr>
                             }

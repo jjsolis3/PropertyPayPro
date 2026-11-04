@@ -51,3 +51,30 @@ table.dataTable { width: 100% !important; }
 .dataTables_wrapper .dataTables_info { padding-top: 0.5rem; }
 table.dataTable thead th { border-bottom: 2px solid rgba(0,0,0,0.06); }
 table.dataTable thead th.no-sort { background-image: none !important; cursor: default; }
+
+/* Dropdowns are plain Bootstrap .form-select (bootstrap-select is switched off in
+   _LayoutAdmin). The theme styles .form-select as a shrink-to-fit grey pill with
+   bold text; match the text inputs instead: full column width, same height,
+   border, radius and font. Opt out per element with .w-auto. */
+.form-select {
+    width: 100%;
+    height: 2.875rem;
+    padding: .375rem 2.25rem .375rem .75rem;
+    font-size: .9rem;
+    font-weight: 400;
+    color: #555;
+    background-color: #fff;
+    border: 1px solid var(--bs-border-color, #e6e6e6);
+    border-radius: .5rem;
+    background-position: right .75rem center;
+}
+.form-select:focus {
+    border-color: var(--pps-primary, #6418c3);
+    box-shadow: none;
+}
+.form-select-sm {
+    height: auto;
+    padding: .25rem 2rem .25rem .5rem;
+    font-size: .8rem;
+}
+.form-select[multiple], .form-select[size]:not([size="1"]) { height: auto; }

@@ -135,6 +135,21 @@ public class SendModel : PageModel
             .Select(d => d.Id)
             .ToListAsync();
 
+        // Refuse up front (for both now and scheduled sends) if an attachment's
+        // file is gone from storage, naming it, rather than failing mid-send.
+        var missing = new List<string>();
+        foreach (var d in await _db.LeaseDocuments.Where(d => chosenIds.Contains(d.Id)).ToListAsync())
+        {
+            if (!await _storage.ExistsAsync(d.StorageKey)) missing.Add(d.FileName);
+        }
+        if (missing.Count > 0)
+        {
+            ModelState.AddModelError(string.Empty,
+                $"These attachments are missing from storage, so nothing was sent: {string.Join(", ", missing)}. " +
+                "Upload them again on the lease page, or untick them.");
+            return Page();
+        }
+
         // Translate the admin's local time to UTC. The browser sends
         // the datetime-local as "unspecified"; we treat it as the
         // server's local kind to stay consistent across the app.

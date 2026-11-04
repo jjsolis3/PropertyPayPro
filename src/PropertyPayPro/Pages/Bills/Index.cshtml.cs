@@ -49,6 +49,8 @@ public class IndexModel : PageModel
 
     public async Task<IActionResult> OnPostGenerateAsync()
     {
+        // Managers can view this page but only Admins may change data.
+        if (!User.IsInRole(IdentitySeed.AdminRole)) return Forbid();
         if (GenerateMonth < 1 || GenerateMonth > 12)
         {
             TempData["GenerateError"] = "Month must be 1–12.";
@@ -65,6 +67,8 @@ public class IndexModel : PageModel
 
     public async Task<IActionResult> OnPostSendAllStatementsAsync()
     {
+        // Managers can view this page but only Admins may change data.
+        if (!User.IsInRole(IdentitySeed.AdminRole)) return Forbid();
         if (!_mail.IsConfigured)
         {
             TempData["GenerateError"] = "SMTP is not configured.";
