@@ -16,7 +16,7 @@
         <form method="post" asp-page-handler="GeneratePdf" asp-route-leaseId="@Model.Lease.Id" class="d-inline">
             <button type="submit" class="btn btn-outline-secondary">Generate PDF</button>
         </form>
-        @if (Model.MailConfigured && tenantsWithEmail.Any())
+        @if (Model.MailConfigured && tenantsWithEmail.Any() && User.IsInRole(IdentitySeed.AdminRole))
         {
             <form method="post" asp-page-handler="Send" asp-route-leaseId="@Model.Lease.Id" class="d-inline">
                 <button type="submit" class="btn btn-outline-success">Email to Tenant</button>

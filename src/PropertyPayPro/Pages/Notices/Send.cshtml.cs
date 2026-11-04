@@ -232,7 +232,8 @@ public class SendModel : PageModel
             RunAtUtc = sendAtUtc,
             PayloadJson = JsonSerializer.Serialize(payload),
             CreatedByUserId = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value,
-            Description = $"Notice \"{Input.Subject}\" to {Input.Recipients.Count} recipient(s)",
+            // Description is varchar(300) but a subject can be 300 chars: shorten it.
+            Description = $"Notice \"{(Input.Subject.Length > 200 ? Input.Subject[..200] + "…" : Input.Subject)}\" to {Input.Recipients.Count} recipient(s)",
         };
         _db.ScheduledTasks.Add(task);
         await _db.SaveChangesAsync();

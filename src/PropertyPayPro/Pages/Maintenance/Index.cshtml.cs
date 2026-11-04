@@ -34,10 +34,14 @@ public class IndexModel : PageModel
 
     public async Task OnGetAsync()
     {
-        var baseUrl = $"{Request.Scheme}://{Request.Host}";
-        // Opportunistic run — cheap when nothing is due, and keeps
-        // schedules moving even if the external cron isn't wired up.
-        await _scheduler.GenerateDueTicketsAsync(baseUrl);
+        // Opportunistic run — cheap when nothing is due, and keeps schedules moving
+        // even if the external cron isn't wired up. Admins only: it creates tickets
+        // and can email tenants, and Managers are read-only.
+        if (User.IsInRole(IdentitySeed.AdminRole))
+        {
+            var baseUrl = $"{Request.Scheme}://{Request.Host}";
+            await _scheduler.GenerateDueTicketsAsync(baseUrl);
+        }
         await LoadAsync();
     }
 

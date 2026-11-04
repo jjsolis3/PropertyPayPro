@@ -73,6 +73,14 @@ public class BrandingModel : PageModel
             ModelState.AddModelError("Input.TimeZoneId", "Pick a time zone from the list.");
         }
 
+        // Check logo types up front, as a form error. Previously a bad type threw
+        // (500) after the shared cached settings had already been changed in memory.
+        foreach (var (file, field) in new[] { (logoMain, "logoMain"), (logoSmall, "logoSmall") })
+        {
+            if (file is { Length: > 0 } && !IsAllowedLogo(file))
+                ModelState.AddModelError(field, $"\"{file.FileName}\" isn't a PNG, JPG or WebP image; logo not changed.");
+        }
+
         if (!ModelState.IsValid) return Page();
         var previousZone = Current.TimeZoneId;
 
@@ -141,11 +149,12 @@ public class BrandingModel : PageModel
         return File(stream, "image/png");
     }
 
+    private static bool IsAllowedLogo(IFormFile file) =>
+        Path.GetExtension(file.FileName).ToLowerInvariant() is ".png" or ".jpg" or ".jpeg" or ".webp";
+
     private async Task<string> SaveLogoAsync(IFormFile file, string label)
     {
         var safeExt = Path.GetExtension(file.FileName).ToLowerInvariant();
-        if (safeExt is not (".png" or ".jpg" or ".jpeg" or ".webp"))
-            throw new InvalidOperationException("Logo must be PNG, JPG, or WebP.");
         await using var stream = file.OpenReadStream();
         return await _storage.SaveAsync("branding", $"logo-{label}{safeExt}", stream);
     }

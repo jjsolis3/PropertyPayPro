@@ -83,7 +83,13 @@ public class MaintenanceSchedulerService
 
             s.LastGeneratedOn = today;
             s.LastServiceTicketId = ticket.Id;
-            s.NextDueDate = AdvanceNextDueDate(s.NextDueDate, s.RecurrenceMonths);
+            // Catch up to the first occurrence after today. Advancing only one cycle
+            // left an overdue schedule's next date still in the past, and since
+            // LastGeneratedOn (today) was then >= NextDueDate it never fired again.
+            var next = AdvanceNextDueDate(s.NextDueDate, s.RecurrenceMonths);
+            while (next <= today && s.RecurrenceMonths > 0)
+                next = AdvanceNextDueDate(next, s.RecurrenceMonths);
+            s.NextDueDate = next;
             await _db.SaveChangesAsync(ct);
 
             ticketsCreated++;

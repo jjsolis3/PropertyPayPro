@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.EntityFrameworkCore;
 using PropertyPayPro.Data;
 using PropertyPayPro.Models;
+using PropertyPayPro.Services;
 
 namespace PropertyPayPro.Pages.Payments;
 
@@ -12,7 +13,12 @@ namespace PropertyPayPro.Pages.Payments;
 public class EditModel : PageModel
 {
     private readonly ApplicationDbContext _db;
-    public EditModel(ApplicationDbContext db) => _db = db;
+    private readonly BillingService _billing;
+    public EditModel(ApplicationDbContext db, BillingService billing)
+    {
+        _db = db;
+        _billing = billing;
+    }
 
     [BindProperty]
     public RentPayment Payment { get; set; } = new();
@@ -48,28 +54,43 @@ public class EditModel : PageModel
 
     public async Task<IActionResult> OnPostAsync()
     {
-        if (!ModelState.IsValid)
-        {
-            await LoadSelectListAsync();
-            await LoadOutstandingAsync();
-            return Page();
-        }
-
-        var totalAllocated = AllocationAmounts.Where(a => a > 0).Sum();
-        if (totalAllocated > Payment.Amount)
-        {
-            ModelState.AddModelError(string.Empty,
-                $"Total allocated ({totalAllocated:C}) exceeds payment amount ({Payment.Amount:C}).");
-            await LoadSelectListAsync();
-            await LoadOutstandingAsync();
-            return Page();
-        }
-
-        // Update payment scalars
         var existing = await _db.RentPayments
             .Include(p => p.Allocations)
             .FirstOrDefaultAsync(p => p.Id == Payment.Id);
         if (existing is null) return NotFound();
+
+        // Moving the payment to another lease: the allocation rows on the form are the
+        // old lease's bills, so clear them and send the admin back to pick the new
+        // lease's bills (previously they stayed attached to the old lease's bills).
+        var leaseChanged = existing.LeaseId != Payment.LeaseId;
+        if (leaseChanged)
+        {
+            AllocationChargeIds.Clear();
+            AllocationAmounts.Clear();
+        }
+
+        if (ModelState.IsValid)
+        {
+            var totalAllocated = AllocationAmounts.Where(a => a > 0).Sum();
+            if (totalAllocated > Payment.Amount)
+                ModelState.AddModelError(string.Empty,
+                    $"Total allocated ({totalAllocated:C}) exceeds payment amount ({Payment.Amount:C}).");
+            else if (await _billing.ValidateAllocationsAsync(Payment.LeaseId, AllocationChargeIds, AllocationAmounts, existing.Id) is string allocationError)
+                ModelState.AddModelError(string.Empty, allocationError);
+        }
+        if (!ModelState.IsValid)
+        {
+            // Redisplay what was entered (the view reads CurrentAllocations); before,
+            // this was empty, so saving again wiped the payment's allocations.
+            CurrentAllocations = new Dictionary<int, decimal>();
+            for (var i = 0; i < AllocationChargeIds.Count && i < AllocationAmounts.Count; i++)
+                CurrentAllocations[AllocationChargeIds[i]] = AllocationAmounts[i];
+            if (CurrentAllocations.Count == 0)
+                CurrentAllocations = existing.Allocations.ToDictionary(a => a.RentalChargeId, a => a.Amount);
+            await LoadSelectListAsync();
+            await LoadOutstandingAsync();
+            return Page();
+        }
 
         existing.LeaseId = Payment.LeaseId;
         existing.PaidByTenantId = Payment.PaidByTenantId;
@@ -93,6 +114,11 @@ public class EditModel : PageModel
         }
 
         await _db.SaveChangesAsync();
+        if (leaseChanged)
+        {
+            TempData["Message"] = "Lease changed. Its old bill allocations were removed: pick the new lease's bills below and save.";
+            return RedirectToPage(new { id = existing.Id });
+        }
         return RedirectToPage("/Receipts/Show", new { id = existing.Id });
     }
 

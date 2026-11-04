@@ -5,10 +5,20 @@
 }
 
 <h1 class="text-danger">Delete Tenant</h1>
-<p>Are you sure you want to delete <strong>@Model.Tenant!.DisplayName</strong>?</p>
+@if (Model.BlockedReason is not null)
+{
+    <div class="alert alert-warning">@Model.BlockedReason</div>
+}
+else
+{
+    <p>Are you sure you want to delete <strong>@Model.Tenant!.DisplayName</strong>?</p>
+}
 
 <form method="post">
     <input type="hidden" asp-for="Tenant.Id" />
-    <button type="submit" class="btn btn-danger">Delete</button>
+    @if (Model.BlockedReason is null)
+    {
+        <button type="submit" class="btn btn-danger">Delete</button>
+    }
     <a asp-page="Index" class="btn btn-outline-secondary">Cancel</a>
 </form>

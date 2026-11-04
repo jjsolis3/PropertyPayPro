@@ -46,6 +46,11 @@ public class DeleteModel : PageModel
             try { await _storage.DeleteAsync(photo.StorageKey); } catch { /* ignore */ }
         }
 
+        // A move-out may point at this move-in (PairedMoveInId, NoAction in the database),
+        // which would block the delete. Unlink those first.
+        var pairedMoveOuts = await _db.Inspections.Where(x => x.PairedMoveInId == id).ToListAsync();
+        foreach (var mo in pairedMoveOuts) mo.PairedMoveInId = null;
+
         _db.Inspections.Remove(i);
         await _db.SaveChangesAsync();
         TempData["Message"] = $"Inspection #{id} deleted.";

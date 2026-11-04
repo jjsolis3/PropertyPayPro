@@ -96,9 +96,16 @@ public class BillingService
     {
         var rentCharge = await _db.RentalCharges
             .Include(c => c.Lease)
+            .Include(c => c.Allocations)
             .FirstOrDefaultAsync(c => c.Id == rentChargeId && c.Kind == ChargeKind.Rent);
 
         if (rentCharge?.Lease is null || rentCharge.Lease.LateFeeAmount <= 0) return null;
+        // Re-check at apply time: the bill may have been paid, or already given a fee
+        // (double click, page refresh, or the billing sweep running at the same moment).
+        if (rentCharge.Balance <= 0) return null;
+        var alreadyHasFee = await _db.RentalCharges.AnyAsync(c => c.LeaseId == rentCharge.LeaseId
+            && c.Kind == ChargeKind.LateFee && c.BillingPeriodStart == rentCharge.BillingPeriodStart);
+        if (alreadyHasFee) return null;
 
         var lateFee = new RentalCharge
         {
@@ -110,7 +117,17 @@ public class BillingService
             Notes = $"Late fee applied for {rentCharge.BillingPeriodStart:MMMM yyyy} rent."
         };
         _db.RentalCharges.Add(lateFee);
-        await _db.SaveChangesAsync();
+        try
+        {
+            await _db.SaveChangesAsync();
+        }
+        catch (DbUpdateException)
+        {
+            // Lost a race with a concurrent apply: the unique (lease, period, kind)
+            // index already has this fee. Treat as "nothing to do".
+            _db.Entry(lateFee).State = EntityState.Detached;
+            return null;
+        }
         return lateFee;
     }
 
@@ -155,5 +172,40 @@ public class BillingService
         }
 
         return suggestions;
+    }
+
+    /// <summary>
+    /// Server-side check of a payment's bill allocations (the browser checks too, but
+    /// that can be bypassed or go stale): every bill must belong to the payment's
+    /// lease, appear once, and receive no more than its remaining balance. Amounts
+    /// this same payment already has on a bill count as available when editing.
+    /// Returns a message describing the first problem, or null when valid.
+    /// </summary>
+    public async Task<string?> ValidateAllocationsAsync(int leaseId, IReadOnlyList<int> chargeIds,
+        IReadOnlyList<decimal> amounts, int? editingPaymentId = null)
+    {
+        var wanted = new Dictionary<int, decimal>();
+        for (var i = 0; i < chargeIds.Count && i < amounts.Count; i++)
+        {
+            if (amounts[i] < 0) return "Allocation amounts can't be negative.";
+            if (amounts[i] == 0) continue;
+            wanted[chargeIds[i]] = wanted.GetValueOrDefault(chargeIds[i]) + amounts[i];
+        }
+        if (wanted.Count == 0) return null;
+
+        var ids = wanted.Keys.ToList();
+        var charges = await _db.RentalCharges.Include(c => c.Allocations)
+            .Where(c => ids.Contains(c.Id)).ToListAsync();
+        foreach (var (id, amount) in wanted)
+        {
+            var c = charges.FirstOrDefault(x => x.Id == id);
+            if (c is null || c.LeaseId != leaseId)
+                return "One of the bills selected doesn't belong to this payment's lease. Reload the page and pick again.";
+            var ownShare = editingPaymentId is int pid ? c.Allocations.Where(a => a.RentPaymentId == pid).Sum(a => a.Amount) : 0m;
+            var available = c.Balance + ownShare;
+            if (amount > available)
+                return $"{c.BillingPeriodStart:MMMM yyyy} {(c.Kind == ChargeKind.LateFee ? "late fee" : "rent")} only has {available:C} left to pay; {amount:C} was entered.";
+        }
+        return null;
     }
 }

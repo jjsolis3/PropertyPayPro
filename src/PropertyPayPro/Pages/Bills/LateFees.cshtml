@@ -46,13 +46,16 @@ else
                 <td class="text-end">@c.Balance.ToString("C")</td>
                 <td class="text-end">@c.Lease.LateFeeAmount.ToString("C")</td>
                 <td class="text-end">
-                    <form method="post" asp-page-handler="Apply" class="d-inline">
-                        <input type="hidden" name="chargeId" value="@c.Id" />
-                        <button type="submit" class="btn btn-sm btn-warning"
-                                onclick="return confirm('Apply late fee of @c.Lease.LateFeeAmount.ToString("C") to this lease?')">
-                            Apply
-                        </button>
-                    </form>
+                    @if (User.IsInRole(IdentitySeed.AdminRole))
+                    {
+                        <form method="post" asp-page-handler="Apply" class="d-inline">
+                            <input type="hidden" name="chargeId" value="@c.Id" />
+                            <button type="submit" class="btn btn-sm btn-warning"
+                                    onclick="return confirm('Apply late fee of @c.Lease.LateFeeAmount.ToString("C") to this lease?')">
+                                Apply
+                            </button>
+                        </form>
+                    }
                 </td>
             </tr>
         }

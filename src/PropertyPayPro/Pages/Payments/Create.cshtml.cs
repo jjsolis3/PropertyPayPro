@@ -71,6 +71,15 @@ public class CreateModel : PageModel
             return Page();
         }
 
+        var allocationError = await _billing.ValidateAllocationsAsync(Payment.LeaseId, AllocationChargeIds, AllocationAmounts);
+        if (allocationError is not null)
+        {
+            ModelState.AddModelError(string.Empty, allocationError);
+            await LoadLeasesAsync();
+            await LoadOutstandingAsync();
+            return Page();
+        }
+
         _db.RentPayments.Add(Payment);
         await _db.SaveChangesAsync();
 

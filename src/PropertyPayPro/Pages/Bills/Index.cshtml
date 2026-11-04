@@ -138,6 +138,8 @@
     </div>
 </div>
 
+@if (User.IsInRole(IdentitySeed.AdminRole))
+{
 <!-- Generate Bills Modal -->
 <div class="modal fade" id="generateBillsModal" tabindex="-1" aria-labelledby="generateBillsModalLabel" aria-hidden="true">
     <div class="modal-dialog">
@@ -171,3 +173,4 @@
         </div>
     </div>
 </div>
+}

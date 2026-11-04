@@ -39,8 +39,41 @@ public static class AppTimeZone
     {
         if (!IsValid(id)) return false;
         Environment.SetEnvironmentVariable("TZ", id);
+        NativeTimeZone.Set(id!);
         TimeZoneInfo.ClearCachedData();
         return true;
+    }
+
+    /// <summary>
+    /// Environment.SetEnvironmentVariable only changes .NET's own copy of the
+    /// environment. Native code in the same process (OpenSSL, used to validate TLS
+    /// certificates when sending email) kept the container's zone (UTC), so it
+    /// disagreed with .NET's local time by the zone offset (8 hours for Los Angeles).
+    /// The visible symptom: a mail server certificate issued in the last 8 hours was
+    /// rejected as "not yet valid", so email failed after a provider rotated certs.
+    /// Setting TZ natively too, then tzset(), keeps both sides in step.
+    /// </summary>
+    private static class NativeTimeZone
+    {
+        [System.Runtime.InteropServices.DllImport("libc", EntryPoint = "setenv")]
+        private static extern int SetEnv(string name, string value, int overwrite);
+
+        [System.Runtime.InteropServices.DllImport("libc", EntryPoint = "tzset")]
+        private static extern void TzSet();
+
+        public static void Set(string id)
+        {
+            if (!OperatingSystem.IsLinux() && !OperatingSystem.IsMacOS()) return;
+            try
+            {
+                SetEnv("TZ", id, 1);
+                TzSet();
+            }
+            catch (Exception e) when (e is DllNotFoundException or EntryPointNotFoundException)
+            {
+                // No libc to call (unusual platform): .NET's own time zone still applies.
+            }
+        }
     }
 
     /// <summary>Every IANA zone on the server, for the full picker list.</summary>

@@ -62,7 +62,7 @@ public class PreviewModel : PageModel
         if (doc is null) return NotFound();
 
         var stream = await _storage.OpenReadAsync(doc.StorageKey);
-        Response.Headers["Content-Disposition"] = $"inline; filename=\"{doc.FileName}\"";
+        PropertyPayPro.Infrastructure.InlineFileHeader.Set(Response, doc.FileName);
         return File(stream, doc.ContentType);
     }
 

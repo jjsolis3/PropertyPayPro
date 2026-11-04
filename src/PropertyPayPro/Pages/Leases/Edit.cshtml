@@ -9,7 +9,7 @@
 <div class="row">
     <div class="col-md-6">
         <form method="post">
-            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <div asp-validation-summary="All" class="text-danger"></div>
             <input type="hidden" asp-for="Lease.Id" />
             <div class="mb-3">
                 <label asp-for="Lease.PropertyId" class="form-label">Property</label>
@@ -26,7 +26,9 @@
                 </div>
                 <div class="col mb-3">
                     <label asp-for="Lease.EndDate" class="form-label"></label>
-                    <input asp-for="Lease.EndDate" class="form-control" />
+                    <input asp-for="Lease.EndDate" class="form-control" data-val="false" />
+                    <small class="text-muted">Leave blank for a month-to-month lease.</small>
+                    <span asp-validation-for="Lease.EndDate" class="text-danger small d-block"></span>
                 </div>
             </div>
             <div class="row">

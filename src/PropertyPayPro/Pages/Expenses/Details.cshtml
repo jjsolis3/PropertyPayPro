@@ -7,7 +7,7 @@
 <div class="d-flex justify-content-between align-items-center mb-3">
     <h1 class="h3 mb-0">@Model.Expense!.Description</h1>
     <div>
-        @if (Model.Expense.PassThroughToTenant && !Model.Expense.IsReimbursed)
+        @if (Model.Expense.PassThroughToTenant && !Model.Expense.IsReimbursed && User.IsInRole(IdentitySeed.AdminRole))
         {
             <form method="post" asp-page-handler="MarkReimbursed" asp-route-id="@Model.Expense.Id" class="d-inline">
                 <button type="submit" class="btn btn-outline-success"
@@ -16,7 +16,7 @@
                 </button>
             </form>
         }
-        @if (Model.Expense.IsReimbursed)
+        @if (Model.Expense.IsReimbursed && User.IsInRole(IdentitySeed.AdminRole))
         {
             <form method="post" asp-page-handler="ClearReimbursed" asp-route-id="@Model.Expense.Id" class="d-inline">
                 <button type="submit" class="btn btn-outline-warning"

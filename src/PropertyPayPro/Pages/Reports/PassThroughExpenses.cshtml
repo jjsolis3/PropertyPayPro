@@ -20,7 +20,7 @@
            asp-route-Category="@Model.Category"
            asp-route-export="csv"
            class="btn btn-outline-success">Export CSV</a>
-        @if (Model.MailConfigured && Model.TotalOutstanding > 0)
+        @if (Model.MailConfigured && Model.TotalOutstanding > 0 && User.IsInRole(IdentitySeed.AdminRole))
         {
             <form method="post" asp-page-handler="SendReminders" class="d-inline">
                 <input type="hidden" name="FromDate" value="@Model.FromDate" />

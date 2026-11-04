@@ -5,10 +5,27 @@
 }
 
 <h1 class="text-danger">Delete Lease</h1>
-<p>Are you sure you want to delete the lease for <strong>@Model.Lease!.TenantNames</strong> at <strong>@Model.Lease.Property!.Name</strong>?</p>
+@if (Model.PaymentCount > 0)
+{
+    <div class="alert alert-warning">
+        This lease has @Model.PaymentCount payment(s) recorded, so it can't be deleted: that would erase
+        its payment history. If the lease has ended, edit it and set the end date instead.
+    </div>
+}
+else
+{
+    <p>Are you sure you want to delete the lease for <strong>@Model.Lease!.TenantNames</strong> at <strong>@Model.Lease.Property!.Name</strong>?</p>
+    @if (Model.BillCount > 0 || Model.DocumentCount > 0)
+    {
+        <p class="text-danger">This also deletes its @Model.BillCount bill(s) and @Model.DocumentCount document(s).</p>
+    }
+}
 
 <form method="post">
     <input type="hidden" asp-for="Lease.Id" />
-    <button type="submit" class="btn btn-danger">Delete</button>
+    @if (Model.PaymentCount == 0)
+    {
+        <button type="submit" class="btn btn-danger">Delete</button>
+    }
     <a asp-page="Index" class="btn btn-outline-secondary">Cancel</a>
 </form>

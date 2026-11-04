@@ -15,7 +15,7 @@
         <form method="post" asp-page-handler="GeneratePdf" asp-route-id="@Model.Payment.Id" class="d-inline">
             <button type="submit" class="btn btn-outline-secondary">Regenerate PDF</button>
         </form>
-        @if (Model.MailConfigured)
+        @if (Model.MailConfigured && User.IsInRole(IdentitySeed.AdminRole))
         {
             <form method="post" asp-page-handler="Email" asp-route-id="@Model.Payment.Id" class="d-inline">
                 <button type="submit" class="btn btn-outline-success">Email Receipt</button>

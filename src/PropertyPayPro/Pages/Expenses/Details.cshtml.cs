@@ -25,6 +25,8 @@ public class DetailsModel : PageModel
 
     public async Task<IActionResult> OnPostMarkReimbursedAsync(int id)
     {
+        // Managers can view this page but only Admins may email tenants or change records.
+        if (!User.IsInRole(IdentitySeed.AdminRole)) return Forbid();
         var e = await _db.PropertyExpenses.FindAsync(id);
         if (e is null) return NotFound();
         e.ReimbursedOn = DateOnly.FromDateTime(DateTime.Now);
@@ -36,6 +38,8 @@ public class DetailsModel : PageModel
 
     public async Task<IActionResult> OnPostClearReimbursedAsync(int id)
     {
+        // Managers can view this page but only Admins may email tenants or change records.
+        if (!User.IsInRole(IdentitySeed.AdminRole)) return Forbid();
         var e = await _db.PropertyExpenses.FindAsync(id);
         if (e is null) return NotFound();
         e.ReimbursedOn = null;
