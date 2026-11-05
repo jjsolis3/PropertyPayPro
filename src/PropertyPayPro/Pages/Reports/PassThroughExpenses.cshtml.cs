@@ -55,6 +55,8 @@ public class PassThroughExpensesModel : PageModel
 
     public async Task<IActionResult> OnPostSendRemindersAsync(int? leaseId)
     {
+        // Managers can view this page but only Admins may email tenants or change records.
+        if (!User.IsInRole(IdentitySeed.AdminRole)) return Forbid();
         if (!_mail.IsConfigured)
         {
             TempData["Error"] = "SMTP is not configured.";
@@ -81,9 +83,13 @@ public class PassThroughExpensesModel : PageModel
         else
         {
             // Bulk — every lease where the lease's property has unreimbursed pass-through expenses
+            // Current leases only: past tenants shouldn't be asked to reimburse the
+            // current tenant's expenses.
+            var today = DateOnly.FromDateTime(DateTime.Now);
             var leases = await _db.Leases
                 .Include(l => l.Tenants)
-                .Where(l => l.Tenants.Any(t => t.ReceiveReminders))
+                .Where(l => l.Tenants.Any(t => t.ReceiveReminders)
+                    && l.StartDate <= today && (l.IsMonthToMonth || l.EndDate >= today))
                 .ToListAsync();
 
             var expenses = await _db.PropertyExpenses

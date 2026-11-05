@@ -40,6 +40,8 @@ public class StatementModel : PageModel
 
     public async Task<IActionResult> OnPostSendAsync(int leaseId)
     {
+        // Managers can view this page but only Admins may email tenants or change records.
+        if (!User.IsInRole(IdentitySeed.AdminRole)) return Forbid();
         if (!_mail.IsConfigured)
         {
             TempData["EmailStatus"] = "SMTP is not configured.";

@@ -63,7 +63,7 @@
                 <button type="button" class="btn btn-outline-success" id="selectEligibleBtn">Select Email-Eligible</button>
                 <button type="button" class="btn btn-outline-secondary" id="clearAllBtn">Clear</button>
             </div>
-            @if (Model.MailConfigured)
+            @if (Model.MailConfigured && User.IsInRole(IdentitySeed.AdminRole))
             {
                 <button type="submit" class="btn btn-primary" id="sendBtn"
                         onclick="return confirm('Email statements to selected tenants?');">

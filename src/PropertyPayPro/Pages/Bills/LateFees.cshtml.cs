@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
+using PropertyPayPro.Data;
 using PropertyPayPro.Models;
 using PropertyPayPro.Services;
 
@@ -17,16 +18,19 @@ public class LateFeesModel : PageModel
 
     public async Task OnGetAsync()
     {
+        Message = TempData["Message"] as string;
         Candidates = await _billing.GetLateFeeCandidatesAsync();
     }
 
     public async Task<IActionResult> OnPostApplyAsync(int chargeId)
     {
+        // Managers can view this page but only Admins may change data.
+        if (!User.IsInRole(IdentitySeed.AdminRole)) return Forbid();
         var lateFee = await _billing.ApplyLateFeeAsync(chargeId);
-        Message = lateFee is null
-            ? "Could not apply late fee — the bill may already have one, or the lease has no late fee configured."
+        TempData["Message"] = lateFee is null
+            ? "No late fee applied: the bill already has one, is paid, or its lease has no late fee set."
             : $"Late fee of {lateFee.AmountDue:C} applied.";
-        Candidates = await _billing.GetLateFeeCandidatesAsync();
-        return Page();
+        // Redirect so a refresh doesn't re-submit the form.
+        return RedirectToPage();
     }
 }

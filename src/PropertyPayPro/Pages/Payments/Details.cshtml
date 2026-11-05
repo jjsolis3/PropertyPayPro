@@ -26,7 +26,7 @@
         {
             <tr>
                 <td><a asp-page="/Bills/Details" asp-route-id="@a.RentalChargeId">@a.RentalCharge!.PeriodLabel</a></td>
-                <td>@a.RentalCharge.DueDate.ToString("yyyy-MM-dd")</td>
+                <td>@a.RentalCharge!.DueDate.ToString("yyyy-MM-dd")</td>
                 <td class="text-end">@a.Amount.ToString("C")</td>
             </tr>
         }

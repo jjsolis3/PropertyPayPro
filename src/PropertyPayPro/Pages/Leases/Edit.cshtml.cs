@@ -21,7 +21,7 @@ public class EditModel : PageModel
     public List<int> SelectedTenantIds { get; set; } = new();
 
     public SelectList Properties { get; private set; } = default!;
-    public SelectList Tenants { get; private set; } = default!;
+    public MultiSelectList Tenants { get; private set; } = default!;
 
     public async Task<IActionResult> OnGetAsync(int id)
     {
@@ -37,6 +37,7 @@ public class EditModel : PageModel
 
     public async Task<IActionResult> OnPostAsync()
     {
+        ValidateEndDate();
         if (SelectedTenantIds.Count == 0)
         {
             ModelState.AddModelError(string.Empty, "Pick at least one tenant.");
@@ -78,6 +79,32 @@ public class EditModel : PageModel
     {
         Properties = new SelectList(await _db.Properties.OrderBy(p => p.Name).ToListAsync(), "Id", "Name");
         var tenants = await _db.Tenants.OrderBy(t => t.LastName).ToListAsync();
-        Tenants = new SelectList(tenants.Select(t => new { t.Id, Name = t.DisplayName }), "Id", "Name", SelectedTenantIds);
+        // MultiSelectList (not SelectList) so every tenant already on the lease is preselected.
+        Tenants = new MultiSelectList(tenants.Select(t => new { t.Id, Name = t.DisplayName }), "Id", "Name", SelectedTenantIds);
+    }
+
+    /// <summary>
+    /// Month-to-month leases ignore the end date everywhere, so a blank one is fine:
+    /// store the start date as a placeholder. Fixed-term leases need a real end date
+    /// after the start.
+    /// </summary>
+    private void ValidateEndDate()
+    {
+        var blank = ModelState.TryGetValue("Lease.EndDate", out var entry) && string.IsNullOrWhiteSpace(entry.AttemptedValue);
+        if (Lease.IsMonthToMonth)
+        {
+            ModelState.Remove("Lease.EndDate");
+            if (blank || Lease.EndDate == default) Lease.EndDate = Lease.StartDate;
+            return;
+        }
+        if (blank)
+        {
+            ModelState.Remove("Lease.EndDate");
+            ModelState.AddModelError("Lease.EndDate", "Enter an end date, or tick Month-to-month.");
+        }
+        else if (Lease.EndDate < Lease.StartDate)
+        {
+            ModelState.AddModelError("Lease.EndDate", "End date must be on or after the start date.");
+        }
     }
 }

@@ -62,6 +62,20 @@ public class DetailsModel : PageModel
         [StringLength(500)] public string? DeductionReason { get; set; }
     }
 
+    /// <summary>
+    /// The item handlers bind plain [FromForm] objects, so their [Required]/[Range]
+    /// rules were never enforced: a blank item name hit the NOT NULL column (500) and
+    /// negative deductions were saved. Returns the first problem, or null if valid.
+    /// </summary>
+    private static string? InvalidInput(object input)
+    {
+        var results = new List<System.ComponentModel.DataAnnotations.ValidationResult>();
+        return System.ComponentModel.DataAnnotations.Validator.TryValidateObject(
+            input, new System.ComponentModel.DataAnnotations.ValidationContext(input), results, validateAllProperties: true)
+            ? null
+            : "Not saved: " + string.Join(" ", results.Select(r => r.ErrorMessage));
+    }
+
     public class NewItemInput
     {
         public int InspectionId { get; set; }
@@ -98,6 +112,11 @@ public class DetailsModel : PageModel
             .FirstOrDefaultAsync(x => x.Id == input.Id);
         if (item is null) return NotFound();
         if (!CanMutate(item.Inspection!)) return Forbid();
+        if (InvalidInput(input) is string error)
+        {
+            TempData["Error"] = error;
+            return RedirectToPage(new { id = input.InspectionId });
+        }
 
         item.Room = input.Room;
         item.Item = input.Item;
@@ -114,6 +133,11 @@ public class DetailsModel : PageModel
         var i = await _db.Inspections.Include(x => x.Items).FirstOrDefaultAsync(x => x.Id == input.InspectionId);
         if (i is null) return NotFound();
         if (!CanMutate(i)) return Forbid();
+        if (InvalidInput(input) is string error)
+        {
+            TempData["Error"] = error;
+            return RedirectToPage(new { id = i.Id });
+        }
 
         var maxOrder = i.Items.Where(x => x.Room == input.Room).Select(x => (int?)x.Order).Max() ?? 0;
         _db.InspectionItems.Add(new InspectionItem
@@ -204,7 +228,8 @@ public class DetailsModel : PageModel
         if (i is null) return NotFound();
         if (!CanMutate(i)) return Forbid();
 
-        // Generate PDF.
+        // Set the completion date before building the PDF so the report shows it.
+        i.CompletedOn ??= DateOnly.FromDateTime(DateTime.Now);
         var pdfBytes = InspectionPdfBuilder.Build(i, TryLoadLogo());
         var kindLabel = i.Kind == InspectionKind.MoveIn ? "MoveIn" : "MoveOut";
         var fileName = $"{i.ScheduledFor:yyyyMMdd}_{kindLabel}_Inspection_{i.Lease?.Property?.Name}.pdf";
@@ -233,7 +258,6 @@ public class DetailsModel : PageModel
 
         i.GeneratedDocumentId = doc.Id;
         i.Status = InspectionStatus.Completed;
-        i.CompletedOn = DateOnly.FromDateTime(DateTime.Now);
         await _db.SaveChangesAsync();
 
         TempData["Message"] = "Inspection completed. Report attached to the lease.";
@@ -248,7 +272,7 @@ public class DetailsModel : PageModel
                 && p.InspectionItem!.InspectionId == id);
         if (photo is null) return NotFound();
         var stream = await _storage.OpenReadAsync(photo.StorageKey);
-        Response.Headers["Content-Disposition"] = $"inline; filename=\"{photo.FileName}\"";
+        PropertyPayPro.Infrastructure.InlineFileHeader.Set(Response, photo.FileName);
         return File(stream, photo.ContentType);
     }
 

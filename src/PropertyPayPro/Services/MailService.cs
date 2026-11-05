@@ -104,7 +104,13 @@ public class MailService
         var expenses = await _db.PropertyExpenses
             .Where(e => e.PropertyId == lease.PropertyId && e.PassThroughToTenant)
             .ToListAsync(ct);
-        var unreimbursed = expenses.Where(e => e.OutstandingReimbursement > 0).ToList();
+        // Only expenses from this lease's own term: a tenant isn't responsible for
+        // utilities from before they moved in or after they left.
+        var unreimbursed = expenses
+            .Where(e => e.OutstandingReimbursement > 0
+                && (e.DueDate is null
+                    || (e.DueDate >= lease.StartDate && (lease.IsMonthToMonth || e.DueDate <= lease.EndDate))))
+            .ToList();
 
         if (unreimbursed.Count == 0)
         {

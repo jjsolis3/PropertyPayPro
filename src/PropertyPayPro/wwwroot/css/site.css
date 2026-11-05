@@ -90,3 +90,7 @@ table.dataTable thead th.no-sort { background-image: none !important; cursor: de
    right above it; clear those floats so the table uses the full card width
    instead of being squeezed into the gap between them. */
 .dataTables_wrapper > .table-responsive { clear: both; width: 100%; }
+
+/* Forms list every validation error in their summary (asp-validation-summary="All")
+   so a problem with any field is visible; hide the empty summary when valid. */
+.validation-summary-valid { display: none; }
